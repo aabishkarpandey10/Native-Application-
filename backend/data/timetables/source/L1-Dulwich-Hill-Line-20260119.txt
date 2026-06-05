@@ -1,0 +1,575 @@
+L1 Dulwich Hill Line
+How to use this timetable
+This timetable provides a snapshot of service information in 24-hour time (e.g. 5am = 05:00, 5pm = 17:00).
+Information contained in this timetable is subject to change without notice. Please note that timetables do not
+include additional trips for special events, short term changes, holiday timetable changes, real-time information,
+trackwork or any disruption alerts.
+For the most up-to-date times, use the Trip Planner or Departures at transportnsw.info
+Real-time planning
+You can plan your trip with real-time information using the Trip Planner or Departures at transportnsw.info or
+by downloading travel apps on your smartphone or tablet.
+The Trip Planner, Departures and travel apps offer various features:
+favourite your regular trips
+see where your service is on the route
+get estimated pick-up and arrival times
+receive service updates
+find nearby stations, stops, wharves and routes
+check accessibility information.
+Find the latest apps at transportnsw.info/apps
+Accessible services
+All light rail vehicles and stops on the network are wheelchair accessible. However, some older stops may not
+have the facilities you need. Visit transportnsw.info to find stops with the facilities to help you get around.
+Who is providing my light rail services?
+The light rail services shown in this timetable are run by Sydney Light Rail.
+Fares
+In Sydney and surrounding regions, fares are based on:
+the distance you travel from tap on to tap off
+the mode of transport you choose
+whether you're eligible for a concession fare or free travel
+any Opal benefits such as discounts and capped fares that apply.
+You can use an Opal card or a contactless payment to pay for your travel.
+Opal cards
+An Opal card is a smartcard you keep and reuse. Add value before you travel, and tap on and tap off to pay your
+fares throughout Sydney, the Blue Mountains, the Central Coast, the Hunter and the Illawarra.
+Which Opal card is right for you?
+Adult – Customers 16 years or older who are not entitled to any concessions and normally pay full fare.
+Child/Youth – For customers aged 4-15 (inclusive), or customers 16 years or older who hold a NSW/ACT
+Senior Secondary Student Concession Card.
+Gold Senior/Pensioner – For eligible NSW and interstate seniors, pensioners, war widows/ers and asylum seekers.
+Concession – For eligible tertiary students, job seekers, apprentices and trainees.
+How to get an Opal card
+You can get an Adult or Child/Youth Opal card over the counter at Opal retailers that display the Opal sign . To
+find your nearest retailer visit transportnsw.info/opal
+If you are eligible to travel with concession fares, you can apply for a Gold Senior/Pensioner or Concession Opal
+card online. Visit transportnsw.info/opal for more information.
+Contactless payments
+If you have an American Express, Mastercard, Visa card or linked device, you can use it to pay for all public
+transport on the Opal network. Just make sure to tap on and tap off at Opal readers at the beginning and end of
+your trip.
+Always separate your cards when you tap on and tap off so your preferred card is charged.
+You will receive the same travel benefits of an Adult Opal card when you tap on and tap off consistently with the
+same credit card, debit card or linked device. This includes daily, weekly and weekend travel caps, and a $2
+transfer discount when you change between metro/train, ferry, bus and light rail services within 60 minutes.
+Adult Opal fare pricing applies.
+Find out more at transportnsw.info/contactless
+Explanation of definitions and symbols
+Wheelchair Accessible
+* Frequency based service, times are a guide only
+Light Rail operates as per frequency; all service times are approximate. Check customer information display for
+approximate time until next service.
+
+-- 1 of 6 --
+
+L1 Central to Dulwich Hill
+Valid from: 19 Jan 2026 Creation date: 23 Dec 2025
+NOTE: Information is correct on date of download.
+Monday to Thursday
+Service Information * * * * * * * * * * * * *
+Central 05:00 every
+15
+mins.
+06:00 every
+10
+mins.
+06:50 06:58 every
+6
+mins.
+09:58 every
+10
+mins.
+14:58 every
+6
+mins.
+18:58 19:07 19:15 every
+10
+mins.
+21:05 21:16 every
+15
+mins.
+00:46 01:00
+Exhibition Centre, Sydney 05:08 06:08 06:58 07:06 10:06 15:06 19:06 19:15 19:23 21:13 21:24 00:54 01:08
+Convention, Sydney 05:09 06:09 06:59 07:07 10:07 15:07 19:07 19:16 19:24 21:14 21:25 00:55 01:09
+The Star, Pyrmont 05:12 06:12 07:02 07:10 10:10 15:10 19:10 19:19 19:27 21:17 21:28 00:58 01:12
+John Street Square, Pyrmont 05:13 06:13 07:03 07:11 10:11 15:11 19:11 19:20 19:28 21:18 21:29 00:59 01:13
+Bank Street, Pyrmont 05:14 06:14 07:04 07:12 10:12 15:12 19:12 19:21 19:29 21:19 21:30 01:00 01:14
+Wentworth Park, Pyrmont 05:16 06:16 07:06 07:14 10:14 15:14 19:14 19:23 19:31 21:21 21:32 01:02 01:16
+Rozelle Bay, Annandale 05:20 06:20 07:10 07:18 10:18 15:18 19:18 19:27 19:35 21:25 21:36 01:06 01:20
+Lilyfield, Lilyfield 05:23 06:23 07:13 07:21 10:21 15:21 19:21 19:30 19:38 21:28 21:39 01:09 01:23
+Leichhardt North, Lilyfield 05:25 06:25 07:15 07:23 10:23 15:23 19:23 19:32 19:40 21:30 21:41 01:11 01:25
+Dulwich Hill, Dulwich Hill 05:36 06:36 07:26 07:34 10:34 15:34 19:34 19:43 19:51 21:41 21:52 01:22 01:36
+Friday
+Service Information * * * * * * * * * * * *
+Central 05:00 every
+15
+mins.
+06:00 every
+10
+mins.
+06:50 06:58 every
+6
+mins.
+09:58 every
+10
+mins.
+14:58 every
+6
+mins.
+18:58 19:05 every
+10
+mins.
+23:05 23:16 every
+15
+mins.
+00:46 01:00
+Exhibition Centre, Sydney 05:08 06:08 06:58 07:06 10:06 15:06 19:06 19:13 23:13 23:24 00:54 01:08
+Convention, Sydney 05:09 06:09 06:59 07:07 10:07 15:07 19:07 19:14 23:14 23:25 00:55 01:09
+The Star, Pyrmont 05:12 06:12 07:02 07:10 10:10 15:10 19:10 19:17 23:17 23:28 00:58 01:12
+John Street Square, Pyrmont 05:13 06:13 07:03 07:11 10:11 15:11 19:11 19:18 23:18 23:29 00:59 01:13
+Bank Street, Pyrmont 05:14 06:14 07:04 07:12 10:12 15:12 19:12 19:19 23:19 23:30 01:00 01:14
+Wentworth Park, Pyrmont 05:16 06:16 07:06 07:14 10:14 15:14 19:14 19:21 23:21 23:32 01:02 01:16
+Rozelle Bay, Annandale 05:20 06:20 07:10 07:18 10:18 15:18 19:18 19:25 23:25 23:36 01:06 01:20
+Lilyfield, Lilyfield 05:23 06:23 07:13 07:21 10:21 15:21 19:21 19:28 23:28 23:39 01:09 01:23
+Leichhardt North, Lilyfield 05:25 06:25 07:15 07:23 10:23 15:23 19:23 19:30 23:30 23:41 01:11 01:25
+Dulwich Hill, Dulwich Hill 05:36 06:36 07:26 07:34 10:34 15:34 19:34 19:41 23:41 23:52 01:22 01:36
+Saturday
+Service Information * * * * * * * * * *
+Central 05:00 every
+15
+mins.
+09:00 every
+10
+mins.
+09:50 09:58 every
+6
+mins.
+18:58 19:05 every
+10
+mins.
+23:05 23:16 every
+15
+mins.
+00:46 01:00
+Exhibition Centre, Sydney 05:08 09:08 09:58 10:06 19:06 19:13 23:13 23:24 00:54 01:08
+Convention, Sydney 05:09 09:09 09:59 10:07 19:07 19:14 23:14 23:25 00:55 01:09
+The Star, Pyrmont 05:12 09:12 10:02 10:10 19:10 19:17 23:17 23:28 00:58 01:12
+John Street Square, Pyrmont 05:13 09:13 10:03 10:11 19:11 19:18 23:18 23:29 00:59 01:13
+Bank Street, Pyrmont 05:14 09:14 10:04 10:12 19:12 19:19 23:19 23:30 01:00 01:14
+Wentworth Park, Pyrmont 05:16 09:16 10:06 10:14 19:14 19:21 23:21 23:32 01:02 01:16
+Rozelle Bay, Annandale 05:20 09:20 10:10 10:18 19:18 19:25 23:25 23:36 01:06 01:20
+Lilyfield, Lilyfield 05:23 09:23 10:13 10:21 19:21 19:28 23:28 23:39 01:09 01:23
+Leichhardt North, Lilyfield 05:25 09:25 10:15 10:23 19:23 19:30 23:30 23:41 01:11 01:25
+Dulwich Hill, Dulwich Hill 05:36 09:36 10:26 10:34 19:34 19:41 23:41 23:52 01:22 01:36
+
+-- 2 of 6 --
+
+L1 Central to Dulwich Hill
+Sunday & Public Holidays
+Service Information * * * * * * * * * *
+Central 05:00 every
+15
+mins.
+09:00 every
+10
+mins.
+09:50 09:58 every
+6
+mins.
+18:58 19:05 every
+10
+mins.
+21:05 21:16 every
+15
+mins.
+00:46 01:00
+Exhibition Centre, Sydney 05:08 09:08 09:58 10:06 19:06 19:13 21:13 21:24 00:54 01:08
+Convention, Sydney 05:09 09:09 09:59 10:07 19:07 19:14 21:14 21:25 00:55 01:09
+The Star, Pyrmont 05:12 09:12 10:02 10:10 19:10 19:17 21:17 21:28 00:58 01:12
+John Street Square, Pyrmont 05:13 09:13 10:03 10:11 19:11 19:18 21:18 21:29 00:59 01:13
+Bank Street, Pyrmont 05:14 09:14 10:04 10:12 19:12 19:19 21:19 21:30 01:00 01:14
+Wentworth Park, Pyrmont 05:16 09:16 10:06 10:14 19:14 19:21 21:21 21:32 01:02 01:16
+Rozelle Bay, Annandale 05:20 09:20 10:10 10:18 19:18 19:25 21:25 21:36 01:06 01:20
+Lilyfield, Lilyfield 05:23 09:23 10:13 10:21 19:21 19:28 21:28 21:39 01:09 01:23
+Leichhardt North, Lilyfield 05:25 09:25 10:15 10:23 19:23 19:30 21:30 21:41 01:11 01:25
+Dulwich Hill, Dulwich Hill 05:36 09:36 10:26 10:34 19:34 19:41 21:41 21:52 01:22 01:36
+
+-- 3 of 6 --
+
+L1 Dulwich Hill to Central
+Monday to Thursday
+Service Information * * * * * * * * * * * * * *
+Dulwich Hill, Dulwich Hill 05:00 every
+15
+mins.
+05:45 05:56 06:05 every
+10
+mins.
+06:55 07:03 every
+6
+mins.
+10:03 10:13 every
+10
+mins.
+14:53 14:58 15:03 every
+6
+mins.
+19:03 19:10 every
+10
+mins.
+21:00
+Leichhardt North, Lilyfield 05:11 05:56 06:07 06:16 07:06 07:14 10:14 10:24 15:04 15:09 15:14 19:14 19:21 21:11
+Lilyfield, Lilyfield 05:13 05:58 06:10 06:19 07:09 07:17 10:17 10:26 15:06 15:12 15:17 19:17 19:23 21:13
+Glebe, Glebe 05:18 06:03 06:15 06:24 07:14 07:22 10:22 10:31 15:11 15:17 15:22 19:22 19:28 21:18
+Wentworth Park, Pyrmont 05:20 06:05 06:17 06:26 07:16 07:24 10:24 10:33 15:13 15:19 15:24 19:24 19:30 21:20
+The Star, Pyrmont 05:24 06:09 06:20 06:29 07:19 07:27 10:27 10:37 15:17 15:22 15:27 19:27 19:34 21:24
+Pyrmont Bay, Pyrmont 05:25 06:10 06:22 06:31 07:21 07:29 10:29 10:38 15:18 15:24 15:29 19:29 19:35 21:25
+Convention, Sydney 05:26 06:11 06:23 06:32 07:22 07:30 10:30 10:39 15:19 15:25 15:30 19:30 19:36 21:26
+Exhibition Centre, Sydney 05:28 06:13 06:24 06:33 07:23 07:31 10:31 10:41 15:21 15:26 15:31 19:31 19:38 21:28
+Central 05:37 06:22 06:33 06:42 07:32 07:40 10:40 10:50 15:30 15:35 15:40 19:40 19:47 21:37
+Monday to Thursday
+Service Information * *
+Dulwich Hill, Dulwich Hill 21:15 every
+15
+mins.
+01:00
+Leichhardt North, Lilyfield 21:26 01:11
+Lilyfield, Lilyfield 21:28 01:13
+Glebe, Glebe 21:33 01:18
+Wentworth Park, Pyrmont 21:35 01:20
+The Star, Pyrmont 21:39 01:24
+Pyrmont Bay, Pyrmont 21:40 01:25
+Convention, Sydney 21:41 01:26
+Exhibition Centre, Sydney 21:43 01:28
+Central 21:52 01:37
+Friday
+Service Information * * * * * * * * * * * * * *
+Dulwich Hill, Dulwich Hill 05:00 every
+15
+mins.
+05:45 05:56 06:05 every
+10
+mins.
+06:55 07:03 every
+6
+mins.
+10:03 10:13 every
+10
+mins.
+14:53 14:58 15:03 every
+6
+mins.
+19:03 19:10 every
+10
+mins.
+23:00
+Leichhardt North, Lilyfield 05:11 05:56 06:07 06:16 07:06 07:14 10:14 10:24 15:04 15:09 15:14 19:14 19:21 23:11
+Lilyfield, Lilyfield 05:13 05:58 06:10 06:19 07:09 07:17 10:17 10:26 15:06 15:12 15:17 19:17 19:23 23:13
+Glebe, Glebe 05:18 06:03 06:15 06:24 07:14 07:22 10:22 10:31 15:11 15:17 15:22 19:22 19:28 23:18
+Wentworth Park, Pyrmont 05:20 06:05 06:17 06:26 07:16 07:24 10:24 10:33 15:13 15:19 15:24 19:24 19:30 23:20
+The Star, Pyrmont 05:24 06:09 06:20 06:29 07:19 07:27 10:27 10:37 15:17 15:22 15:27 19:27 19:34 23:24
+Pyrmont Bay, Pyrmont 05:25 06:10 06:22 06:31 07:21 07:29 10:29 10:38 15:18 15:24 15:29 19:29 19:35 23:25
+Convention, Sydney 05:26 06:11 06:23 06:32 07:22 07:30 10:30 10:39 15:19 15:25 15:30 19:30 19:36 23:26
+Exhibition Centre, Sydney 05:28 06:13 06:24 06:33 07:23 07:31 10:31 10:41 15:21 15:26 15:31 19:31 19:38 23:28
+Central 05:37 06:22 06:33 06:42 07:32 07:40 10:40 10:50 15:30 15:35 15:40 19:40 19:47 23:37
+Friday
+Service Information * *
+Dulwich Hill, Dulwich Hill 23:15 every
+15
+mins.
+01:00
+Leichhardt North, Lilyfield 23:26 01:11
+Lilyfield, Lilyfield 23:28 01:13
+Glebe, Glebe 23:33 01:18
+Wentworth Park, Pyrmont 23:35 01:20
+The Star, Pyrmont 23:39 01:24
+Pyrmont Bay, Pyrmont 23:40 01:25
+Convention, Sydney 23:41 01:26
+Exhibition Centre, Sydney 23:43 01:28
+Central 23:52 01:37
+
+-- 4 of 6 --
+
+L1 Dulwich Hill to Central
+Saturday
+Service Information * * * * * * * * * *
+Dulwich Hill, Dulwich Hill 05:00 every
+15
+mins.
+08:45 08:56 09:05 every
+10
+mins.
+09:55 10:03 every
+6
+mins.
+19:03 19:10 every
+10
+mins.
+23:00 01:00	every
+15
+mins.
+Leichhardt North, Lilyfield 05:11 08:56 09:07 09:16 10:06 10:14 19:14 19:21 23:11 01:11
+Lilyfield, Lilyfield 05:13 08:58 09:09 09:18 10:08 10:17 19:17 19:23 23:13 01:13
+Glebe, Glebe 05:18 09:03 09:14 09:23 10:13 10:22 19:22 19:28 23:18 01:18
+Wentworth Park, Pyrmont 05:20 09:05 09:16 09:25 10:15 10:24 19:24 19:30 23:20 01:20
+The Star, Pyrmont 05:24 09:09 09:20 09:29 10:19 10:27 19:27 19:34 23:24 01:24
+Pyrmont Bay, Pyrmont 05:25 09:10 09:21 09:30 10:20 10:29 19:29 19:35 23:25 01:25
+Convention, Sydney 05:26 09:11 09:22 09:31 10:21 10:30 19:30 19:36 23:26 01:26
+Exhibition Centre, Sydney 05:28 09:13 09:24 09:33 10:23 10:31 19:31 19:38 23:28 01:28
+Central 05:37 09:22 09:33 09:42 10:32 10:40 19:40 19:47 23:37 01:37
+Sunday & Public Holidays
+Service Information * * * * * * * * * *
+Dulwich Hill, Dulwich Hill 05:00 every
+15
+mins.
+08:45 08:56 09:05 every
+10
+mins.
+09:55 10:03 every
+6
+mins.
+19:03 19:10 every
+10
+mins.
+21:00 01:00	every
+15
+mins.
+Leichhardt North, Lilyfield 05:11 08:56 09:07 09:16 10:06 10:14 19:14 19:21 21:11 01:11
+Lilyfield, Lilyfield 05:13 08:58 09:09 09:18 10:08 10:17 19:17 19:23 21:13 01:13
+Glebe, Glebe 05:18 09:03 09:14 09:23 10:13 10:22 19:22 19:28 21:18 01:18
+Wentworth Park, Pyrmont 05:20 09:05 09:16 09:25 10:15 10:24 19:24 19:30 21:20 01:20
+The Star, Pyrmont 05:24 09:09 09:20 09:29 10:19 10:27 19:27 19:34 21:24 01:24
+Pyrmont Bay, Pyrmont 05:25 09:10 09:21 09:30 10:20 10:29 19:29 19:35 21:25 01:25
+Convention, Sydney 05:26 09:11 09:22 09:31 10:21 10:30 19:30 19:36 21:26 01:26
+Exhibition Centre, Sydney 05:28 09:13 09:24 09:33 10:23 10:31 19:31 19:38 21:28 01:28
+Central 05:37 09:22 09:33 09:42 10:32 10:40 19:40 19:47 21:37 01:37
+
+-- 5 of 6 --
+
+Light Rail Network
+L3
+L2
+Paddy’s
+	Markets
+Exhibition Centre
+Convention
+Pyrmont Bay
+The Star
+John Street
+Square
+Central
+Grand Concourse
+Central
+Chalmers Street
+Dulwich Hill
+Bank Street
+Wentworth
+Park
+Lewisham West
+Waratah Mills
+Arlington
+Dulwich Grove
+Jubilee Park
+	Glebe	
+Lilyfield	
+Leichhardt North
+Rozelle Bay
+Hawthorne
+Marion
+Taverners Hill
+L1
+L3
+L1
+Kingsford
+Juniors Kingsford
+UNSW Anzac Parade
+Kensington
+ES Marks
+Moore Park
+Royal Randwick
+Wansey Road
+UNSW High Street
+Randwick
+Surry Hills
+Town Hall
+QVB
+Wynyard
+Bridge Street
+L3 Circular Quay
+L2	L2
+Capitol Square
+Haymarket
+Chinatown
+Sydney light rail network
+Light Rail
+Sydney light rail lines
+L1 Dulwich Hill Line
+Dulwich Hill
+Central
+L2 Randwick Line
+Circular Quay
+Randwick
+L3 Kingsford Line
+Circular Quay
+Juniors Kingsford
+End of line	
+Stop
+Interchange
+Change between lines
+Copyright © 2025 Transport for NSW 	272x129.5_SLM_20251112
+Visit transportnsw.info
+Check timetables and trip planners
+for train services and connections
+Train towards
+Strathfield, Parramatta,
+Liverpool, Airport,
+Campbelltown,
+Bankstown
+& Sutherland
+Train
+towards
+Bondi
+Junction
+Train
+towards
+Hornsby
+	Train
+towards
+Sydney CBD
+Train
+towards
+Bankstown
+& Liverpool
+Circular Quay
+Station
+Wynyard
+Station
+Town Hall
+Station
+Martin Place
+Station
+St James
+Station
+Museum
+Station
+Central
+Station
+Marrickville
+Station
+Dulwich Hill
+Station
+Central Stop
+Capitol
+Square
+Stop
+Paddy’s
+Markets
+Stop
+Light rail
+towards
+Dulwich Hill
+423
+L23
+L23
+423
+L23
+426
+426
+Kingsgrove	423 L23 	City - Martin Place 423 L23 426
+Sydney CBD
+7am - 7pm
+weekdays
+Broadway
+7am - 7pm
+weekdays
+Joins Above Right
+Railway
+Square
+University of
+Technology
+Sydney
+Broadway
+Shopping
+Centre
+Park
+Cooks River
+Earlwood
+Shops
+Kingsgrove
+Bus Depot
+Hunt
+e
+r S t
+George St
+George St
+Castlereagh St
+Elizabeth St
+King St
+Market St
+Park St	Druitt St
+Pitt St
+Pitt St
+Bathurst St
+Liverpool St
+Goulburn St
+Hay St
+Eddy Ave
+Harris St
+Wattle St
+Abercrombie St
+Broadway
+Glebe Point Rd
+City Rd
+Parramatta Rd
+Cleveland St
+Edinburgh Rd
+Sydenham Rd
+Victoria Rd
+ille Rd
+Wardell R
+Illawarra Rd
+Bayview Ave
+Homer St
+	Wardell Rd
+	Earlwood Ave
+Hartill-Law Ave
+Homer St
+Bexley Rd
+William St
+Kingsgrove Rd
+Omnibus Rd
+Woolcott St
+Sydney
+Ultimo
+Chippendale
+Glebe
+Enmore	Marrickville
+Sydenham
+	Marrickville
+South
+Undercliffe
+Earlwood
+Turrella
+Clemton
+Park
+Belmore
+Kingsgrove
+Light rail line/stop	Bus route start/finish
+Train line/station
+Bus route
+Bus route number
+Legend
+423
+Diagrammatic Map
+Not to Scale
+	North
+transportnsw.info
+Route L23 to City
+Picks up and sets down as requested at all stops to Marrickville Rd & Garners Ave Marrickville, then Enmore Rd & Addison Rd Marrickville
+(Enmore Park), Enmore Rd & Stanmore Rd Enmore, Newtown Station, King St & Missenden Rd Newtown, The University of Sydney (City Rd &
+Butlin Ave), Broadway & Mountain St Ultimo, then all stops from Central Station Railway Square.
+Route L23 to Kingsgrove Depot
+Picks up and sets down as requested at all stops to Railway Square, then Broadway & Buckland St Ultimo, The University of Sydney (City Rd &
+Butlin Ave), King St & Missenden Rd Newtown, Newtown Station, Enmore Rd & Edgeware Rd Enmore, Enmore Rd & Addison Rd Marrickville
+(Enmore Park), then all stops from Marrickville Rd & Illawarra Rd Marrickville.
+
+-- 6 of 6 --
+

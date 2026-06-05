@@ -1,0 +1,28 @@
+# API only — use with: npm run docker:api
+# Pair with local Expo: npx expo start --web --port 8085
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sydney-transit-api
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+    volumes:
+      - api-data:/app/backend/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+
+volumes:
+  api-data:

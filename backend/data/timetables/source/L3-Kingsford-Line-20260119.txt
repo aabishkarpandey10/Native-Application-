@@ -1,0 +1,564 @@
+L3 Kingsford Line
+How to use this timetable
+This timetable provides a snapshot of service information in 24-hour time (e.g. 5am = 05:00, 5pm = 17:00).
+Information contained in this timetable is subject to change without notice. Please note that timetables do not
+include additional trips for special events, short term changes, holiday timetable changes, real-time information,
+trackwork or any disruption alerts.
+For the most up-to-date times, use the Trip Planner or Departures at transportnsw.info
+Real-time planning
+You can plan your trip with real-time information using the Trip Planner or Departures at transportnsw.info or
+by downloading travel apps on your smartphone or tablet.
+The Trip Planner, Departures and travel apps offer various features:
+favourite your regular trips
+see where your service is on the route
+get estimated pick-up and arrival times
+receive service updates
+find nearby stations, stops, wharves and routes
+check accessibility information.
+Find the latest apps at transportnsw.info/apps
+Accessible services
+All light rail vehicles and stops on the network are wheelchair accessible. However, some older stops may not
+have the facilities you need. Visit transportnsw.info to find stops with the facilities to help you get around.
+Who is providing my light rail services?
+The light rail services shown in this timetable are run by Sydney Light Rail.
+Fares
+In Sydney and surrounding regions, fares are based on:
+the distance you travel from tap on to tap off
+the mode of transport you choose
+whether you're eligible for a concession fare or free travel
+any Opal benefits such as discounts and capped fares that apply.
+You can use an Opal card or a contactless payment to pay for your travel.
+Opal cards
+An Opal card is a smartcard you keep and reuse. Add value before you travel, and tap on and tap off to pay your
+fares throughout Sydney, the Blue Mountains, the Central Coast, the Hunter and the Illawarra.
+Which Opal card is right for you?
+Adult – Customers 16 years or older who are not entitled to any concessions and normally pay full fare.
+Child/Youth – For customers aged 4-15 (inclusive), or customers 16 years or older who hold a NSW/ACT
+Senior Secondary Student Concession Card.
+Gold Senior/Pensioner – For eligible NSW and interstate seniors, pensioners, war widows/ers and asylum seekers.
+Concession – For eligible tertiary students, job seekers, apprentices and trainees.
+How to get an Opal card
+You can get an Adult or Child/Youth Opal card over the counter at Opal retailers that display the Opal sign . To
+find your nearest retailer visit transportnsw.info/opal
+If you are eligible to travel with concession fares, you can apply for a Gold Senior/Pensioner or Concession Opal
+card online. Visit transportnsw.info/opal for more information.
+Contactless payments
+If you have an American Express, Mastercard, Visa card or linked device, you can use it to pay for all public
+transport on the Opal network. Just make sure to tap on and tap off at Opal readers at the beginning and end of
+your trip.
+Always separate your cards when you tap on and tap off so your preferred card is charged.
+You will receive the same travel benefits of an Adult Opal card when you tap on and tap off consistently with the
+same credit card, debit card or linked device. This includes daily, weekly and weekend travel caps, and a $2
+transfer discount when you change between metro/train, ferry, bus and light rail services within 60 minutes.
+Adult Opal fare pricing applies.
+Find out more at transportnsw.info/contactless
+Explanation of definitions and symbols
+Wheelchair Accessible
+* Frequency based service, times are a guide only
+Light Rail operates as per frequency; all service times are approximate. Check customer information display for
+approximate time until next service
+
+-- 1 of 6 --
+
+L3 Circular Quay to Juniors Kingsford
+Valid from: 19 Jan 2026 Creation date: 23 Dec 2025
+NOTE: Information is correct on date of download.
+Monday to Thursday
+Service Information * * * * * * * * * * * * *
+Circular Quay, Sydney 05:10 05:22 every
+10-12
+mins.
+06:58 07:06 every
+8
+mins.
+09:22 09:30 09:38 every
+8
+mins.
+18:58 19:07 19:17 19:27 every
+10
+mins.
+22:27 01:02	every
+10-12
+mins.
+Bridge Street, Sydney 05:12 05:24 07:00 07:08 09:24 09:32 09:40 19:00 19:09 19:19 19:29 22:29 01:04
+Wynyard, Sydney 05:13 05:25 07:01 07:09 09:25 09:33 09:41 19:01 19:10 19:20 19:30 22:30 01:05
+QVB, Sydney 05:15 05:27 07:03 07:11 09:27 09:35 09:43 19:03 19:12 19:22 19:32 22:32 01:07
+Town Hall, Sydney 05:16 05:29 07:05 07:12 09:28 09:36 09:44 19:04 19:13 19:24 19:33 22:33 01:08
+Chinatown, Sydney 05:18 05:31 07:07 07:14 09:30 09:38 09:46 19:06 19:15 19:26 19:35 22:35 01:10
+Haymarket, Haymarket 05:21 05:33 07:09 07:17 09:33 09:41 09:49 19:09 19:18 19:28 19:38 22:38 01:13
+Central 05:23 05:36 07:12 07:19 09:35 09:43 09:51 19:11 19:20 19:31 19:40 22:40 01:15
+Surry Hills, Surry Hills 05:25 05:38 07:14 07:21 09:37 09:46 09:53 19:13 19:22 19:33 19:42 22:42 01:17
+Moore Park, Moore Park 05:29 05:41 07:17 07:25 09:41 09:49 09:57 19:17 19:26 19:36 19:46 22:46 01:21
+ES Marks, Kensington 05:32 05:45 07:21 07:28 09:44 09:52 10:00 19:20 19:29 19:40 19:49 22:49 01:24
+Kensington, Kensington 05:33 05:46 07:22 07:29 09:45 09:54 10:01 19:21 19:30 19:41 19:50 22:50 01:25
+UNSW Anzac Parade, Kensington 05:36 05:48 07:24 07:32 09:48 09:56 10:04 19:24 19:33 19:43 19:53 22:53 01:28
+Kingsford, Kingsford 05:38 05:50 07:26 07:34 09:50 09:58 10:06 19:26 19:35 19:45 19:55 22:55 01:30
+Juniors Kingsford, Kingsford 05:41 05:53 07:29 07:37 09:53 10:01 10:09 19:29 19:38 19:48 19:58 22:58 01:33
+Friday
+Service Information * * * * * * * * * *
+Circular Quay, Sydney 05:10 05:22 every
+10-12
+mins.
+06:58 07:06 every
+8
+mins.
+09:22 09:30 09:38 every
+8
+mins.
+19:06 19:15 every
+10
+mins.
+01:05
+Bridge Street, Sydney 05:12 05:24 07:00 07:08 09:24 09:32 09:40 19:08 19:17 01:07
+Wynyard, Sydney 05:13 05:25 07:01 07:09 09:25 09:33 09:41 19:09 19:18 01:08
+QVB, Sydney 05:15 05:27 07:03 07:11 09:27 09:35 09:43 19:11 19:20 01:10
+Town Hall, Sydney 05:16 05:29 07:05 07:12 09:28 09:36 09:44 19:12 19:21 01:11
+Chinatown, Sydney 05:18 05:31 07:07 07:14 09:30 09:38 09:46 19:14 19:23 01:13
+Haymarket, Haymarket 05:21 05:33 07:09 07:17 09:33 09:41 09:49 19:17 19:26 01:16
+Central 05:23 05:36 07:12 07:19 09:35 09:43 09:51 19:19 19:28 01:18
+Surry Hills, Surry Hills 05:25 05:38 07:14 07:21 09:37 09:46 09:53 19:21 19:30 01:20
+Moore Park, Moore Park 05:29 05:41 07:17 07:25 09:41 09:49 09:57 19:25 19:34 01:24
+ES Marks, Kensington 05:32 05:45 07:21 07:28 09:44 09:52 10:00 19:28 19:37 01:27
+Kensington, Kensington 05:33 05:46 07:22 07:29 09:45 09:54 10:01 19:29 19:38 01:28
+UNSW Anzac Parade, Kensington 05:36 05:48 07:24 07:32 09:48 09:56 10:04 19:32 19:41 01:31
+Kingsford, Kingsford 05:38 05:50 07:26 07:34 09:50 09:58 10:06 19:34 19:43 01:33
+Juniors Kingsford, Kingsford 05:41 05:53 07:29 07:37 09:53 10:01 10:09 19:37 19:46 01:36
+
+-- 2 of 6 --
+
+L3 Circular Quay to Juniors Kingsford
+Saturday
+* * * * *
+Circular Quay, Sydney 05:02 05:11 every
+15
+mins.
+06:56 every
+10
+mins.
+00:56 01:05
+Bridge Street, Sydney 05:04 05:13 06:58 00:58 01:07
+Wynyard, Sydney 05:05 05:14 06:59 00:59 01:08
+QVB, Sydney 05:07 05:16 07:01 01:01 01:10
+Town Hall, Sydney 05:09 05:18 07:03 01:03 01:12
+Chinatown, Sydney 05:11 05:20 07:05 01:05 01:14
+Haymarket, Haymarket 05:13 05:22 07:07 01:07 01:16
+Central 05:16 05:25 07:10 01:10 01:19
+Surry Hills, Surry Hills 05:18 05:27 07:12 01:12 01:21
+Moore Park, Moore Park 05:21 05:30 07:15 01:15 01:24
+ES Marks, Kensington 05:25 05:34 07:19 01:19 01:28
+Kensington, Kensington 05:26 05:35 07:20 01:20 01:29
+UNSW Anzac Parade, Kensington 05:28 05:37 07:22 01:22 01:31
+Kingsford, Kingsford 05:30 05:39 07:24 01:24 01:33
+Juniors Kingsford, Kingsford 05:33 05:42 07:27 01:27 01:36
+Sunday & Public Holidays
+Service Information * * * * * * * *
+Circular Quay, Sydney 05:03 every
+15
+mins.
+06:48 every
+10-12
+mins.
+07:20 07:30 every
+10
+mins.
+18:50 19:03 every
+15
+mins.
+00:48 00:59
+Bridge Street, Sydney 05:05 06:50 07:23 07:32 18:52 19:05 00:50 01:01
+Wynyard, Sydney 05:06 06:51 07:24 07:33 18:53 19:06 00:51 01:02
+QVB, Sydney 05:08 06:53 07:25 07:35 18:55 19:08 00:53 01:04
+Town Hall, Sydney 05:10 06:55 07:27 07:37 18:57 19:10 00:55 01:05
+Chinatown, Sydney 05:12 06:57 07:29 07:39 18:59 19:12 00:57 01:07
+Haymarket, Haymarket 05:14 06:59 07:31 07:41 19:01 19:14 00:59 01:10
+Central 05:17 07:02 07:34 07:44 19:04 19:17 01:02 01:12
+Surry Hills, Surry Hills 05:19 07:04 07:36 07:46 19:06 19:19 01:04 01:14
+Moore Park, Moore Park 05:22 07:07 07:40 07:49 19:09 19:22 01:07 01:18
+ES Marks, Kensington 05:26 07:11 07:43 07:53 19:13 19:26 01:11 01:21
+Kensington, Kensington 05:27 07:12 07:44 07:54 19:14 19:27 01:12 01:22
+UNSW Anzac Parade, Kensington 05:29 07:14 07:46 07:56 19:16 19:29 01:14 01:25
+Kingsford, Kingsford 05:31 07:16 07:48 07:58 19:18 19:31 01:16 01:27
+Juniors Kingsford, Kingsford 05:34 07:19 07:51 08:01 19:21 19:34 01:19 01:30
+
+-- 3 of 6 --
+
+L3 Juniors Kingsford to Circular Quay
+Monday to Thursday
+Service Information * * * * * * * * * * * * * * * * * *
+Juniors Kingsford, Kingsford 05:09 every
+10-12
+mins.
+06:20 06:29 06:37 06:45 06:53 07:01 every
+8
+mins.
+16:21 16:30 16:37 every
+8
+mins.
+18:21 18:30 18:37 18:45 18:53
+Kingsford, Kingsford 05:11 06:22 06:31 06:38 06:46 06:55 07:02 16:22 16:32 16:38 18:22 18:32 18:38 18:46 18:54
+UNSW Anzac Parade, Kensington 05:12 06:23 06:32 06:40 06:48 06:56 07:04 16:24 16:33 16:40 18:24 18:33 18:40 18:48 18:56
+Kensington, Kensington 05:15 06:26 06:35 06:42 06:50 06:59 07:06 16:26 16:36 16:42 18:26 18:36 18:42 18:50 18:58
+ES Marks, Kensington 05:16 06:27 06:36 06:43 06:51 07:00 07:07 16:27 16:37 16:43 18:27 18:37 18:43 18:51 18:59
+Moore Park, Moore Park 04:39 04:54 05:07 05:20 06:31 06:40 06:48 06:56 07:04 07:12 16:32 16:40 16:48 18:32 18:40 18:48 18:56 19:04
+Surry Hills, Surry Hills 04:42 04:57 05:10 05:23 06:34 06:43 06:51 06:59 07:07 07:15 16:35 16:43 16:51 18:35 18:43 18:51 18:59 19:07
+Central 04:45 05:00 05:13 05:26 06:37 06:46 06:53 07:01 07:10 07:17 16:37 16:45 16:53 18:37 18:45 18:53 19:01 19:09
+Haymarket, Haymarket 04:47 05:02 05:15 05:28 06:39 06:48 06:56 07:04 07:12 07:20 16:40 16:48 16:56 18:40 18:48 18:56 19:04 19:12
+Chinatown, Sydney 04:50 05:05 05:18 05:31 06:42 06:51 06:58 07:06 07:15 07:22 16:42 16:50 16:58 18:42 18:50 18:58 19:06 19:14
+Town Hall, Sydney 04:52 05:07 05:20 05:33 06:44 06:53 07:01 07:09 07:17 07:25 16:45 16:53 17:01 18:45 18:53 19:01 19:09 19:17
+QVB, Sydney 04:54 05:09 05:22 05:35 06:46 06:55 07:02 07:10 07:19 07:26 16:46 16:54 17:02 18:46 18:54 19:02 19:10 19:18
+Wynyard, Sydney 04:56 05:11 05:24 05:36 06:47 06:57 07:04 07:12 07:20 07:28 16:48 16:56 17:04 18:48 18:56 19:04 19:12 19:20
+Bridge Street, Sydney 04:57 05:12 05:25 05:38 06:49 06:58 07:05 07:13 07:22 07:29 16:49 16:57 17:05 18:49 18:57 19:05 19:13 19:21
+Circular Quay, Sydney 05:00 05:15 05:28 05:41 06:52 07:01 07:09 07:17 07:25 07:33 16:53 17:01 17:09 18:53 19:01 19:09 19:16 19:24
+Monday to Thursday
+Service Information * * * *
+Juniors Kingsford, Kingsford 19:01 19:10 every
+10
+mins.
+21:50 01:11	every
+10-12
+mins.
+Kingsford, Kingsford 19:02 19:11 21:51 01:12
+UNSW Anzac Parade, Kensington 19:04 19:13 21:53 01:14
+Kensington, Kensington 19:06 19:15 21:55 01:16
+ES Marks, Kensington 19:07 19:16 21:56 01:17
+Moore Park, Moore Park 19:12 19:21 22:01 01:22
+Surry Hills, Surry Hills 19:15 19:24 22:04 01:25
+Central 19:17 19:26 22:06 01:27
+Haymarket, Haymarket 19:20 19:29 22:09 01:30
+Chinatown, Sydney 19:22 19:31 22:11 01:32
+Town Hall, Sydney 19:25 19:34 22:14 01:35
+QVB, Sydney 19:26 19:35 22:15 01:36
+Wynyard, Sydney 19:28 19:37 22:17 01:38
+Bridge Street, Sydney 19:29 19:38 22:18 01:39
+Circular Quay, Sydney 19:33 19:42 22:22 01:43
+Friday
+Service Information * * * * * * * * * * * * * * * *
+Juniors Kingsford, Kingsford 05:09 every
+10-12
+mins.
+06:20 06:29 06:37 06:45 06:53 07:01 every
+8
+mins.
+16:21 16:30 16:37 every
+8
+mins.
+18:21 18:30 18:37 18:45 18:53 19:00
+Kingsford, Kingsford 05:11 06:22 06:31 06:38 06:46 06:55 07:02 16:22 16:32 16:38 18:22 18:32 18:38 18:46 18:54 19:01
+UNSW Anzac Parade, Kensington 05:12 06:23 06:32 06:40 06:48 06:56 07:04 16:24 16:33 16:40 18:24 18:33 18:40 18:48 18:56 19:03
+Kensington, Kensington 05:15 06:26 06:35 06:42 06:50 06:59 07:06 16:26 16:36 16:42 18:26 18:36 18:42 18:50 18:58 19:05
+ES Marks, Kensington 05:16 06:27 06:36 06:43 06:51 07:00 07:07 16:27 16:37 16:43 18:27 18:37 18:43 18:51 18:59 19:06
+Moore Park, Moore Park 05:20 06:31 06:40 06:48 06:56 07:04 07:12 16:32 16:40 16:48 18:32 18:40 18:48 18:56 19:04 19:11
+Surry Hills, Surry Hills 05:23 06:34 06:43 06:51 06:59 07:07 07:15 16:35 16:43 16:51 18:35 18:43 18:51 18:59 19:07 19:14
+Central 05:26 06:37 06:46 06:53 07:01 07:10 07:17 16:37 16:45 16:53 18:37 18:45 18:53 19:01 19:09 19:16
+Haymarket, Haymarket 05:28 06:39 06:48 06:56 07:04 07:12 07:20 16:40 16:48 16:56 18:40 18:48 18:56 19:04 19:12 19:19
+Chinatown, Sydney 05:31 06:42 06:51 06:58 07:06 07:15 07:22 16:42 16:50 16:58 18:42 18:50 18:58 19:06 19:14 19:21
+Town Hall, Sydney 05:33 06:44 06:53 07:01 07:09 07:17 07:25 16:45 16:53 17:01 18:45 18:53 19:01 19:09 19:17 19:24
+QVB, Sydney 05:35 06:46 06:55 07:02 07:10 07:19 07:26 16:46 16:54 17:02 18:46 18:54 19:02 19:10 19:18 19:25
+Wynyard, Sydney 05:36 06:47 06:57 07:04 07:12 07:20 07:28 16:48 16:56 17:04 18:48 18:56 19:04 19:12 19:20 19:27
+Bridge Street, Sydney 05:38 06:49 06:58 07:05 07:13 07:22 07:29 16:49 16:57 17:05 18:49 18:57 19:05 19:13 19:21 19:28
+Circular Quay, Sydney 05:41 06:52 07:01 07:09 07:17 07:25 07:33 16:53 17:01 17:09 18:53 19:01 19:09 19:16 19:26 19:32
+
+-- 4 of 6 --
+
+L3 Juniors Kingsford to Circular Quay
+Friday
+* *
+Juniors Kingsford, Kingsford 19:08 every
+10
+mins.
+01:08
+Kingsford, Kingsford 19:09 01:09
+UNSW Anzac Parade, Kensington 19:11 01:11
+Kensington, Kensington 19:13 01:13
+ES Marks, Kensington 19:14 01:14
+Moore Park, Moore Park 19:19 01:19
+Surry Hills, Surry Hills 19:22 01:22
+Central 19:24 01:24
+Haymarket, Haymarket 19:27 01:27
+Chinatown, Sydney 19:29 01:29
+Town Hall, Sydney 19:32 01:32
+QVB, Sydney 19:33 01:33
+Wynyard, Sydney 19:35 01:35
+Bridge Street, Sydney 19:36 01:36
+Circular Quay, Sydney 19:40 01:40
+Saturday
+Service Information * * * * * * * * * *
+Juniors Kingsford, Kingsford 05:01 05:14 every
+15
+mins.
+06:29 06:44 06:59 every
+10
+mins.
+00:59 01:08
+Kingsford, Kingsford 05:03 05:16 06:31 06:46 07:01 01:01 01:10
+UNSW Anzac Parade, Kensington 05:04 05:17 06:32 06:47 07:02 01:02 01:11
+Kensington, Kensington 05:07 05:20 06:35 06:50 07:05 01:05 01:14
+ES Marks, Kensington 05:08 05:21 06:36 06:51 07:06 01:06 01:15
+Moore Park, Moore Park 04:44 04:57 05:12 05:25 06:40 06:51 06:55 07:10 01:10 01:19
+Surry Hills, Surry Hills 04:47 05:00 05:15 05:28 06:43 06:54 06:58 07:13 01:13 01:22
+Central 04:49 05:02 05:18 05:31 06:46 06:56 07:01 07:16 01:16 01:25
+Haymarket, Haymarket 04:52 05:05 05:20 05:33 06:48 06:59 07:03 07:18 01:18 01:27
+Chinatown, Sydney 04:54 05:07 05:23 05:36 06:51 07:01 07:06 07:21 01:21 01:30
+Town Hall, Sydney 04:57 05:10 05:25 05:38 06:53 07:04 07:08 07:23 01:23 01:32
+QVB, Sydney 04:58 05:11 05:27 05:40 06:55 07:05 07:10 07:25 01:25 01:34
+Wynyard, Sydney 05:00 05:13 05:28 05:41 06:56 07:07 07:11 07:26 01:26 01:35
+Bridge Street, Sydney 05:01 05:14 05:30 05:43 06:58 07:08 07:13 07:28 01:28 01:37
+Circular Quay, Sydney 05:05 05:18 05:33 05:46 07:01 07:12 07:16 07:31 01:31 01:40
+Sunday & Public Holidays
+Service Information * * * * * * * * * *
+Juniors Kingsford, Kingsford 05:03 every
+15
+mins.
+06:33 06:48 07:03 every
+10
+mins.
+19:03 00:48	every
+15
+mins.
+00:58
+Kingsford, Kingsford 05:05 06:35 06:50 07:05 19:05 00:50 01:00
+UNSW Anzac Parade, Kensington 05:06 06:36 06:51 07:06 19:06 00:51 01:01
+Kensington, Kensington 05:09 06:39 06:54 07:09 19:09 00:54 01:04
+ES Marks, Kensington 05:10 06:40 06:55 07:10 19:10 00:55 01:05
+Moore Park, Moore Park 04:48 05:01 05:14 06:44 06:54 06:59 07:14 19:14 00:59 01:09
+Surry Hills, Surry Hills 04:51 05:04 05:17 06:47 06:57 07:02 07:17 19:17 01:02 01:12
+Central 04:53 05:06 05:20 06:50 06:59 07:05 07:20 19:20 01:05 01:15
+Haymarket, Haymarket 04:56 05:09 05:22 06:52 07:02 07:07 07:22 19:22 01:07 01:17
+Chinatown, Sydney 04:58 05:11 05:25 06:55 07:04 07:10 07:25 19:25 01:10 01:20
+Town Hall, Sydney 05:01 05:14 05:27 06:57 07:07 07:12 07:27 19:27 01:12 01:22
+QVB, Sydney 05:02 05:15 05:29 06:59 07:08 07:14 07:29 19:29 01:14 01:24
+Wynyard, Sydney 05:04 05:17 05:30 07:00 07:10 07:15 07:30 19:30 01:15 01:25
+Bridge Street, Sydney 05:05 05:18 05:32 07:02 07:11 07:17 07:32 19:32 01:17 01:27
+Circular Quay, Sydney 05:09 05:22 05:35 07:05 07:15 07:20 07:35 19:35 01:20 01:30
+
+-- 5 of 6 --
+
+Light Rail Network
+L3
+L2
+Paddy’s
+	Markets
+Exhibition Centre
+Convention
+Pyrmont Bay
+The Star
+John Street
+Square
+Central
+Grand Concourse
+Central
+Chalmers Street
+Dulwich Hill
+Bank Street
+Wentworth
+Park
+Lewisham West
+Waratah Mills
+Arlington
+Dulwich Grove
+Jubilee Park
+	Glebe	
+Lilyfield	
+Leichhardt North
+Rozelle Bay
+Hawthorne
+Marion
+Taverners Hill
+L1
+L3
+L1
+Kingsford
+Juniors Kingsford
+UNSW Anzac Parade
+Kensington
+ES Marks
+Moore Park
+Royal Randwick
+Wansey Road
+UNSW High Street
+Randwick
+Surry Hills
+Town Hall
+QVB
+Wynyard
+Bridge Street
+L3 Circular Quay
+L2	L2
+Capitol Square
+Haymarket
+Chinatown
+Sydney light rail network
+Light Rail
+Sydney light rail lines
+L1 Dulwich Hill Line
+Dulwich Hill
+Central
+L2 Randwick Line
+Circular Quay
+Randwick
+L3 Kingsford Line
+Circular Quay
+Juniors Kingsford
+End of line	
+Stop
+Interchange
+Change between lines
+Copyright © 2025 Transport for NSW 	272x129.5_SLM_20251112
+Visit transportnsw.info
+Check timetables and trip planners
+for train services and connections
+Train towards
+Strathfield, Parramatta,
+Liverpool, Airport,
+Campbelltown,
+Bankstown
+& Sutherland
+Train
+towards
+Bondi
+Junction
+Train
+towards
+Hornsby
+	Train
+towards
+Sydney CBD
+Train
+towards
+Bankstown
+& Liverpool
+Circular Quay
+Station
+Wynyard
+Station
+Town Hall
+Station
+Martin Place
+Station
+St James
+Station
+Museum
+Station
+Central
+Station
+Marrickville
+Station
+Dulwich Hill
+Station
+Central Stop
+Capitol
+Square
+Stop
+Paddy’s
+Markets
+Stop
+Light rail
+towards
+Dulwich Hill
+423
+L23
+L23
+423
+L23
+426
+426
+Kingsgrove	423 L23 	City - Martin Place 423 L23 426
+Sydney CBD
+7am - 7pm
+weekdays
+Broadway
+7am - 7pm
+weekdays
+Joins Above Right
+Railway
+Square
+University of
+Technology
+Sydney
+Broadway
+Shopping
+Centre
+Park
+Cooks River
+Earlwood
+Shops
+Kingsgrove
+Bus Depot
+Hunt
+e
+r S t
+George St
+George St
+Castlereagh St
+Elizabeth St
+King St
+Market St
+Park St	Druitt St
+Pitt St
+Pitt St
+Bathurst St
+Liverpool St
+Goulburn St
+Hay St
+Eddy Ave
+Harris St
+Wattle St
+Abercrombie St
+Broadway
+Glebe Point Rd
+City Rd
+Parramatta Rd
+Cleveland St
+Edinburgh Rd
+Sydenham Rd
+Victoria Rd
+ille Rd
+Wardell R
+Illawarra Rd
+Bayview Ave
+Homer St
+	Wardell Rd
+	Earlwood Ave
+Hartill-Law Ave
+Homer St
+Bexley Rd
+William St
+Kingsgrove Rd
+Omnibus Rd
+Woolcott St
+Sydney
+Ultimo
+Chippendale
+Glebe
+Enmore	Marrickville
+Sydenham
+	Marrickville
+South
+Undercliffe
+Earlwood
+Turrella
+Clemton
+Park
+Belmore
+Kingsgrove
+Light rail line/stop	Bus route start/finish
+Train line/station
+Bus route
+Bus route number
+Legend
+423
+Diagrammatic Map
+Not to Scale
+	North
+transportnsw.info
+Route L23 to City
+Picks up and sets down as requested at all stops to Marrickville Rd & Garners Ave Marrickville, then Enmore Rd & Addison Rd Marrickville
+(Enmore Park), Enmore Rd & Stanmore Rd Enmore, Newtown Station, King St & Missenden Rd Newtown, The University of Sydney (City Rd &
+Butlin Ave), Broadway & Mountain St Ultimo, then all stops from Central Station Railway Square.
+Route L23 to Kingsgrove Depot
+Picks up and sets down as requested at all stops to Railway Square, then Broadway & Buckland St Ultimo, The University of Sydney (City Rd &
+Butlin Ave), King St & Missenden Rd Newtown, Newtown Station, Enmore Rd & Edgeware Rd Enmore, Enmore Rd & Addison Rd Marrickville
+(Enmore Park), then all stops from Marrickville Rd & Illawarra Rd Marrickville.
+
+-- 6 of 6 --
+

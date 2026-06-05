@@ -1,0 +1,21 @@
+{
+  "name": "sydney-transit-backend",
+  "version": "2.0.0",
+  "description": "TripView-style backend API — real-time NSW transport, trip planner, WebSocket",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/**/*.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "gtfs-realtime-bindings": "^2.0.0",
+    "ioredis": "^5.6.1",
+    "jsonwebtoken": "^9.0.2",
+    "ws": "^8.18.1"
+  }
+}

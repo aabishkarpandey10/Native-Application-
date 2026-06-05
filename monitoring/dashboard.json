@@ -1,0 +1,37 @@
+{
+  "dashboard": {
+    "title": "TripView API Monitoring",
+    "panels": [
+      {
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [{ "expr": "rate(http_requests_total[5m])", "legend": "{{method}} {{path}}" }]
+      },
+      {
+        "title": "P95 Latency",
+        "type": "graph",
+        "targets": [{ "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))" }]
+      },
+      {
+        "title": "TfNSW Outage Mode",
+        "type": "stat",
+        "targets": [{ "expr": "tripview_tfnsw_outage_mode" }]
+      },
+      {
+        "title": "WebSocket Connections",
+        "type": "graph",
+        "targets": [{ "expr": "tripview_websocket_connections_active" }]
+      },
+      {
+        "title": "Cache Hit Rate",
+        "type": "gauge",
+        "targets": [{ "expr": "rate(tripview_cache_hits_total[5m]) / rate(tripview_cache_requests_total[5m])" }]
+      },
+      {
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [{ "expr": "rate(http_requests_total{status=~\"5..\"}[5m])" }]
+      }
+    ]
+  }
+}

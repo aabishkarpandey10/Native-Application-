@@ -1,0 +1,79 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tripview-ingress
+  namespace: tripview
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/websocket-services: tripview-api
+spec:
+  tls:
+    - hosts:
+        - api.tripview.example.com
+        - app.tripview.example.com
+      secretName: tripview-tls
+  rules:
+    - host: api.tripview.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tripview-api
+                port:
+                  number: 80
+    - host: app.tripview.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tripview-web
+                port:
+                  number: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tripview-web
+  namespace: tripview
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tripview-web
+  template:
+    metadata:
+      labels:
+        app: tripview-web
+    spec:
+      containers:
+        - name: web
+          image: tripview/web:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tripview-web
+  namespace: tripview
+spec:
+  selector:
+    app: tripview-web
+  ports:
+    - port: 80
+      targetPort: 80

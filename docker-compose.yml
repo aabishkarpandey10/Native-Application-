@@ -1,0 +1,50 @@
+# Sydney Transit — Docker full stack
+#   npm run setup:env          # create .env from .env.example (once)
+#   npm run docker:up          # build & start API + web
+#
+#   App:   http://localhost:8085
+#   API:   http://localhost:3000
+#   Admin: http://localhost:3000/admin
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: sydney-transit-api
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+    volumes:
+      - api-data:/app/backend/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:-http://localhost:3000}
+        EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL:-}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY:-}
+        EXPO_PUBLIC_SENTRY_DSN: ${EXPO_PUBLIC_SENTRY_DSN:-}
+    container_name: sydney-transit-web
+    ports:
+      - "${WEB_PORT:-8085}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  api-data:

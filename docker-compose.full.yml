@@ -1,0 +1,100 @@
+# Full production stack: API + Web + Postgres + Redis + RabbitMQ
+# Usage: docker compose -f docker-compose.full.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tripview-postgres
+    environment:
+      POSTGRES_USER: tripview
+      POSTGRES_PASSWORD: tripview_dev
+      POSTGRES_DB: tripview
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./supabase/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./supabase/schema-extended.sql:/docker-entrypoint-initdb.d/02-extended.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tripview"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tripview-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: tripview-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: tripview
+      RABBITMQ_DEFAULT_PASS: tripview_dev
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: tripview-api
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      REDIS_ENABLED: "true"
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://tripview:tripview_dev@postgres:5432/tripview
+      RABBITMQ_URL: amqp://tripview:tripview_dev@rabbitmq:5672
+    volumes:
+      - api-data:/app/backend/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:-http://localhost:3000}
+    container_name: tripview-web
+    ports:
+      - "${WEB_PORT:-8085}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  api-data:

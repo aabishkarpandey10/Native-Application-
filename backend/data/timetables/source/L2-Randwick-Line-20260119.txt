@@ -1,0 +1,549 @@
+L2 Randwick Line
+How to use this timetable
+This timetable provides a snapshot of service information in 24-hour time (e.g. 5am = 05:00, 5pm = 17:00).
+Information contained in this timetable is subject to change without notice. Please note that timetables do not
+include additional trips for special events, short term changes, holiday timetable changes, real-time information,
+trackwork or any disruption alerts.
+For the most up-to-date times, use the Trip Planner or Departures at transportnsw.info
+Real-time planning
+You can plan your trip with real-time information using the Trip Planner or Departures at transportnsw.info or
+by downloading travel apps on your smartphone or tablet.
+The Trip Planner, Departures and travel apps offer various features:
+favourite your regular trips
+see where your service is on the route
+get estimated pick-up and arrival times
+receive service updates
+find nearby stations, stops, wharves and routes
+check accessibility information.
+Find the latest apps at transportnsw.info/apps
+Accessible services
+All light rail vehicles and stops on the network are wheelchair accessible. However, some older stops may not
+have the facilities you need. Visit transportnsw.info to find stops with the facilities to help you get around.
+Who is providing my light rail services?
+The light rail services shown in this timetable are run by Sydney Light Rail.
+Fares
+In Sydney and surrounding regions, fares are based on:
+the distance you travel from tap on to tap off
+the mode of transport you choose
+whether you're eligible for a concession fare or free travel
+any Opal benefits such as discounts and capped fares that apply.
+You can use an Opal card or a contactless payment to pay for your travel.
+Opal cards
+An Opal card is a smartcard you keep and reuse. Add value before you travel, and tap on and tap off to pay your
+fares throughout Sydney, the Blue Mountains, the Central Coast, the Hunter and the Illawarra.
+Which Opal card is right for you?
+Adult – Customers 16 years or older who are not entitled to any concessions and normally pay full fare.
+Child/Youth – For customers aged 4-15 (inclusive), or customers 16 years or older who hold a NSW/ACT
+Senior Secondary Student Concession Card.
+Gold Senior/Pensioner – For eligible NSW and interstate seniors, pensioners, war widows/ers and asylum seekers.
+Concession – For eligible tertiary students, job seekers, apprentices and trainees.
+How to get an Opal card
+You can get an Adult or Child/Youth Opal card over the counter at Opal retailers that display the Opal sign . To
+find your nearest retailer visit transportnsw.info/opal
+If you are eligible to travel with concession fares, you can apply for a Gold Senior/Pensioner or Concession Opal
+card online. Visit transportnsw.info/opal for more information.
+Contactless payments
+If you have an American Express, Mastercard, Visa card or linked device, you can use it to pay for all public
+transport on the Opal network. Just make sure to tap on and tap off at Opal readers at the beginning and end of
+your trip.
+Always separate your cards when you tap on and tap off so your preferred card is charged.
+You will receive the same travel benefits of an Adult Opal card when you tap on and tap off consistently with the
+same credit card, debit card or linked device. This includes daily, weekly and weekend travel caps, and a $2
+transfer discount when you change between metro/train, ferry, bus and light rail services within 60 minutes.
+Adult Opal fare pricing applies.
+Find out more at transportnsw.info/contactless
+Explanation of definitions and symbols
+Wheelchair Accessible
+* Frequency based service, times are a guide only
+Light Rail operates as per frequency; all service times are approximate. Check customer information display for
+approximate time until next service.
+
+-- 1 of 6 --
+
+L2 Circular Quay to Randwick
+Valid from: 19 Jan 2026 Creation date: 23 Dec 2025
+NOTE: Information is correct on date of download.
+Monday to Thursday
+Service Information * * * * * * * * * * *
+Circular Quay, Sydney 05:04 every
+9-13
+mins.
+07:02 every
+8
+mins.
+16:22 16:30 16:38 every
+8
+mins.
+18:22 18:30 18:38 every
+8
+mins.
+19:02 22:32	every
+10
+mins.
+01:08	every
+9-13
+mins.
+Bridge Street, Sydney 05:06 07:04 16:24 16:32 16:40 18:24 18:32 18:40 19:04 22:34 01:10
+Wynyard, Sydney 05:07 07:05 16:25 16:33 16:41 18:25 18:33 18:41 19:05 22:35 01:11
+QVB, Sydney 05:09 07:07 16:27 16:35 16:43 18:27 18:35 18:43 19:07 22:37 01:13
+Town Hall, Sydney 05:10 07:08 16:28 16:36 16:44 18:28 18:36 18:44 19:08 22:38 01:14
+Chinatown, Sydney 05:12 07:10 16:30 16:38 16:46 18:30 18:38 18:46 19:10 22:40 01:16
+Haymarket, Haymarket 05:15 07:13 16:33 16:41 16:49 18:33 18:41 18:49 19:13 22:43 01:19
+Central 05:17 07:15 16:35 16:43 16:51 18:35 18:43 18:51 19:15 22:45 01:21
+Surry Hills, Surry Hills 05:19 07:17 16:37 16:46 16:53 18:37 18:46 18:53 19:17 22:47 01:23
+Moore Park, Moore Park 05:23 07:21 16:41 16:49 16:57 18:41 18:49 18:57 19:21 22:51 01:27
+Royal Randwick, Centennial Park 05:26 07:24 16:44 16:53 17:00 18:44 18:53 19:00 19:24 22:54 01:30
+Wansey Road, Randwick 05:29 07:27 16:47 16:55 17:03 18:47 18:55 19:03 19:27 22:57 01:33
+UNSW High Street, Randwick 05:31 07:29 16:49 16:57 17:05 18:49 18:57 19:05 19:29 22:59 01:35
+Randwick, Randwick 05:35 07:33 16:53 17:01 17:09 18:53 19:01 19:09 19:33 23:03 01:39
+Friday
+Service Information * * * * * * * * * * *
+Circular Quay, Sydney 05:04 every
+9-13
+mins.
+07:02 every
+8
+mins.
+16:22 16:30 16:38 every
+8
+mins.
+18:22 18:30 18:38 every
+8
+mins.
+19:02 every
+9-13
+mins.
+19:50 every
+10
+mins.
+01:10
+Bridge Street, Sydney 05:06 07:04 16:24 16:32 16:40 18:24 18:32 18:40 19:04 19:52 01:12
+Wynyard, Sydney 05:07 07:05 16:25 16:33 16:41 18:25 18:33 18:41 19:05 19:53 01:13
+QVB, Sydney 05:09 07:07 16:27 16:35 16:43 18:27 18:35 18:43 19:07 19:55 01:15
+Town Hall, Sydney 05:10 07:08 16:28 16:36 16:44 18:28 18:36 18:44 19:08 19:56 01:16
+Chinatown, Sydney 05:12 07:10 16:30 16:38 16:46 18:30 18:38 18:46 19:10 19:58 01:18
+Haymarket, Haymarket 05:15 07:13 16:33 16:41 16:49 18:33 18:41 18:49 19:13 20:01 01:21
+Central 05:17 07:15 16:35 16:43 16:51 18:35 18:43 18:51 19:15 20:03 01:23
+Surry Hills, Surry Hills 05:19 07:17 16:37 16:46 16:53 18:37 18:46 18:53 19:17 20:05 01:25
+Moore Park, Moore Park 05:23 07:21 16:41 16:49 16:57 18:41 18:49 18:57 19:21 20:09 01:29
+Royal Randwick, Centennial Park 05:26 07:24 16:44 16:53 17:00 18:44 18:53 19:00 19:24 20:12 01:32
+Wansey Road, Randwick 05:29 07:27 16:47 16:55 17:03 18:47 18:55 19:03 19:27 20:15 01:35
+UNSW High Street, Randwick 05:31 07:29 16:49 16:57 17:05 18:49 18:57 19:05 19:29 20:17 01:37
+Randwick, Randwick 05:35 07:33 16:53 17:01 17:09 18:53 19:01 19:09 19:33 20:21 01:41
+
+-- 2 of 6 --
+
+L2 Circular Quay to Randwick
+Saturday
+Service Information * * * * * * * * * * * * *
+Circular Quay, Sydney 05:09 05:22 every
+15
+mins.
+06:37 06:52 07:02 07:12 07:21 every
+10
+mins.
+18:51 19:01 19:11 every
+10
+mins.
+00:51 01:01 01:10
+Bridge Street, Sydney 05:11 05:24 06:39 06:54 07:04 07:14 07:23 18:53 19:03 19:13 00:53 01:03 01:12
+Wynyard, Sydney 05:12 05:25 06:40 06:55 07:05 07:15 07:24 18:54 19:04 19:14 00:54 01:04 01:13
+QVB, Sydney 05:14 05:27 06:42 06:57 07:07 07:17 07:26 18:56 19:06 19:16 00:56 01:06 01:15
+Town Hall, Sydney 05:16 05:29 06:44 06:58 07:08 07:19 07:28 18:58 19:07 19:18 00:58 01:07 01:16
+Chinatown, Sydney 05:18 05:31 06:46 07:00 07:10 07:21 07:30 19:00 19:09 19:20 01:00 01:09 01:18
+Haymarket, Haymarket 05:20 05:33 06:48 07:03 07:13 07:23 07:32 19:02 19:12 19:22 01:02 01:12 01:21
+Central 05:23 05:36 06:51 07:05 07:15 07:26 07:35 19:05 19:14 19:25 01:05 01:14 01:23
+Surry Hills, Surry Hills 05:25 05:38 06:53 07:07 07:17 07:28 07:37 19:07 19:16 19:27 01:07 01:16 01:25
+Moore Park, Moore Park 05:28 05:41 06:56 07:11 07:21 07:31 07:40 19:10 19:20 19:30 01:10 01:20 01:29
+Royal Randwick, Centennial Park 05:32 05:45 07:00 07:14 07:24 07:35 07:44 19:14 19:23 19:34 01:14 01:23 01:32
+Wansey Road, Randwick 05:34 05:47 07:02 07:17 07:27 07:37 07:46 19:16 19:26 19:36 01:16 01:26 01:35
+UNSW High Street, Randwick 05:37 05:50 07:05 07:19 07:29 07:40 07:49 19:19 19:28 19:39 01:19 01:28 01:37
+Randwick, Randwick 05:40 05:53 07:08 07:23 07:33 07:43 07:52 19:22 19:32 19:42 01:22 01:32 01:41
+Sunday & Public Holidays
+Service Information * * * * * * * *
+Circular Quay, Sydney 05:11 every
+15
+mins.
+06:41 06:55 07:05 every
+10
+mins.
+18:55 19:11 every
+15
+mins.
+00:56 01:06
+Bridge Street, Sydney 05:13 06:43 06:57 07:07 18:57 19:13 00:58 01:08
+Wynyard, Sydney 05:14 06:44 06:58 07:08 18:58 19:14 00:59 01:09
+QVB, Sydney 05:16 06:46 07:00 07:10 19:00 19:16 01:01 01:11
+Town Hall, Sydney 05:17 06:47 07:01 07:12 19:02 19:17 01:02 01:12
+Chinatown, Sydney 05:19 06:49 07:03 07:14 19:04 19:19 01:04 01:14
+Haymarket, Haymarket 05:22 06:52 07:06 07:16 19:06 19:22 01:07 01:17
+Central 05:24 06:54 07:08 07:19 19:09 19:24 01:09 01:19
+Surry Hills, Surry Hills 05:26 06:56 07:10 07:21 19:11 19:26 01:11 01:21
+Moore Park, Moore Park 05:30 07:00 07:14 07:24 19:14 19:30 01:15 01:25
+Royal Randwick, Centennial Park 05:33 07:03 07:17 07:28 19:18 19:33 01:18 01:28
+Wansey Road, Randwick 05:36 07:06 07:20 07:30 19:20 19:36 01:21 01:31
+UNSW High Street, Randwick 05:38 07:08 07:22 07:33 19:23 19:38 01:23 01:33
+Randwick, Randwick 05:42 07:12 07:26 07:36 19:26 19:42 01:27 01:37
+
+-- 3 of 6 --
+
+L2 Randwick to Circular Quay
+Monday to Thursday
+Service Information * * * * * * * * * * * * * *
+Randwick, Randwick 05:04 every
+9-13
+mins.
+06:25 06:33 06:41 every
+8
+mins.
+09:21 09:30 09:37 every
+8
+mins.
+18:49 18:57 19:05 every
+10
+mins.
+21:55 01:07	every
+9-13
+mins.
+UNSW High Street, Randwick 05:05 06:27 06:35 06:42 09:22 09:32 09:38 18:50 18:58 19:06 21:56 01:08
+Wansey Road, Randwick 05:08 06:29 06:37 06:45 09:25 09:34 09:41 18:53 19:01 19:09 21:59 01:11
+Royal Randwick, Centennial Park 05:10 06:31 06:40 06:47 09:27 09:37 09:43 18:55 19:03 19:11 22:01 01:13
+Moore Park, Moore Park 04:47 05:01 05:15 06:36 06:44 06:52 09:32 09:40 09:48 19:00 19:08 19:16 22:06 01:18
+Surry Hills, Surry Hills 04:50 05:04 05:18 06:39 06:47 06:55 09:35 09:42 09:51 19:03 19:11 19:19 22:09 01:21
+Central 04:53 05:07 05:20 06:42 06:50 06:57 09:37 09:45 09:53 19:05 19:13 19:21 22:11 01:23
+Haymarket, Haymarket 04:55 05:09 05:23 06:44 06:52 07:00 09:40 09:48 09:56 19:08 19:16 19:24 22:14 01:26
+Chinatown, Sydney 04:57 05:11 05:25 06:46 06:55 07:02 09:42 09:50 09:58 19:10 19:18 19:26 22:16 01:28
+Town Hall, Sydney 05:00 05:14 05:28 06:49 06:57 07:05 09:45 09:53 10:01 19:13 19:21 19:29 22:19 01:31
+QVB, Sydney 05:01 05:15 05:29 06:50 06:59 07:06 09:46 09:54 10:02 19:14 19:22 19:30 22:20 01:32
+Wynyard, Sydney 05:03 05:17 05:31 06:52 07:00 07:08 09:48 09:56 10:04 19:16 19:24 19:32 22:22 01:34
+Bridge Street, Sydney 05:04 05:18 05:32 06:53 07:02 07:09 09:49 09:57 10:05 19:17 19:25 19:33 22:23 01:35
+Circular Quay, Sydney 05:08 05:22 05:36 06:57 07:05 07:13 09:53 10:01 10:09 19:21 19:31 19:37 22:27 01:39
+Friday
+Service Information * * * * * * * * * * * * * * * *
+Randwick, Randwick 05:04 every
+9-13
+mins.
+06:25 06:33 06:41 every
+8
+mins.
+09:21 09:30 09:37 every
+8
+mins.
+18:41 18:49 18:56 19:04
+UNSW High Street, Randwick 05:05 06:27 06:35 06:42 09:22 09:32 09:38 18:42 18:50 18:58 19:05
+Wansey Road, Randwick 05:08 06:29 06:37 06:45 09:25 09:34 09:41 18:45 18:53 19:00 19:08
+Royal Randwick, Centennial Park 05:10 06:31 06:40 06:47 09:27 09:37 09:43 18:47 18:55 19:03 19:10
+Moore Park, Moore Park 04:42 04:49 04:56 05:03 05:10 05:15 06:36 06:44 06:52 09:32 09:40 09:48 18:52 19:00 19:07 19:15
+Surry Hills, Surry Hills 04:44 04:52 04:59 05:06 05:13 05:18 06:39 06:47 06:55 09:35 09:42 09:51 18:55 19:03 19:10 19:18
+Central 04:47 04:55 05:02 05:09 05:16 05:20 06:42 06:50 06:57 09:37 09:45 09:53 18:57 19:05 19:13 19:20
+Haymarket, Haymarket 04:49 04:57 05:04 05:11 05:18 05:23 06:44 06:52 07:00 09:40 09:48 09:56 19:00 19:08 19:15 19:23
+Chinatown, Sydney 04:52 04:59 05:06 05:13 05:20 05:25 06:46 06:55 07:02 09:42 09:50 09:58 19:02 19:10 19:18 19:25
+Town Hall, Sydney 04:55 05:02 05:09 05:16 05:23 05:28 06:49 06:57 07:05 09:45 09:53 10:01 19:05 19:13 19:20 19:28
+QVB, Sydney 04:56 05:03 05:10 05:17 05:24 05:29 06:50 06:59 07:06 09:46 09:54 10:02 19:06 19:14 19:22 19:29
+Wynyard, Sydney 04:58 05:05 05:12 05:19 05:26 05:31 06:52 07:00 07:08 09:48 09:56 10:04 19:08 19:16 19:23 19:31
+Bridge Street, Sydney 04:59 05:06 05:13 05:20 05:27 05:32 06:53 07:02 07:09 09:49 09:57 10:05 19:09 19:17 19:25 19:32
+Circular Quay, Sydney 05:02 05:10 05:17 05:24 05:31 05:36 06:57 07:05 07:13 09:53 10:01 10:09 19:13 19:22 19:28 19:36
+Friday
+Service Information * *
+Randwick, Randwick 19:13 every
+10
+mins.
+01:03
+UNSW High Street, Randwick 19:14 01:04
+Wansey Road, Randwick 19:17 01:07
+Royal Randwick, Centennial Park 19:19 01:09
+Moore Park, Moore Park 19:24 01:14
+Surry Hills, Surry Hills 19:27 01:17
+Central 19:29 01:19
+Haymarket, Haymarket 19:32 01:22
+Chinatown, Sydney 19:34 01:24
+Town Hall, Sydney 19:37 01:27
+QVB, Sydney 19:38 01:28
+Wynyard, Sydney 19:40 01:30
+Bridge Street, Sydney 19:41 01:31
+Circular Quay, Sydney 19:45 01:35
+
+-- 4 of 6 --
+
+L2 Randwick to Circular Quay
+Saturday
+Service Information * * * * * * * * * * * *
+Randwick, Randwick 05:10 05:22 every
+15
+mins.
+06:22 06:37 06:52 07:04 every
+10
+mins.
+00:14 01:03	every
+9-13
+mins.
+UNSW High Street, Randwick 05:12 05:23 06:23 06:38 06:53 07:06 00:16 01:05
+Wansey Road, Randwick 05:14 05:26 06:26 06:41 06:56 07:08 00:18 01:07
+Royal Randwick, Centennial Park 05:17 05:28 06:28 06:43 06:58 07:11 00:21 01:10
+Moore Park, Moore Park 04:35 04:50 05:04 05:21 05:33 06:33 06:44 06:48 07:03 07:15 00:25 01:14
+Surry Hills, Surry Hills 04:38 04:53 05:07 05:24 05:36 06:36 06:47 06:51 07:06 07:18 00:28 01:17
+Central 04:41 04:56 05:09 05:27 05:38 06:38 06:49 06:53 07:08 07:21 00:31 01:20
+Haymarket, Haymarket 04:43 04:58 05:12 05:29 05:41 06:41 06:52 06:56 07:11 07:23 00:33 01:22
+Chinatown, Sydney 04:46 05:01 05:14 05:32 05:43 06:43 06:54 06:58 07:13 07:26 00:36 01:25
+Town Hall, Sydney 04:48 05:03 05:17 05:34 05:46 06:46 06:57 07:01 07:16 07:28 00:38 01:27
+QVB, Sydney 04:50 05:05 05:18 05:36 05:47 06:47 06:58 07:02 07:17 07:30 00:40 01:29
+Wynyard, Sydney 04:52 05:07 05:20 05:37 05:49 06:49 07:00 07:04 07:19 07:31 00:41 01:30
+Bridge Street, Sydney 04:53 05:08 05:21 05:39 05:50 06:50 07:01 07:05 07:20 07:33 00:43 01:32
+Circular Quay, Sydney 04:56 05:11 05:25 05:42 05:54 06:54 07:05 07:09 07:24 07:36 00:46 01:35
+Sunday & Public Holidays
+Service Information * * * * * * * * * * * * * *
+Randwick, Randwick 05:12 05:26 every
+15
+mins.
+06:26 06:41 06:56 07:08 every
+10
+mins.
+18:58 19:11 every
+15
+mins.
+00:56 01:05
+UNSW High Street, Randwick 05:14 05:27 06:27 06:42 06:57 07:10 19:00 19:12 00:57 01:07
+Wansey Road, Randwick 05:16 05:30 06:30 06:45 07:00 07:12 19:02 19:15 01:00 01:09
+Royal Randwick, Centennial Park 05:19 05:32 06:32 06:47 07:02 07:15 19:05 19:17 01:02 01:12
+Moore Park, Moore Park 04:39 04:55 05:08 05:23 05:37 06:37 06:49 06:52 07:07 07:19 19:09 19:22 01:07 01:16
+Surry Hills, Surry Hills 04:42 04:58 05:11 05:26 05:40 06:40 06:52 06:55 07:10 07:22 19:12 19:25 01:10 01:19
+Central 04:45 05:00 05:13 05:29 05:42 06:42 06:54 06:57 07:12 07:25 19:15 19:27 01:12 01:22
+Haymarket, Haymarket 04:47 05:03 05:16 05:31 05:45 06:45 06:57 07:00 07:15 07:27 19:17 19:30 01:15 01:24
+Chinatown, Sydney 04:50 05:05 05:18 05:34 05:47 06:47 06:59 07:02 07:17 07:30 19:20 19:32 01:17 01:27
+Town Hall, Sydney 04:52 05:08 05:21 05:36 05:50 06:50 07:02 07:05 07:20 07:32 19:22 19:35 01:20 01:29
+QVB, Sydney 04:54 05:09 05:22 05:38 05:51 06:51 07:03 07:06 07:21 07:34 19:24 19:36 01:21 01:31
+Wynyard, Sydney 04:56 05:11 05:24 05:39 05:53 06:53 07:05 07:08 07:23 07:35 19:25 19:38 01:23 01:32
+Bridge Street, Sydney 04:57 05:12 05:25 05:41 05:54 06:54 07:06 07:09 07:24 07:37 19:27 19:39 01:24 01:34
+Circular Quay, Sydney 05:00 05:16 05:29 05:44 05:58 06:58 07:10 07:13 07:28 07:40 19:30 19:43 01:28 01:37
+
+-- 5 of 6 --
+
+Light Rail Network
+L3
+L2
+Paddy’s
+	Markets
+Exhibition Centre
+Convention
+Pyrmont Bay
+The Star
+John Street
+Square
+Central
+Grand Concourse
+Central
+Chalmers Street
+Dulwich Hill
+Bank Street
+Wentworth
+Park
+Lewisham West
+Waratah Mills
+Arlington
+Dulwich Grove
+Jubilee Park
+	Glebe	
+Lilyfield	
+Leichhardt North
+Rozelle Bay
+Hawthorne
+Marion
+Taverners Hill
+L1
+L3
+L1
+Kingsford
+Juniors Kingsford
+UNSW Anzac Parade
+Kensington
+ES Marks
+Moore Park
+Royal Randwick
+Wansey Road
+UNSW High Street
+Randwick
+Surry Hills
+Town Hall
+QVB
+Wynyard
+Bridge Street
+L3 Circular Quay
+L2	L2
+Capitol Square
+Haymarket
+Chinatown
+Sydney light rail network
+Light Rail
+Sydney light rail lines
+L1 Dulwich Hill Line
+Dulwich Hill
+Central
+L2 Randwick Line
+Circular Quay
+Randwick
+L3 Kingsford Line
+Circular Quay
+Juniors Kingsford
+End of line	
+Stop
+Interchange
+Change between lines
+Copyright © 2025 Transport for NSW 	272x129.5_SLM_20251112
+Visit transportnsw.info
+Check timetables and trip planners
+for train services and connections
+Train towards
+Strathfield, Parramatta,
+Liverpool, Airport,
+Campbelltown,
+Bankstown
+& Sutherland
+Train
+towards
+Bondi
+Junction
+Train
+towards
+Hornsby
+	Train
+towards
+Sydney CBD
+Train
+towards
+Bankstown
+& Liverpool
+Circular Quay
+Station
+Wynyard
+Station
+Town Hall
+Station
+Martin Place
+Station
+St James
+Station
+Museum
+Station
+Central
+Station
+Marrickville
+Station
+Dulwich Hill
+Station
+Central Stop
+Capitol
+Square
+Stop
+Paddy’s
+Markets
+Stop
+Light rail
+towards
+Dulwich Hill
+423
+L23
+L23
+423
+L23
+426
+426
+Kingsgrove	423 L23 	City - Martin Place 423 L23 426
+Sydney CBD
+7am - 7pm
+weekdays
+Broadway
+7am - 7pm
+weekdays
+Joins Above Right
+Railway
+Square
+University of
+Technology
+Sydney
+Broadway
+Shopping
+Centre
+Park
+Cooks River
+Earlwood
+Shops
+Kingsgrove
+Bus Depot
+Hunt
+e
+r S t
+George St
+George St
+Castlereagh St
+Elizabeth St
+King St
+Market St
+Park St	Druitt St
+Pitt St
+Pitt St
+Bathurst St
+Liverpool St
+Goulburn St
+Hay St
+Eddy Ave
+Harris St
+Wattle St
+Abercrombie St
+Broadway
+Glebe Point Rd
+City Rd
+Parramatta Rd
+Cleveland St
+Edinburgh Rd
+Sydenham Rd
+Victoria Rd
+ille Rd
+Wardell R
+Illawarra Rd
+Bayview Ave
+Homer St
+	Wardell Rd
+	Earlwood Ave
+Hartill-Law Ave
+Homer St
+Bexley Rd
+William St
+Kingsgrove Rd
+Omnibus Rd
+Woolcott St
+Sydney
+Ultimo
+Chippendale
+Glebe
+Enmore	Marrickville
+Sydenham
+	Marrickville
+South
+Undercliffe
+Earlwood
+Turrella
+Clemton
+Park
+Belmore
+Kingsgrove
+Light rail line/stop	Bus route start/finish
+Train line/station
+Bus route
+Bus route number
+Legend
+423
+Diagrammatic Map
+Not to Scale
+	North
+transportnsw.info
+Route L23 to City
+Picks up and sets down as requested at all stops to Marrickville Rd & Garners Ave Marrickville, then Enmore Rd & Addison Rd Marrickville
+(Enmore Park), Enmore Rd & Stanmore Rd Enmore, Newtown Station, King St & Missenden Rd Newtown, The University of Sydney (City Rd &
+Butlin Ave), Broadway & Mountain St Ultimo, then all stops from Central Station Railway Square.
+Route L23 to Kingsgrove Depot
+Picks up and sets down as requested at all stops to Railway Square, then Broadway & Buckland St Ultimo, The University of Sydney (City Rd &
+Butlin Ave), King St & Missenden Rd Newtown, Newtown Station, Enmore Rd & Edgeware Rd Enmore, Enmore Rd & Addison Rd Marrickville
+(Enmore Park), then all stops from Marrickville Rd & Illawarra Rd Marrickville.
+
+-- 6 of 6 --
+

@@ -1,0 +1,44 @@
+{
+  "cli": {
+    "version": ">= 9.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_ADMIN": "false",
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_ADMIN": "false",
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_ADMIN": "false",
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

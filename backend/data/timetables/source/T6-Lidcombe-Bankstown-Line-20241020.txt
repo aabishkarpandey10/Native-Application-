@@ -1,0 +1,690 @@
+T6 Lidcombe & Bankstown Line
+How to use this timetable
+This timetable provides a snapshot of service information in 24-hour time (e.g. 5am = 05:00, 5pm = 17:00).
+Information contained in this timetable is subject to change without notice. Please note that timetables do not
+include additional trips for special events, short term changes, holiday timetable changes, real-time information,
+trackwork or any disruption alerts.
+For the most up-to-date times, use the Trip Planner or Departures at transportnsw.info
+Real-time planning
+You can plan your trip with real-time information using the Trip Planner or Departures at transportnsw.info or
+by downloading travel apps on your smartphone or tablet.
+The Trip Planner, Departures and travel apps offer various features:
+favourite your regular trips
+see where your service is on the route
+get estimated pick-up and arrival times
+receive service updates
+find nearby stations, stops, wharves and routes
+check accessibility information.
+Find the latest apps at transportnsw.info/apps
+Accessible services
+Wheelchair accessible stations are indicated with a icon on the map at the back of this timetable. However,
+some older stations may not have all the facilities you need. Visit transportnsw.info to find the stations with
+the facilities you need to get around.
+Fares
+In Sydney and surrounding regions, fares are based on:
+the distance you travel from tap on to tap off
+the mode of transport you choose
+whether you're eligible for a concession fare or free travel
+any Opal benefits such as discounts and capped fares that apply.
+You can use an Opal card or a contactless payment to pay for your travel.
+Opal cards
+An Opal card is a smartcard you keep and reuse. Add value before you travel, and tap on and tap off to pay your
+fares throughout Sydney, the Blue Mountains, the Central Coast, the Hunter and the Illawarra.
+Which Opal card is right for you?
+Adult – Customers 16 years or older who are not entitled to any concessions and normally pay full fare.
+Child/Youth – For customers aged 4-15 (inclusive), or customers 16 years or older who hold a NSW/ACT
+Senior Secondary Student Concession Card.
+Gold Senior/Pensioner – For eligible NSW and interstate seniors, pensioners, war widows/ers and asylum seekers.
+Concession – For eligible tertiary students, job seekers, apprentices and trainees.
+How to get an Opal card
+You can get an Adult or Child/Youth Opal card over the counter at Opal retailers that display the Opal sign . To
+find your nearest retailer visit transportnsw.info/opal
+If you are eligible to travel with concession fares, you can apply for a Gold Senior/Pensioner or Concession Opal
+card online. Visit transportnsw.info/opal for more information.
+Contactless payments
+If you have an American Express, Mastercard, Visa card or linked device, you can use it to pay for all public
+transport on the Opal network. Just make sure to tap on and tap off at Opal readers at the beginning and end of
+your trip.
+Always separate your cards when you tap on and tap off so your preferred card is charged.
+You will receive the same travel benefits of an Adult Opal card when you tap on and tap off consistently with the
+same credit card, debit card or linked device. This includes daily, weekly and weekend travel caps, and a $2
+transfer discount when you change between metro/train, ferry, bus and light rail services within 60 minutes.
+Adult Opal fare pricing applies.
+Find out more at transportnsw.info/contactless
+Explanation of definitions and symbols
+Wheelchair Accessible
+F Friday only
+Sa Saturday only
+
+-- 1 of 6 --
+
+T6 Bankstown to Lidcombe
+Valid from: 20 Oct 2024 Creation date: 01 Nov 2024
+NOTE: Information is correct on date of download.
+Monday to Friday
+Bankstown 04:08 04:28 04:48 05:08 05:25 05:40 05:55 06:10 06:25 06:40 06:55 07:10 07:25 07:40 07:55 08:10 08:25 08:40 08:55 09:10 09:22
+Yagoona 04:11 04:31 04:51 05:11 05:28 05:43 05:58 06:13 06:28 06:43 06:58 07:13 07:28 07:43 07:58 08:13 08:28 08:43 08:58 09:13 09:25
+Birrong 04:14 04:34 04:54 05:14 05:31 05:46 06:01 06:16 06:31 06:46 07:01 07:16 07:31 07:46 08:01 08:16 08:31 08:46 09:01 09:16 09:29
+Regents Park ARR 09:32
+Regents Park DEP 04:17 04:37 04:57 05:17 05:34 05:49 06:04 06:19 06:34 06:49 07:04 07:19 07:34 07:49 08:04 08:19 08:34 08:49 09:04 09:19 09:34
+Berala 04:20 04:40 05:00 05:20 05:37 05:52 06:07 06:22 06:37 06:52 07:07 07:22 07:37 07:52 08:07 08:22 08:37 08:52 09:07 09:22 09:37
+Lidcombe 04:24 04:44 05:04 05:24 05:41 05:56 06:11 06:26 06:41 06:56 07:11 07:26 07:41 07:56 08:11 08:26 08:41 08:56 09:11 09:26 09:41
+Monday to Friday
+Bankstown 09:37 09:52 10:07 10:22 10:37 10:52 11:07 11:22 11:37 11:52 12:07 12:22 12:37 12:52 13:07 13:22 13:37 13:52 14:07 14:22 14:37
+Yagoona 09:40 09:55 10:10 10:25 10:40 10:55 11:10 11:25 11:40 11:55 12:10 12:25 12:40 12:55 13:10 13:25 13:40 13:55 14:10 14:25 14:40
+Birrong 09:43 09:58 10:13 10:28 10:43 10:58 11:13 11:28 11:43 11:58 12:13 12:28 12:43 12:58 13:13 13:28 13:43 13:58 14:13 14:28 14:46
+Regents Park ARR 09:46 10:01 10:16 10:31 10:46 11:01 11:16 11:31 11:46 12:01 12:16 12:31 12:46 13:01 13:16 13:31 13:46 14:01 14:16 14:31
+Regents Park DEP 09:49 10:04 10:19 10:34 10:49 11:04 11:19 11:34 11:49 12:04 12:19 12:35 12:49 13:05 13:19 13:34 13:49 14:04 14:19 14:34 14:49
+Berala 09:52 10:07 10:22 10:37 10:52 11:07 11:22 11:37 11:52 12:07 12:22 12:38 12:52 13:08 13:22 13:37 13:52 14:07 14:22 14:37 14:52
+Lidcombe 09:56 10:11 10:26 10:41 10:56 11:11 11:26 11:41 11:56 12:11 12:26 12:42 12:56 13:12 13:26 13:41 13:56 14:11 14:26 14:41 14:56
+Monday to Friday
+Bankstown 14:52 15:10 15:26 15:41 15:56 16:11 16:26 16:41 16:56 17:11 17:27 17:42 17:57 18:12 18:27 18:37 18:52 19:07 19:22 19:37 19:52
+Yagoona 14:55 15:13 15:29 15:44 15:59 16:14 16:29 16:44 16:59 17:14 17:30 17:45 18:00 18:15 18:30 18:40 18:55 19:10 19:25 19:40 19:55
+Birrong 14:58 15:16 15:32 15:47 16:02 16:17 16:32 16:47 17:02 17:17 17:33 17:48 18:03 18:18 18:33 18:43 18:58 19:13 19:28 19:43 19:58
+Regents Park ARR 15:01 18:46 19:01 19:16 19:31 19:46 20:01
+Regents Park DEP 15:04 15:19 15:35 15:50 16:05 16:20 16:35 16:50 17:05 17:20 17:36 17:51 18:06 18:21 18:36 18:49 19:04 19:19 19:34 19:49 20:04
+Berala 15:07 15:22 15:38 15:53 16:08 16:23 16:38 16:53 17:08 17:23 17:39 17:54 18:09 18:24 18:39 18:52 19:07 19:22 19:37 19:52 20:07
+Lidcombe 15:11 15:26 15:42 15:57 16:12 16:27 16:42 16:57 17:12 17:27 17:43 17:58 18:13 18:28 18:43 18:56 19:11 19:26 19:41 19:56 20:11
+Monday to Friday
+Day Restrictions F F
+Bankstown 20:07 20:22 20:37 20:52 21:07 21:22 21:48 22:18 22:48 23:18 23:48 00:18 00:48 01:18 01:48
+Yagoona 20:10 20:25 20:40 20:55 21:10 21:25 21:51 22:21 22:51 23:21 23:51 00:21 00:51 01:21 01:51
+Birrong 20:13 20:28 20:43 20:58 21:13 21:28 21:54 22:24 22:54 23:24 23:54 00:24 00:54 01:24 01:54
+Regents Park ARR 20:16 20:31 20:46 21:01 21:16 21:31
+Regents Park DEP 20:19 20:34 20:49 21:04 21:19 21:34 21:57 22:27 22:57 23:27 23:57 00:27 00:57 01:27 01:57
+Berala 20:22 20:37 20:52 21:07 21:22 21:37 22:00 22:30 23:00 23:30 00:00 00:30 01:00 01:30 02:00
+Lidcombe 20:26 20:41 20:56 21:11 21:26 21:41 22:04 22:34 23:04 23:34 00:04 00:34 01:04 01:34 02:04
+Weekends & Public Holidays
+Bankstown 04:04 04:23 04:45 05:05 05:23 05:45 06:05 06:23 06:45 07:05 07:23 07:45 08:05 08:23 08:45 09:05 09:23 09:45 10:05 10:23 10:45
+Yagoona 04:07 04:26 04:48 05:08 05:26 05:48 06:08 06:26 06:48 07:08 07:26 07:48 08:08 08:26 08:48 09:08 09:26 09:48 10:08 10:26 10:48
+Birrong 04:10 04:29 04:51 05:11 05:29 05:51 06:11 06:29 06:51 07:11 07:29 07:51 08:11 08:29 08:51 09:11 09:29 09:51 10:11 10:29 10:51
+Regents Park ARR 04:13 04:32 04:54 05:14 05:32 05:54 06:14 06:32 06:54 07:14 07:32 07:54 08:14 08:32 08:54 09:14 09:32 09:54 10:14 10:32 10:54
+Regents Park DEP 04:14 04:33 04:55 05:15 05:33 05:55 06:15 06:33 06:55 07:15 07:33 07:55 08:15 08:33 08:55 09:15 09:33 09:55 10:15 10:33 10:55
+Berala 04:16 04:35 04:57 05:17 05:35 05:57 06:17 06:35 06:57 07:17 07:35 07:57 08:17 08:35 08:57 09:17 09:35 09:57 10:17 10:35 10:57
+Lidcombe 04:20 04:39 05:01 05:21 05:39 06:01 06:21 06:39 07:01 07:21 07:39 08:01 08:21 08:39 09:01 09:21 09:39 10:01 10:21 10:39 11:01
+
+-- 2 of 6 --
+
+T6 Bankstown to Lidcombe
+Weekends & Public Holidays
+Bankstown 11:05 11:23 11:45 12:05 12:23 12:45 13:05 13:23 13:45 14:05 14:23 14:45 15:05 15:23 15:45 16:05 16:23 16:45 17:05 17:23 17:45
+Yagoona 11:08 11:26 11:48 12:08 12:26 12:48 13:08 13:26 13:48 14:08 14:26 14:48 15:08 15:26 15:48 16:08 16:26 16:48 17:08 17:26 17:48
+Birrong 11:11 11:29 11:51 12:11 12:29 12:51 13:11 13:29 13:51 14:11 14:29 14:51 15:11 15:29 15:51 16:11 16:29 16:51 17:11 17:29 17:51
+Regents Park ARR 11:14 11:32 11:54 12:14 12:32 12:54 13:14 13:32 13:54 14:14 14:32 14:54 15:14 15:32 15:54 16:14 16:32 16:54 17:14 17:32 17:54
+Regents Park DEP 11:15 11:33 11:55 12:15 12:33 12:55 13:15 13:33 13:55 14:15 14:33 14:55 15:15 15:33 15:55 16:15 16:33 16:55 17:15 17:33 17:55
+Berala 11:17 11:35 11:57 12:17 12:35 12:57 13:17 13:35 13:57 14:17 14:35 14:57 15:17 15:35 15:57 16:17 16:35 16:57 17:17 17:35 17:57
+Lidcombe 11:21 11:39 12:01 12:21 12:39 13:01 13:21 13:39 14:01 14:21 14:39 15:01 15:21 15:39 16:01 16:21 16:39 17:01 17:21 17:39 18:01
+Weekends & Public Holidays
+Bankstown 18:05 18:23 18:45 19:05 19:23 19:45 20:05 20:23 20:45 21:05 21:23 21:45 22:05 22:23 22:45 23:05 23:23 23:45 00:05 00:23 00:45
+Yagoona 18:08 18:26 18:48 19:08 19:26 19:48 20:08 20:26 20:48 21:08 21:26 21:48 22:08 22:26 22:48 23:08 23:26 23:48 00:08 00:26 00:48
+Birrong 18:11 18:29 18:51 19:11 19:29 19:51 20:11 20:29 20:51 21:11 21:29 21:51 22:11 22:29 22:51 23:11 23:29 23:51 00:11 00:29 00:51
+Regents Park ARR 18:14 18:32 18:54 19:14 19:32 19:54 20:14 20:32 20:54 21:14 21:32 21:54 22:14 22:32 22:54 23:14 23:32 23:54 00:14 00:32 00:54
+Regents Park DEP 18:15 18:33 18:55 19:15 19:33 19:55 20:15 20:33 20:55 21:15 21:33 21:55 22:15 22:33 22:55 23:15 23:33 23:55 00:15 00:33 00:55
+Berala 18:17 18:35 18:57 19:17 19:35 19:57 20:17 20:35 20:57 21:17 21:35 21:57 22:17 22:35 22:57 23:17 23:35 23:57 00:17 00:35 00:57
+Lidcombe 18:21 18:39 19:01 19:21 19:39 20:01 20:21 20:39 21:01 21:21 21:39 22:01 22:21 22:39 23:01 23:21 23:39 00:01 00:21 00:39 01:01
+Weekends & Public Holidays
+Day Restrictions Sa Sa Sa
+Bankstown 01:05 01:23 01:45
+Yagoona 01:08 01:26 01:48
+Birrong 01:11 01:29 01:51
+Regents Park ARR 01:14 01:32 01:54
+Regents Park DEP 01:15 01:33 01:55
+Berala 01:17 01:35 01:58
+Lidcombe 01:21 01:39 02:00
+
+-- 3 of 6 --
+
+T6 Lidcombe to Bankstown
+Monday to Friday
+Lidcombe 04:00 04:20 04:40 05:00 05:18 05:33 05:48 06:03 06:18 06:33 06:48 07:03 07:18 07:33 07:48 08:03 08:18 08:33 08:48 09:07 09:22
+Berala 04:03 04:23 04:43 05:03 05:21 05:36 05:51 06:06 06:21 06:36 06:51 07:06 07:21 07:36 07:51 08:06 08:21 08:36 08:51 09:10 09:25
+Regents Park ARR 09:12 09:27
+Regents Park DEP 04:05 04:25 04:45 05:05 05:23 05:38 05:53 06:08 06:23 06:38 06:53 07:08 07:23 07:38 07:53 08:08 08:23 08:38 08:53 09:15 09:30
+Birrong 04:09 04:29 04:49 05:09 05:27 05:42 05:57 06:12 06:27 06:42 06:57 07:12 07:27 07:42 07:57 08:12 08:27 08:42 08:57 09:19 09:34
+Yagoona 04:11 04:31 04:51 05:11 05:29 05:44 05:59 06:15 06:29 06:44 06:59 07:14 07:29 07:44 07:59 08:14 08:29 08:44 08:59 09:21 09:36
+Bankstown 04:16 04:36 04:56 05:16 05:34 05:49 06:04 06:19 06:34 06:49 07:04 07:19 07:34 07:49 08:04 08:19 08:34 08:49 09:04 09:26 09:41
+Monday to Friday
+Lidcombe 09:37 09:52 10:07 10:22 10:37 10:52 11:07 11:22 11:37 11:52 12:07 12:22 12:37 12:52 13:07 13:22 13:37 13:52 14:07 14:22 14:37
+Berala 09:40 09:55 10:10 10:25 10:40 10:55 11:10 11:25 11:40 11:55 12:10 12:25 12:40 12:55 13:10 13:25 13:40 13:55 14:10 14:25 14:40
+Regents Park ARR 09:42 09:57 10:12 10:27 10:42 10:57 11:12 11:27 11:42 11:57 12:12 12:27 12:42 12:57 13:12 13:27 13:42 13:57 14:12 14:27 14:42
+Regents Park DEP 09:45 10:00 10:15 10:30 10:45 11:00 11:15 11:30 11:45 12:00 12:15 12:30 12:45 13:00 13:15 13:30 13:45 14:00 14:15 14:30 14:45
+Birrong 09:49 10:04 10:19 10:34 10:49 11:04 11:19 11:34 11:49 12:04 12:19 12:34 12:49 13:04 13:19 13:34 13:49 14:04 14:19 14:34 14:49
+Yagoona 09:51 10:06 10:21 10:36 10:51 11:06 11:21 11:36 11:51 12:06 12:21 12:36 12:51 13:06 13:21 13:36 13:51 14:06 14:21 14:36 14:51
+Bankstown 09:56 10:11 10:26 10:41 10:56 11:11 11:26 11:41 11:56 12:11 12:26 12:41 12:56 13:11 13:26 13:41 13:56 14:11 14:26 14:41 14:56
+Monday to Friday
+Lidcombe 14:49 15:04 15:19 15:34 15:49 16:04 16:19 16:34 16:49 17:05 17:20 17:35 17:50 18:05 18:22 18:37 18:52 19:07 19:22 19:37 19:52
+Berala 14:52 15:07 15:22 15:37 15:52 16:07 16:22 16:37 16:52 17:08 17:23 17:38 17:53 18:08 18:25 18:40 18:55 19:10 19:25 19:40 19:55
+Regents Park ARR 18:27 18:42 18:57 19:12 19:27 19:42 19:57
+Regents Park DEP 14:54 15:09 15:24 15:39 15:54 16:09 16:24 16:39 16:54 17:10 17:25 17:40 17:55 18:10 18:30 18:45 19:00 19:15 19:30 19:45 20:00
+Birrong 14:58 15:13 15:28 15:43 15:58 16:13 16:28 16:43 16:58 17:14 17:29 17:44 17:59 18:14 18:34 18:49 19:04 19:19 19:34 19:49 20:04
+Yagoona 15:00 15:15 15:30 15:45 16:00 16:15 16:30 16:45 17:00 17:16 17:31 17:46 18:01 18:16 18:36 18:51 19:06 19:21 19:36 19:51 20:06
+Bankstown 15:05 15:20 15:35 15:50 16:05 16:20 16:35 16:50 17:05 17:21 17:36 17:51 18:06 18:21 18:41 18:56 19:11 19:26 19:41 19:56 20:11
+Monday to Friday
+Day Restrictions F F
+Lidcombe 20:07 20:22 20:37 20:52 21:07 21:22 21:37 21:52 22:19 22:49 23:19 23:49 00:19 00:49 01:19 01:49
+Berala 20:10 20:25 20:41 20:56 21:10 21:25 21:40 21:55 22:22 22:52 23:22 23:52 00:22 00:52 01:22 01:52
+Regents Park ARR 20:12 20:27 20:43 20:58 21:12 21:27 21:42 21:57
+Regents Park DEP 20:15 20:30 20:45 21:00 21:15 21:30 21:47 22:00 22:24 22:54 23:24 23:54 00:24 00:54 01:24 01:54
+Birrong 20:19 20:34 20:50 21:05 21:19 21:34 21:51 22:04 22:28 22:58 23:28 23:58 00:28 00:58 01:28 01:58
+Yagoona 20:21 20:36 20:53 21:08 21:21 21:36 21:53 22:06 22:30 23:00 23:30 00:00 00:30 01:00 01:30 02:00
+Bankstown 20:26 20:41 20:57 21:12 21:26 21:41 21:58 22:11 22:35 23:05 23:35 00:05 00:35 01:05 01:35 02:05
+Weekends & Public Holidays
+Lidcombe 03:57 04:16 04:32 04:56 05:17 05:32 05:56 06:17 06:32 06:56 07:17 07:32 07:56 08:17 08:32 08:56 09:17 09:32 09:56 10:17 10:32
+Berala 04:00 04:19 04:35 04:59 05:20 05:35 05:59 06:20 06:35 06:59 07:20 07:35 07:59 08:20 08:35 08:59 09:20 09:35 09:59 10:20 10:35
+Regents Park ARR 04:21 04:37 05:01 05:22 05:37 06:01 06:22 06:37 07:01 07:22 07:37 08:01 08:22 08:37 09:01 09:22 09:37 10:01 10:22 10:37
+Regents Park DEP 04:02 04:22 04:38 05:02 05:23 05:38 06:02 06:23 06:38 07:02 07:23 07:38 08:02 08:23 08:38 09:02 09:23 09:38 10:02 10:23 10:38
+Birrong 04:06 04:26 04:42 05:06 05:27 05:42 06:06 06:27 06:42 07:06 07:27 07:42 08:06 08:27 08:42 09:06 09:27 09:42 10:06 10:27 10:42
+Yagoona 04:08 04:28 04:44 05:08 05:29 05:44 06:08 06:29 06:44 07:08 07:29 07:44 08:08 08:29 08:44 09:08 09:29 09:44 10:08 10:29 10:44
+Bankstown 04:13 04:33 04:49 05:13 05:34 05:49 06:13 06:34 06:49 07:13 07:34 07:49 08:13 08:34 08:49 09:13 09:34 09:49 10:13 10:34 10:49
+Weekends & Public Holidays
+Lidcombe 10:56 11:17 11:32 11:56 12:17 12:32 12:56 13:17 13:32 13:56 14:17 14:32 14:56 15:17 15:32 15:56 16:17 16:32 16:56 17:17 17:32
+Berala 10:59 11:20 11:35 11:59 12:20 12:35 12:59 13:20 13:35 13:59 14:20 14:35 14:59 15:20 15:35 15:59 16:20 16:35 16:59 17:20 17:35
+Regents Park ARR 11:01 11:22 11:37 12:01 12:22 12:37 13:01 13:22 13:37 14:01 14:22 14:37 15:01 15:22 15:37 16:01 16:22 16:37 17:01 17:22 17:37
+Regents Park DEP 11:02 11:23 11:38 12:02 12:23 12:38 13:02 13:23 13:38 14:02 14:23 14:38 15:02 15:23 15:38 16:02 16:23 16:38 17:02 17:23 17:38
+Birrong 11:06 11:27 11:42 12:06 12:27 12:42 13:06 13:27 13:42 14:06 14:27 14:42 15:06 15:27 15:42 16:06 16:27 16:42 17:06 17:27 17:42
+Yagoona 11:08 11:29 11:44 12:08 12:29 12:44 13:08 13:29 13:44 14:08 14:29 14:44 15:08 15:29 15:44 16:08 16:29 16:44 17:08 17:29 17:44
+Bankstown 11:13 11:34 11:49 12:13 12:34 12:49 13:13 13:34 13:49 14:13 14:34 14:49 15:13 15:34 15:49 16:13 16:34 16:49 17:13 17:34 17:49
+
+-- 4 of 6 --
+
+T6 Lidcombe to Bankstown
+Weekends & Public Holidays
+Lidcombe 17:56 18:17 18:32 18:56 19:17 19:32 19:56 20:17 20:32 20:56 21:17 21:32 21:56 22:17 22:32 22:56 23:17 23:32 23:56 00:17 00:32
+Berala 17:59 18:20 18:35 18:59 19:20 19:35 19:59 20:20 20:35 20:59 21:20 21:35 21:59 22:20 22:35 22:59 23:20 23:35 23:59 00:20 00:35
+Regents Park ARR 18:01 18:22 18:37 19:01 19:22 19:37 20:01 20:22 20:37 21:01 21:22 21:37 22:01 22:22 22:37 23:01 23:22 23:37 00:01 00:22 00:37
+Regents Park DEP 18:02 18:23 18:38 19:02 19:23 19:38 20:02 20:23 20:38 21:02 21:23 21:38 22:02 22:23 22:38 23:02 23:23 23:38 00:02 00:23 00:38
+Birrong 18:06 18:27 18:42 19:06 19:27 19:42 20:06 20:27 20:42 21:06 21:27 21:42 22:06 22:27 22:42 23:06 23:27 23:42 00:06 00:27 00:42
+Yagoona 18:08 18:29 18:44 19:08 19:29 19:44 20:08 20:29 20:44 21:08 21:29 21:44 22:08 22:29 22:44 23:08 23:29 23:44 00:08 00:29 00:44
+Bankstown 18:13 18:34 18:49 19:13 19:34 19:49 20:13 20:34 20:49 21:13 21:34 21:49 22:13 22:34 22:49 23:13 23:34 23:49 00:13 00:34 00:49
+Weekends & Public Holidays
+Day Restrictions Sa Sa Sa
+Lidcombe 00:56 01:17 01:32 01:56
+Berala 00:59 01:20 01:35 01:59
+Regents Park ARR 01:01 01:22 01:37 02:01
+Regents Park DEP 01:02 01:23 01:38 02:02
+Birrong 01:06 01:27 01:42 02:06
+Yagoona 01:08 01:29 01:44 02:08
+Bankstown 01:13 01:34 01:49 02:13
+
+-- 5 of 6 --
+
+Sydney rail network
+Barangaroo
+Gadigal
+Waterloo
+Norwest
+	Cherrybrook
+	Castle Hill
+	Hills Showground	
+Tallawong
+Kellyville
+	Rouse Hill
+	Bella Vista
+To Central Coast &
+	Newcastle Line
+To South Coast Line
+To Southern Highlands Line
+Richmond
+Clarendon
+East Richmond
+Windsor
+Mulgrave
+Riverstone
+Vineyard
+Quakers Hill
+Schofields
+Marayong
+Richmond 	Richmond
+Doonside
+	Rooty Hill
+	Mount Druitt
+To Blue
+	Mountains Line
+Western Sydney
+Aerotropolis
+Emu Plains
+Airport Terminal
+Airport Business Park
+Orchard Hills
+Luddenham
+Penrith
+	St Marys	
+Werrington
+	Kingswood
+Western
+Sydenham	M1
+Hunter Street
+Check timetables and trip planners
+for train services and connections
+End of line	
+Stop
+Interchange
+	Interchange
+NORTH
+Line under construction
+Line under conversion - bus services
+Visit transportnsw.info
+Cronulla
+Waterfall
+Macarthur
+Liverpool
+Campbelltown
+Central
+	Parramatta
+Bondi Junction
+Leppington
+Epping
+Kirrawee
+	Gymea
+Miranda
+Caringbah
+	Woolooware
+Loftus
+Engadine
+Heathcote
+Banksia
+Rockdale
+Kogarah
+Carlton
+Allawah
+Arncliffe
+Como
+Mortdale
+Penshurst
+Oatley
+Jannali
+Hurstville
+Sutherland
+Wolli Creek
+Sydenham
+Mascot
+Green Square
+Tempe
+Macquarie Fields
+Minto
+Ingleburn
+Leumeah
+Merrylands
+Guildford
+Yennora
+Fairfield
+Canley Vale
+Warwick Farm
+Casula
+Cabramatta
+Glenfield
+Sefton
+Chester Hill	
+Leightonfield
+Villawood
+	Carramar
+Punchbowl
+	Wiley Park
+	Lakemba
+	Belmore
+Wynyard
+Town Hall
+Redfern
+Hurlstone Park
+Canterbury
+Campsie
+Regents Park
+Yagoona
+Birrong
+Bankstown
+Croydon	
+Ashfield
+Summer Hill
+	Lewisham
+	Petersham
+	Stanmore
+	Newtown
+Macdonaldtown
+Flemington	
+Homebush
+	Strathfield	
+Burwood
+North Ryde
+Macquarie Park
+Macquarie
+Thornleigh
+Normanhurst
+Pennant Hills
+Beecroft
+Cheltenham
+Waitara
+Wahroonga
+Warrawee
+Turramurra
+Pymble
+Killara
+Roseville
+Lindfield
+Gordon
+Blacktown
+Harris Park
+Westmead
+	Wentworthville
+Pendle Hill
+	Toongabbie	
+Seven Hills	
+Kings Cross
+	Edgecliff
+Edmondson Park
+Hornsby
+Berowra
+Asquith
+Mount Colah
+Mount Kuring-gai
+University
+Liverpool
+Inner West
+Cronulla
+Illawarra
+South T8
+Leppington
+Leppington
+Eastern Suburbs
+Northern T9
+North Shore
+Gordon T9
+Tallawong	M1
+City
+Milsons
+Point Circular
+Quay
+Bankstown
+ T6	
+Sydney Metro - Western Sydney Airport
+	under construction
+Artarmon
+St Leonards
+Waverton
+Wollstonecraft
+North Sydney
+Chatswood
+Rhodes
+Concord West
+North
+Strathfield
+Denistone
+West Ryde
+Meadowbank
+Eastwood
+Martin
+	Place
+Holsworthy
+	Padstow
+	Panania	
+East Hills
+	Revesby	
+Narwee
+	Riverwood
+Turrella
+Bardwell Park
+Bexley North
+Kingsgrove
+Beverly Hills
+St James
+Museum
+Erskineville
+St Peters
+Lidcombe
+Berala
+Granville
+Clyde
+Auburn
+Olympic Park
+Olympic Park
+Crows Nest
+Victoria Cross
+Sydney Metro West
+under construction
+Burwood North
+Five Dock
+The Bays
+Pyrmont
+Dulwich Hill
+	Marrickville	
+Station Access Fee applies
+Station Access Fee applies	
+International Airport
+Domestic Airport
+Airport	T8
+180x205_SRM_20240701
+Airport
+	South
+	City
+Airport & South Line
+Northern
+	Gordon
+Northern Line
+Eastern Suburbs
+	Illawarra
+	Cronulla
+Eastern Suburbs
+	& Illawarra Line 	Leppington
+	Richmond
+Cumberland Line
+Olympic Park
+	Lidcombe
+Olympic Park Line
+Sydenham
+	Tallawong
+Metro North West
+	& Bankstown Line
+North Shore
+	Western
+	Richmond
+North Shore
+	& Western Line
+Sydney train and metro lines
+Inner West
+	Leppington
+	City
+Leppington
+	& Inner West Line
+Liverpool
+	City
+Liverpool
+	& Inner West Line
+Copyright © 2024 Transport for NSW
+Lidcombe
+	Bankstown
+Lidcombe
+	& Bankstown Line
+Train towards
+Strathfield, Parramatta,
+Liverpool, Airport,
+Campbelltown,
+Bankstown
+& Sutherland
+Train
+towards
+Bondi
+Junction
+Train
+towards
+Hornsby
+Train
+towards
+Sydney CBD
+Train
+towards
+Strathfield
+Train
+towards
+Sydney CBD
+Train
+towards
+Bankstown
+& Liverpool
+Circular Quay
+Station
+Wynyard
+Station
+Town Hall
+Station
+Martin Place
+Station
+St James
+Station
+Museum
+Station
+Central
+Station
+Newtown
+Station
+Marrickville
+Station
+Dulwich Hill
+Station
+Central Stop
+Capitol
+Square
+Stop
+Paddy’s
+Markets
+Stop
+Light rail
+towards
+Dulwich Hill
+423
+L23
+423
+L23
+423
+L23
+426
+426
+Kingsgrove	423 L23
+Dulwich Hill 426
+City - Martin Place 423 L23 426
+Sydney CBD
+7am - 7pm
+weekdays
+Broadway
+7am - 7pm
+weekdays
+King St
+7am - 7pm
+weekdays
+Joins
+Below Left
+Joins Above Right
+Railway
+Square
+University of
+Technology
+Sydney
+Broadway
+Shopping
+Centre
+The University
+of Sydney
+Royal
+Prince
+Alfred
+Hospital
+Enmore
+Park
+Cooks River
+Earlwood
+Shops
+Kingsgrove
+Bus Depot
+Hunt
+e
+r S t
+George St
+George St
+Castlereagh St
+Elizabeth St
+King St
+Market St
+Park St	Druitt St
+Pitt St
+Pitt St
+Bathurst St
+Liverpool St
+Goulburn St
+Hay St
+Eddy Ave
+Harris St
+Wattle St
+Abercrombie St
+Broadway
+Glebe Point Rd
+City Rd
+Parramatta Rd
+Cleveland St
+Butlin Ave
+Carillon Ave
+M i ss
+enden Rd
+King St
+	Stanmore Rd
+Edgeware Rd
+Enmore Rd
+Addison Rd
+Edinburgh Rd
+Sydenham Rd
+Victoria Rd
+Marrickville Rd
+Wardell Rd
+New Cante
+rbury Rd
+Illawarra Rd
+Bayview Ave
+Homer St
+	Wardell Rd
+	Earlwood Ave
+Hartill-Law Ave
+Homer St
+Bexley Rd
+William St
+Kingsgrove Rd
+Omnibus Rd
+Woolcott St
+Livingstone Rd
+Sydney
+Ultimo
+Chippendale
+Glebe
+Newtown
+Stanmore
+Enmore	Marrickville
+Dulwich
+Hill
+Sydenham
+	Marrickville
+South
+Undercliffe
+Earlwood
+Turrella
+Clemton
+Park
+Belmore
+Kingsgrove
+Light rail line/stop	Bus route start/finish
+Train line/station
+Bus route
+Bus route number
+Legend
+423
+Diagrammatic Map
+Not to Scale
+	North
+Routes 423, L23, 426
+transportnsw.info
+Route L23 to City
+Picks up and sets down as requested at all stops to Marrickville Rd & Garners Ave Marrickville, then Enmore Rd & Addison Rd Marrickville
+(Enmore Park), Enmore Rd & Stanmore Rd Enmore, Newtown Station, King St & Missenden Rd Newtown, The University of Sydney (City Rd &
+Butlin Ave), Broadway & Mountain St Ultimo, then all stops from Central Station Railway Square.
+Route L23 to Kingsgrove Depot
+Picks up and sets down as requested at all stops to Railway Square, then Broadway & Buckland St Ultimo, The University of Sydney (City Rd &
+Butlin Ave), King St & Missenden Rd Newtown, Newtown Station, Enmore Rd & Edgeware Rd Enmore, Enmore Rd & Addison Rd Marrickville
+(Enmore Park), then all stops from Marrickville Rd & Illawarra Rd Marrickville.
+
+-- 6 of 6 --
+

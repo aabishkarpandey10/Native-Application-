@@ -1,0 +1,94 @@
+{
+  "importedAt": "2026-06-04T11:54:27.881Z",
+  "lines": [
+    {
+      "route": "T1",
+      "routes": [
+        "T1"
+      ],
+      "lineName": "T1 Western Line",
+      "validFrom": "2026-04-19",
+      "source": "https://transportnsw.info/documents/timetables/93-T1-Western-Line-20260419.pdf",
+      "stationCount": 43,
+      "tripCount": 16902
+    },
+    {
+      "route": "T8",
+      "routes": [
+        "T8"
+      ],
+      "lineName": "T8 Airport & South Line",
+      "validFrom": "2025-10-19",
+      "source": "https://transportnsw.info/documents/timetables/93-T8-Airport-South-Line-20251019.pdf",
+      "stationCount": 34,
+      "tripCount": 14309
+    },
+    {
+      "route": "T2",
+      "routes": [
+        "T2",
+        "T3"
+      ],
+      "lineName": "T2 Inner West & T3 Bankstown/Liverpool",
+      "validFrom": "2025-06-29",
+      "source": "https://transportnsw.info/documents/timetables/93-T2-Inner-West-Leppington-Line-20250629.pdf",
+      "stationCount": 44,
+      "tripCount": 17892
+    },
+    {
+      "route": "T4",
+      "routes": [
+        "T4"
+      ],
+      "lineName": "T4 Eastern Suburbs & Illawarra Line",
+      "validFrom": "2026-04-19",
+      "source": "https://transportnsw.info/documents/timetables/93-T4-Eastern-Suburbs-Illawarra-Line-20260419.pdf",
+      "stationCount": 34,
+      "tripCount": 12486
+    },
+    {
+      "route": "T5",
+      "routes": [
+        "T5"
+      ],
+      "lineName": "T5 Cumberland Line",
+      "validFrom": "2025-04-19",
+      "source": "https://transportnsw.info/documents/timetables/93-T5-Cumberland-Line-20250419.pdf",
+      "stationCount": 30,
+      "tripCount": 4210
+    },
+    {
+      "route": "T6",
+      "routes": [
+        "T6"
+      ],
+      "lineName": "T6 Lidcombe & Bankstown Line",
+      "validFrom": "2024-10-20",
+      "source": "https://transportnsw.info/documents/timetables/93-T6-Lidcombe-Bankstown-Line-20241020.pdf",
+      "stationCount": 6,
+      "tripCount": 1909
+    },
+    {
+      "route": "T7",
+      "routes": [
+        "T7"
+      ],
+      "lineName": "T7 Olympic Park Line",
+      "validFrom": "2024-10-20",
+      "source": "https://transportnsw.info/documents/timetables/93-T7-Olympic-Park-Line-20241020.pdf",
+      "stationCount": 2,
+      "tripCount": 433
+    },
+    {
+      "route": "T9",
+      "routes": [
+        "T9"
+      ],
+      "lineName": "T9 Northern Line",
+      "validFrom": "2025-04-19",
+      "source": "https://transportnsw.info/documents/timetables/93-T9-Northern-Line-20250419.pdf",
+      "stationCount": 31,
+      "tripCount": 10978
+    }
+  ]
+}

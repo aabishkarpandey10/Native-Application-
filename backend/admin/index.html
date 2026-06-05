@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Sydney Transit Admin</title>
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="phone-shell">
+    <div id="login-view" class="panel login-panel">
+      <div class="login-icon">ST</div>
+      <h1>Admin</h1>
+      <p class="muted">Manage all app settings, stations, and alerts.</p>
+      <input type="password" id="login-password" placeholder="Admin password" autocomplete="current-password" />
+      <button id="login-btn" class="btn primary full">Sign in</button>
+      <p id="login-error" class="error hidden"></p>
+    </div>
+
+    <div id="app-view" class="hidden">
+      <header class="mobile-header">
+        <div>
+          <h1>Admin</h1>
+          <p class="muted" id="last-updated"></p>
+        </div>
+        <button id="logout-btn" class="btn ghost small" type="button">Logout</button>
+      </header>
+
+      <div class="stats-row">
+        <div class="stat-card"><span class="stat-value" id="stat-stations">0</span><span class="stat-label">Stations</span></div>
+        <div class="stat-card"><span class="stat-value" id="stat-alerts">0</span><span class="stat-label">Alerts</span></div>
+        <div class="stat-card"><span class="stat-value" id="stat-status">Live</span><span class="stat-label">Status</span></div>
+      </div>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="config" type="button">App</button>
+        <button class="tab" data-tab="map" type="button">Map</button>
+        <button class="tab" data-tab="stations" type="button">Stations</button>
+        <button class="tab" data-tab="alerts" type="button">Alerts</button>
+      </nav>
+
+      <main class="tab-content">
+        <section id="tab-config" class="tab-panel">
+          <form id="config-form" class="card stack-form">
+            <h2 class="form-section">Branding</h2>
+            <label>App name <input id="cfg-appName" /></label>
+            <label>Tagline <input id="cfg-tagline" /></label>
+            <label>Announcement <textarea id="cfg-announcement" rows="2"></textarea></label>
+            <label class="checkbox"><input type="checkbox" id="cfg-showBanner" /> Show announcement banner</label>
+            <label class="checkbox"><input type="checkbox" id="cfg-maintenance" /> Maintenance mode</label>
+            <label>Maintenance message <textarea id="cfg-maintenanceMessage" rows="2"></textarea></label>
+
+            <h2 class="form-section">Appearance</h2>
+            <label>Default theme (light / dark) <input id="cfg-defaultTheme" /></label>
+            <label class="checkbox"><input type="checkbox" id="cfg-allowUserTheme" /> Users can change theme</label>
+            <label>Accent colour (hex) <input id="cfg-accentColor" placeholder="#0079C1" /></label>
+
+            <h2 class="form-section">Features</h2>
+            <label class="checkbox"><input type="checkbox" id="cfg-featureTripPlanner" /> Trip planner</label>
+            <label class="checkbox"><input type="checkbox" id="cfg-featureMaps" /> Maps</label>
+            <label class="checkbox"><input type="checkbox" id="cfg-featureAlerts" /> Service alerts</label>
+            <label class="checkbox"><input type="checkbox" id="cfg-featureFavourites" /> Favourites</label>
+            <label class="checkbox"><input type="checkbox" id="cfg-featureAiChat" /> AI assistant</label>
+
+            <h2 class="form-section">Refresh (seconds)</h2>
+            <label>Alerts <input type="number" id="cfg-alertsRefreshSec" min="10" max="300" /></label>
+            <label>Departures <input type="number" id="cfg-departuresRefreshSec" min="10" max="300" /></label>
+            <label>Trip results <input type="number" id="cfg-tripPlanRefreshSec" min="10" max="120" /></label>
+
+            <h2 class="form-section">Links & text</h2>
+            <label>Transport NSW URL <input id="cfg-linkTransportNsw" /></label>
+            <label>Open data URL <input id="cfg-linkOpenData" /></label>
+            <label>About disclaimer <textarea id="cfg-aboutDisclaimer" rows="3"></textarea></label>
+            <label class="checkbox"><input type="checkbox" id="cfg-notificationsDefaultOn" /> Notifications on by default</label>
+            <label>Notifications help <textarea id="cfg-notificationsHelpText" rows="2"></textarea></label>
+            <label class="checkbox"><input type="checkbox" id="cfg-showWalkLegs" /> Show walking in trip details</label>
+
+            <button type="submit" class="btn primary full">Save all settings</button>
+          </form>
+        </section>
+
+        <section id="tab-map" class="tab-panel hidden">
+          <div class="card stack-form">
+            <p class="muted" id="map-source-label"></p>
+            <div id="map-preview" class="map-preview"></div>
+            <label>Upload map (PNG/JPG) <input type="file" id="map-file" accept="image/png,image/jpeg,image/webp" /></label>
+            <button id="map-upload-btn" class="btn primary full" type="button">Upload selected file</button>
+            <button id="map-reset-btn" class="btn danger-outline full" type="button">Reset to default map</button>
+            <h2 class="form-section">Optional URL</h2>
+            <label>Hosted map URL <input id="cfg-networkMapUrl" placeholder="https://…/map.png" /></label>
+            <h2 class="form-section">Settings text</h2>
+            <label>Map description in app <textarea id="cfg-settingsMapDescription" rows="2"></textarea></label>
+            <button id="map-save-settings-btn" class="btn primary full" type="button">Save map settings</button>
+          </div>
+        </section>
+
+        <section id="tab-stations" class="tab-panel hidden">
+          <input type="search" id="station-search" class="search-input" placeholder="Search stations…" />
+          <div id="stations-list" class="stack"></div>
+          <button id="add-station-btn" class="btn ghost full" type="button">+ Add station</button>
+          <button id="save-stations-btn" class="btn primary full" type="button">Save all stations</button>
+        </section>
+
+        <section id="tab-alerts" class="tab-panel hidden">
+          <div id="alerts-list" class="stack"></div>
+          <button id="add-alert-btn" class="btn ghost full" type="button">+ Add alert</button>
+          <button id="save-alerts-btn" class="btn primary full" type="button">Save all alerts</button>
+        </section>
+      </main>
+
+      <footer class="mobile-footer">
+        <button id="reset-btn" class="btn danger-outline full" type="button">Reset to defaults</button>
+      </footer>
+
+      <p id="toast" class="toast hidden"></p>
+    </div>
+  </div>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

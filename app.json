@@ -1,0 +1,69 @@
+{
+  "expo": {
+    "name": "Sydney Transit",
+    "slug": "sydney-transit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sydneytransit",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sydneytransit.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Sydney Transit uses your location to show nearby stops and walking distance.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Sydney Transit uses your location to show nearby stops."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0079C1"
+      },
+      "package": "com.sydneytransit.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0079C1",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Sydney Transit to use your location to find nearby stops."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#0079C1",
+          "sounds": []
+        }
+      ],
+      "expo-sqlite",
+      "@sentry/react-native"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d8c6faab-34cc-4bca-b996-1791f6d06b08"
+      }
+    }
+  }
+}

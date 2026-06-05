@@ -1,0 +1,80 @@
+# Sydney Transit Fastlane Automation Pipeline
+# Configures build distribution for Apple App Store (TestFlight) & Google Play Console
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to Apple TestFlight"
+  lane :beta do
+    # 1. Fetch profiles and certificates using match
+    match(type: "appstore", readonly: true)
+
+    # 2. Increment iOS build number
+    increment_build_number(
+      build_number: lane_context[SharedValues::BUILD_NUMBER]
+    )
+
+    # 3. Build the native app bundle
+    gym(
+      scheme: "SydneyTransit",
+      workspace: "ios/SydneyTransit.xcworkspace",
+      configuration: "Release",
+      export_method: "app-store"
+    )
+
+    # 4. Upload build to TestFlight
+    upload_to_testflight(
+      username: "developer@sydneytransit.app",
+      app_identifier: "com.sydneytransit.app",
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Publish production build to App Store Connect"
+  lane :release do
+    match(type: "appstore", readonly: true)
+    
+    gym(
+      scheme: "SydneyTransit",
+      workspace: "ios/SydneyTransit.xcworkspace",
+      configuration: "Release"
+    )
+
+    deliver(
+      username: "developer@sydneytransit.app",
+      app_identifier: "com.sydneytransit.app",
+      submit_for_review: true,
+      force: true
+    )
+  end
+end
+
+platform :android do
+  desc "Submit android package to Google Play Internal Test Track"
+  lane :beta do
+    # 1. Compile android release package
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android"
+    )
+
+    # 2. Upload APK/AAB to Play Store internal test track
+    upload_to_play_store(
+      package_name: "com.sydneytransit.app",
+      json_key: "./pc-api-key.json",
+      track: "internal",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab"
+    )
+  end
+
+  desc "Promote beta release to Google Play Production track"
+  lane :release do
+    upload_to_play_store(
+      package_name: "com.sydneytransit.app",
+      json_key: "./pc-api-key.json",
+      track: "production",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab"
+    )
+  end
+end
