@@ -39,6 +39,23 @@ export async function getSydneyBusLines(): Promise<BusLine[]> {
   return (await loadBusMeta()).busLines;
 }
 
-export function getBusLinesForStation(_stationId: string): BusLine[] {
-  return [];
+export async function getBusLinesForStation(stationId: string): Promise<BusLine[]> {
+  const meta = await loadBusMeta();
+  const routes = new Set<string>();
+  for (const branch of meta.branches) {
+    if (branch.stationIds.includes(stationId)) routes.add(branch.route);
+  }
+  if (!routes.size) return [];
+  return meta.busLines.filter((line) => routes.has(line.route));
+}
+
+export async function getBusStopsForRoute(route: string): Promise<string[]> {
+  const meta = await loadBusMeta();
+  const ids = new Set<string>();
+  for (const branch of meta.branches) {
+    if (branch.route === route) {
+      for (const id of branch.stationIds) ids.add(id);
+    }
+  }
+  return [...ids];
 }

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { planTrip } from '../services/tfnsw';
 import type { TripItinerary } from '../services/tfnsw';
@@ -11,6 +12,12 @@ export type TripPlanStationIds = {
 export type UseTripPlanOptions = TripPlanStationIds & {
   /** Include earlier trips today (slower full-day timetable). */
   includePast?: boolean;
+  /** Full weekday timetable from service-day start (04:00) through end of day. */
+  fullDay?: boolean;
+  /** Bypass server cache. */
+  forceRefresh?: boolean;
+  /** When false, skips the query (for staged / background fetches). */
+  enabled?: boolean;
 };
 
 export function useTripPlan(
@@ -21,45 +28,63 @@ export function useTripPlan(
 ) {
   const departAt = departure ?? new Date();
   const includePast = options?.includePast ?? false;
+  const fullDay = options?.fullDay ?? false;
   const refreshMs = useRefreshIntervalMs('tripPlan', 15_000);
   const queryClient = useQueryClient();
   const timeKey = departAt.toISOString().slice(0, 16);
 
-  const upcomingKey = [
+  const queryKey = [
     'tripPlan',
     origin,
     destination,
     options?.originId,
     options?.destinationId,
     timeKey,
-    'upcoming',
+    fullDay ? 'fullday' : includePast ? 'with-past' : 'upcoming',
   ] as const;
 
-  return useQuery({
-    queryKey: [
-      'tripPlan',
-      origin,
-      destination,
-      options?.originId,
-      options?.destinationId,
-      timeKey,
-      includePast ? 'with-past' : 'upcoming',
-    ],
+  const refetchFresh = useCallback(async () => {
+    const fresh = await planTrip(origin!, destination!, departAt, {
+      originId: options?.originId,
+      destinationId: options?.destinationId,
+      includePast,
+      fullDay,
+      forceRefresh: true,
+    });
+    queryClient.setQueryData(queryKey, fresh);
+    return fresh;
+  }, [
+    departAt,
+    destination,
+    fullDay,
+    includePast,
+    options?.destinationId,
+    options?.originId,
+    origin,
+    queryClient,
+    queryKey,
+  ]);
+
+  const query = useQuery({
+    queryKey,
     queryFn: () =>
       planTrip(origin!, destination!, departAt, {
         originId: options?.originId,
         destinationId: options?.destinationId,
         includePast,
+        fullDay,
       }),
-    enabled: !!origin && !!destination,
-    staleTime: includePast ? 120_000 : 60_000,
-    refetchInterval: includePast ? false : refreshMs,
+    enabled: options?.enabled !== false && !!origin && !!destination,
+    staleTime: fullDay || includePast ? 300_000 : 60_000,
+    refetchInterval: fullDay || includePast ? false : refreshMs,
     refetchIntervalInBackground: false,
     refetchOnMount: false,
     retry: 1,
-    placeholderData: () => {
-      if (!includePast) return undefined;
-      return queryClient.getQueryData<TripItinerary[]>(upcomingKey);
-    },
+    gcTime: 600_000,
   });
+
+  return {
+    ...query,
+    refetchFresh,
+  };
 }

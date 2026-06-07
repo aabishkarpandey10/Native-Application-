@@ -7,7 +7,6 @@ import { fetchBackendJson } from "./apiClient";
 type NotificationsModule = {
   setNotificationHandler: (handler: {
     handleNotification: () => Promise<{
-      shouldShowAlert: boolean;
       shouldPlaySound: boolean;
       shouldSetBadge: boolean;
       shouldShowBanner: boolean;
@@ -33,7 +32,6 @@ async function getNotificationsModule(): Promise<NotificationsModule | null> {
     const mod = (await import("expo-notifications")) as NotificationsModule;
     mod.setNotificationHandler({
       handleNotification: async () => ({
-        shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: false,
         shouldShowBanner: true,
@@ -81,6 +79,7 @@ export async function registerForPushNotifications(accessToken?: string): Promis
   if (accessToken) {
     await fetchBackendJson("/api/v1/notifications/register", {
       method: "POST",
+      throwOnError: false,
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
@@ -98,6 +97,7 @@ export async function registerPushWithDevice(
 ): Promise<void> {
   await fetchBackendJson("/api/push/register", {
     method: "POST",
+    throwOnError: false,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ expoPushToken, deviceId, commuteAlertsEnabled: true }),
   });
@@ -110,6 +110,7 @@ export async function unregisterPushNotifications(
   if (!accessToken) return;
   await fetchBackendJson("/api/v1/notifications/unregister", {
     method: "DELETE",
+    throwOnError: false,
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",

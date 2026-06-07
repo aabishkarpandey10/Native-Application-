@@ -98,7 +98,7 @@ async function loadAll() {
   $("#cfg-featureAlerts").checked = cfg.featureAlerts !== false;
   $("#cfg-featureFavourites").checked = cfg.featureFavourites !== false;
   $("#cfg-featureAiChat").checked = cfg.featureAiChat !== false;
-  $("#cfg-alertsRefreshSec").value = cfg.alertsRefreshSec ?? 30;
+  $("#cfg-alertsRefreshSec").value = cfg.alertsRefreshSec ?? 20;
   $("#cfg-departuresRefreshSec").value = cfg.departuresRefreshSec ?? 30;
   $("#cfg-tripPlanRefreshSec").value = cfg.tripPlanRefreshSec ?? 15;
   $("#cfg-linkTransportNsw").value = cfg.linkTransportNsw || "";
@@ -107,6 +107,8 @@ async function loadAll() {
   $("#cfg-notificationsDefaultOn").checked = !!cfg.notificationsDefaultOn;
   if ($("#cfg-networkMapUrl")) $("#cfg-networkMapUrl").value = cfg.networkMapUrl || "";
   if ($("#cfg-settingsMapDescription")) $("#cfg-settingsMapDescription").value = cfg.settingsMapDescription || "";
+  if ($("#cfg-appLogoUrl")) $("#cfg-appLogoUrl").value = cfg.appLogoUrl || "";
+  updateLogoPreview(cfg);
   updateMapPreview(cfg);
   $("#cfg-notificationsHelpText").value = cfg.notificationsHelpText || "";
   $("#cfg-showWalkLegs").checked = !!cfg.showWalkLegsInTrips;
@@ -115,6 +117,35 @@ async function loadAll() {
   updateStats(cfg);
   renderStations();
   renderAlerts();
+}
+
+function logoSourceLabel(cfg) {
+  if (cfg?.appLogoHasUpload || cfg?.appLogoUpdatedAt) return "Uploaded image";
+  if (cfg?.appLogoUrl?.trim()) return "Custom URL";
+  return "Default bundled logo";
+}
+
+function updateLogoPreview(cfg) {
+  const label = $("#logo-source-label");
+  const preview = $("#logo-preview");
+  if (!label || !preview) return;
+  label.textContent = `Current: ${logoSourceLabel(cfg)}`;
+  preview.innerHTML = "";
+  let src = "";
+  if (cfg?.appLogoHasUpload || cfg?.appLogoUpdatedAt) {
+    const v = cfg.appLogoUpdatedAt || "upload";
+    src = `/api/app-logo?v=${encodeURIComponent(v)}`;
+  } else if (cfg?.appLogoUrl?.trim()) {
+    src = cfg.appLogoUrl.trim();
+  }
+  if (src) {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "App logo preview";
+    preview.appendChild(img);
+  } else {
+    preview.textContent = "Using default logo in the app until you upload.";
+  }
 }
 
 function mapSourceLabel(cfg) {
@@ -232,9 +263,10 @@ async function saveStations() {
 }
 
 async function deleteStation(id) {
-  if (!confirm(`Delete station ${id}?`)) return;
-  stations = stations.filter((s) => s.id !== id);
-  await saveStations();
+  if (!confirm(`Hide station ${id} from the app?`)) return;
+  await api(`/api/admin/stations/${encodeURIComponent(id)}`, { method: "DELETE" });
+  showToast("Station hidden");
+  await loadAll();
 }
 
 function renderAlerts() {
@@ -353,6 +385,52 @@ $("#save-stations-btn").addEventListener("click", () => saveStations());
 $("#save-alerts-btn").addEventListener("click", async () => {
   await api("/api/admin/alerts", { method: "PUT", body: JSON.stringify(alerts) });
   showToast("Alerts saved");
+  await loadAll();
+});
+
+$("#logo-upload-btn")?.addEventListener("click", async () => {
+  const file = $("#logo-file")?.files?.[0];
+  if (!file) {
+    showToast("Choose an image first");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try {
+      const data = String(reader.result ?? "");
+      const base64 = data.includes(",") ? data.split(",").pop() : data;
+      await api("/api/admin/app-logo", {
+        method: "POST",
+        body: JSON.stringify({ imageBase64: base64 }),
+      });
+      showToast("Logo uploaded");
+      await loadAll();
+    } catch (e) {
+      showToast(e.message || "Upload failed");
+    }
+  };
+  reader.readAsDataURL(file);
+});
+
+$("#logo-reset-btn")?.addEventListener("click", async () => {
+  if (!confirm("Reset to default logo?")) return;
+  await api("/api/admin/app-logo", { method: "DELETE" });
+  await api("/api/admin/app-config", {
+    method: "PUT",
+    body: JSON.stringify({ appLogoUrl: "" }),
+  });
+  showToast("Logo reset");
+  await loadAll();
+});
+
+$("#logo-save-settings-btn")?.addEventListener("click", async () => {
+  await api("/api/admin/app-config", {
+    method: "PUT",
+    body: JSON.stringify({
+      appLogoUrl: $("#cfg-appLogoUrl")?.value?.trim() ?? "",
+    }),
+  });
+  showToast("Logo settings saved");
   await loadAll();
 });
 

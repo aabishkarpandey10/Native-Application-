@@ -1,5 +1,6 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
 import { isResolvedAlertText } from "./alertFilters.js";
+import { isTrackworkAlert as classifyTrackwork } from "./alertClassification.js";
 
 const GTFS_ALERT_MODES = [
   { feed: "sydneytrains", mode: "train" },
@@ -67,29 +68,23 @@ function inferGtfsSeverity(alert, title, description) {
   const effect = String(alert?.effect || "").toUpperCase();
 
   if (
+    cause === "MAINTENANCE" ||
+    /trackwork|track work|planned maintenance|changed timetable|rail replacement/i.test(blob)
+  ) {
+    return "warning";
+  }
+  if (
     /cancel|suspended|no trains|not stopping|major delay|significant delay|avoid travel/i.test(blob)
   ) {
     return "critical";
   }
-  if (
-    cause === "MAINTENANCE" ||
-    /trackwork|planned maintenance|buses replace|replacement bus|changed timetable/i.test(blob)
-  ) {
+  if (/buses replace|replacement bus/i.test(blob)) {
     return "warning";
   }
   if (effect === "MODIFIED_SERVICE" || /delay|late|divert|altered/i.test(blob)) {
     return "warning";
   }
   return "info";
-}
-
-function isTrackworkAlert(alert, title, description) {
-  const cause = String(alert?.cause || "").toUpperCase();
-  const blob = `${title} ${description}`.toLowerCase();
-  return (
-    cause === "MAINTENANCE" ||
-    /trackwork|planned maintenance|buses replace trains|replacement bus/i.test(blob)
-  );
 }
 
 function mapGtfsEntity(entity, defaultMode) {
@@ -105,7 +100,12 @@ function mapGtfsEntity(entity, defaultMode) {
 
   if (isResolvedAlertText(title, description)) return null;
 
-  const trackwork = isTrackworkAlert(alert, title, description);
+  const draft = {
+    title,
+    description,
+    announcementType: String(alert?.cause || "").toUpperCase() === "MAINTENANCE" ? "trackwork" : null,
+  };
+  const trackwork = classifyTrackwork(draft);
   const displayTitle = trackwork && !/trackwork/i.test(title) ? `Trackwork: ${title}` : title;
 
   const url = pickTranslation(alert.url) || null;
@@ -181,8 +181,8 @@ export async function fetchTransportNswGtfsAlerts(apiKey) {
   }
 
   return merged.sort((a, b) => {
-    const trackA = /trackwork/i.test(a.title) ? 0 : 1;
-    const trackB = /trackwork/i.test(b.title) ? 0 : 1;
+    const trackA = classifyTrackwork(a) ? 0 : 1;
+    const trackB = classifyTrackwork(b) ? 0 : 1;
     if (trackA !== trackB) return trackA - trackB;
     const rank = { critical: 0, warning: 1, info: 2 };
     return (rank[a.severity] ?? 2) - (rank[b.severity] ?? 2);

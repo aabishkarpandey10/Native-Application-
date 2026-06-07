@@ -1,4 +1,5 @@
 import { View } from "react-native";
+import { SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { Txt } from "./Txt";
 
@@ -17,12 +18,12 @@ export function SectionHeader({ title, trailing }: SectionHeaderProps) {
         flexDirection: "row",
         alignItems: "flex-end",
         justifyContent: "space-between",
-        paddingHorizontal: 16,
+        paddingHorizontal: SPACING.screen,
         paddingTop: 20,
         paddingBottom: 8,
       }}
     >
-      <Txt size={12} weight="600" color={c.textSecondary} tracking={0.6} uppercase>
+      <Txt size={15} weight="600" color={c.text} tracking={-0.2}>
         {title}
       </Txt>
       {trailing}

@@ -13,8 +13,8 @@ import { buildMockStopsForDeparture } from "./stopSequence.js";
 import { buildDepartureStopSequence } from "./timedStopSequence.js";
 import { STATION_ID_MAP } from "./sydneyStations.js";
 import {
-  formatItdDateTime,
-  matchesStationMode,
+  fetchDepartureBoardEvents,
+  fetchFullDayDepartureBoardEvents,
   parseStopEvent,
   resolveTfnswStopId,
 } from "./tfnswHelpers.js";
@@ -27,7 +27,8 @@ import {
 import { isSydneyWeekend, parseTfnswTime } from "./tfnswTime.js";
 
 const TFNSW_API_BASE = config.tfnsw.baseUrl;
-const MIN_LIVE_DEPARTURES = 3;
+const MIN_LIVE_DEPARTURES = 1;
+const MIN_FULLDAY_LIVE = 3;
 
 function sortByDepartureTime(list) {
   return [...list].sort(
@@ -51,7 +52,8 @@ function dedupeDepartures(list) {
 }
 
 function enrichDepartureStops(station, stationId, departure) {
-  if (departure.stops?.length >= 2) return departure;
+  const minStops = station?.mode === "bus" ? 4 : 2;
+  if (departure.stops?.length >= minStops) return departure;
   const sched = parseTfnswTime(departure.scheduledTime);
   const row = {
     destination: departure.destination,
@@ -76,61 +78,8 @@ function enrichDepartureStops(station, stationId, departure) {
   };
 }
 
-/** Same logic as GET /api/departures — shared with AI live context. */
-export async function fetchStationDepartures(
-  stationId,
-  apiKey,
-  { fullDay = false, forceRefresh = false } = {}
-) {
-  if (!stationId) {
-    return { source: "error", departures: [], error: "Missing stationId" };
-  }
-
-  stationId = normalizeStationId(stationId);
-
-  const inflightKey = `${stationId}:${fullDay ? "day" : "board"}`;
-  const existing = getInFlightTfnsw(inflightKey);
-  if (existing) return existing;
-
-  const run = fetchStationDeparturesInner(stationId, apiKey, { fullDay, forceRefresh });
-  return setInFlightTfnsw(inflightKey, run);
-}
-
-async function fetchLiveDepartures(stationId, station, apiKey, { lite = false } = {}) {
-  let tfnswId = STATION_ID_MAP[stationId] || station?.tfnswStopId;
-
-  if (!tfnswId && station) {
-    tfnswId = await resolveTfnswStopId(station, apiKey, TFNSW_API_BASE, tfnswId);
-  }
-  if (!tfnswId) return null;
-
-  markTfnswFetched(stationId);
+function mapLiveBoard(station, stationId, events, { lite = false } = {}) {
   const now = new Date();
-  const { dateStr, timeStr } = formatItdDateTime(now);
-  const url = `${TFNSW_API_BASE}/departure_mon?outputFormat=rapidJSON&coordOutputFormat=EPSG%3A4326&mode=direct&type_dm=stop&name_dm=${tfnswId}&itdDate=${dateStr}&itdTime=${timeStr}&TfNSWDM=true`;
-
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Apikey ${apiKey}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    if (response.status !== 429) {
-      console.warn(
-        `TfNSW departures HTTP ${response.status} for ${stationId} (stop ${tfnswId})`
-      );
-    }
-    return null;
-  }
-
-  const data = await response.json();
-  if (!data.stopEvents?.length) return null;
-
-  const stationMode = station?.mode || "train";
-  const events = data.stopEvents.filter((ev) => matchesStationMode(ev, stationMode));
-
   let mappedDepartures = events
     .map((event) => parseStopEvent(event, stationId))
     .map((d) => (lite ? d : enrichDepartureStops(station, stationId, d)));
@@ -143,100 +92,206 @@ async function fetchLiveDepartures(stationId, station, apiKey, { lite = false } 
 
   if (mappedDepartures.length === 0) return null;
 
-  const departures = mappedDepartures;
-
   return {
     source: "tfnsw-live",
-    departures,
+    departures: mappedDepartures,
     meta: {
-      refreshedAt: new Date().toISOString(),
-      stopId: tfnswId,
+      refreshedAt: now.toISOString(),
+      scheduleSource: "transportnsw.info",
       weekend: isSydneyWeekend(now),
     },
   };
 }
 
-async function fetchStationDeparturesInner(stationId, apiKey, { fullDay = false, forceRefresh = false } = {}) {
+/** Same logic as GET /api/departures — shared with AI live context. */
+export async function fetchStationDepartures(
+  stationId,
+  apiKey,
+  { fullDay = false, forceRefresh = false, routeFilter = null } = {}
+) {
+  if (!stationId) {
+    return { source: "error", departures: [], error: "Missing stationId" };
+  }
+
+  stationId = normalizeStationId(stationId);
+
+  const inflightKey = `${stationId}:${fullDay ? "day" : "board"}`;
+  const existing = getInFlightTfnsw(inflightKey);
+  if (existing) return existing;
+
+  const run = fetchStationDeparturesInner(stationId, apiKey, {
+    fullDay,
+    forceRefresh,
+    routeFilter,
+  });
+  return setInFlightTfnsw(inflightKey, run);
+}
+
+function applyRouteFilter(payload, routeFilter) {
+  if (!routeFilter || !payload?.departures?.length) return payload;
+  const want = String(routeFilter).trim().toUpperCase();
+  const filtered = payload.departures.filter(
+    (d) => String(d.routeNumber || "").toUpperCase() === want
+  );
+  return {
+    ...payload,
+    departures: filtered,
+    meta: {
+      ...(payload.meta || {}),
+      routeFilter: want,
+    },
+  };
+}
+
+async function fetchTfnswFullDayTimetable(stationId, station, apiKey) {
+  let tfnswId = STATION_ID_MAP[stationId] || station?.tfnswStopId;
+
+  if (!tfnswId && station) {
+    tfnswId = await resolveTfnswStopId(station, apiKey, TFNSW_API_BASE, tfnswId);
+  }
+
+  markTfnswFetched(stationId);
+  const now = new Date();
+
+  try {
+    const { events, boardRef } = await fetchFullDayDepartureBoardEvents(
+      station,
+      apiKey,
+      TFNSW_API_BASE,
+      tfnswId
+    );
+    if (!events.length) return null;
+
+    let mapped = events
+      .map((event) => parseStopEvent(event, stationId))
+      .map((d) => enrichDepartureStops(station, stationId, d));
+    mapped = dedupeDepartures(sortByDepartureTime(mapped));
+    mapped = filterActiveDepartures(mapped, now, { stationId, fullDay: true });
+
+    if (mapped.length === 0) return null;
+
+    return {
+      source: "tfnsw-live-fullday",
+      departures: mapped,
+      meta: {
+        refreshedAt: now.toISOString(),
+        scheduleSource: "transportnsw.info",
+        fullDay: true,
+        stopId: boardRef,
+        weekend: isSydneyWeekend(now),
+      },
+    };
+  } catch (apiErr) {
+    console.warn(`TfNSW full-day timetable failed for ${stationId}:`, apiErr.message);
+    return null;
+  }
+}
+
+async function fetchLiveDepartures(stationId, station, apiKey, { lite = false } = {}) {
+  let tfnswId = STATION_ID_MAP[stationId] || station?.tfnswStopId;
+
+  if (!tfnswId && station) {
+    tfnswId = await resolveTfnswStopId(station, apiKey, TFNSW_API_BASE, tfnswId);
+  }
+
+  markTfnswFetched(stationId);
+  const now = new Date();
+
+  try {
+    const { events, boardRef } = await fetchDepartureBoardEvents(
+      station,
+      apiKey,
+      TFNSW_API_BASE,
+      tfnswId,
+      now
+    );
+    if (!events.length) return null;
+
+    const payload = mapLiveBoard(station, stationId, events, { lite });
+    if (!payload) return null;
+    payload.meta.stopId = boardRef;
+    return payload;
+  } catch (apiErr) {
+    console.warn(`TfNSW departures failed for ${stationId}:`, apiErr.message);
+    return null;
+  }
+}
+
+async function fetchStationDeparturesInner(
+  stationId,
+  apiKey,
+  { fullDay = false, forceRefresh = false, routeFilter = null } = {}
+) {
   const station = getStationById(stationId);
   const pdfAvailable = hasCustomTimetable(stationId);
   const now = new Date();
 
-  let liveResult = null;
   const skipThrottle = forceRefresh || fullDay;
   const canFetchLive =
     isTfnswKeyConfigured() && (skipThrottle || !shouldThrottleTfnsw(stationId));
 
-  const isLightRail =
-    station?.mode === "lightrail" || station?.mode === "light_rail";
-  const isMetro = station?.mode === "metro";
+  const isBus = station?.mode === "bus";
+  const finish = (payload) => applyRouteFilter(payload, routeFilter);
 
-  if (pdfAvailable && fullDay) {
-    const pdfPromise = new Promise((resolve) => {
-      setImmediate(() => resolve(buildFullDayDeparturesPayload(station, stationId, 3000)));
-    });
-    const livePromise = canFetchLive
-      ? fetchLiveDepartures(stationId, station, apiKey, { lite: true }).catch((apiErr) => {
-          console.warn(`TfNSW departures failed for ${stationId}:`, apiErr.message);
-          return null;
-        })
-      : Promise.resolve(null);
+  let liveResult = null;
+  if (canFetchLive) {
+    try {
+      liveResult = fullDay
+        ? await fetchTfnswFullDayTimetable(stationId, station, apiKey)
+        : await fetchLiveDepartures(stationId, station, apiKey, { lite: isBus });
+    } catch (apiErr) {
+      console.warn(`TfNSW departures failed for ${stationId}:`, apiErr.message);
+    }
+  }
 
-    const [pdf, live] = await Promise.all([pdfPromise, livePromise]);
-    liveResult = live;
+  const liveCount = liveResult?.departures?.length ?? 0;
+
+  if (pdfAvailable) {
+    const pdf = fullDay
+      ? buildFullDayDeparturesPayload(station, stationId, 3000)
+      : buildPdfDeparturesPayload(station, stationId, 80);
 
     if (pdf?.departures?.length) {
       let departures = pdf.departures;
       if (liveResult?.departures?.length) {
         departures = mergeLiveOntoSchedule(departures, liveResult.departures);
       }
-      departures = filterActiveDepartures(departures, now, { stationId, fullDay: true });
+      departures = filterActiveDepartures(departures, now, { stationId, fullDay });
       if (departures.length > 0) {
-        return {
-          source: liveResult?.departures?.length
-            ? "tfnsw-live+timetable-pdf-fullday"
-            : pdf.source,
+        const source = liveResult?.departures?.length
+          ? fullDay
+            ? "tfnsw-live+timetable-fullday"
+            : isBus
+              ? "tfnsw-live+timetable-gtfs"
+              : "tfnsw-live+timetable-pdf"
+          : pdf.source;
+        return finish({
+          source,
           departures,
           meta: {
             ...pdf.meta,
             ...(liveResult?.meta || {}),
-            fullDay: true,
+            scheduleSource: liveResult?.departures?.length
+              ? "transportnsw.info"
+              : pdf.meta?.scheduleSource,
+            fullDay: fullDay || undefined,
             syncedAt: now.toISOString(),
+            weekendNote:
+              isBus && !liveResult?.departures?.length && isSydneyWeekend(now)
+                ? "Weekday GTFS times — live board unavailable"
+                : pdf.meta?.weekendNote,
           },
-        };
-      }
-    }
-  } else if (canFetchLive) {
-    try {
-      liveResult = await fetchLiveDepartures(stationId, station, apiKey);
-    } catch (apiErr) {
-      console.warn(`TfNSW departures failed for ${stationId}:`, apiErr.message);
-    }
-  }
-
-  if (pdfAvailable && (isLightRail || isMetro)) {
-    const pdf = buildPdfDeparturesPayload(station, stationId, 80);
-    if (pdf?.departures?.length) {
-      pdf.departures = filterActiveDepartures(pdf.departures, now, { stationId });
-      if (pdf.departures.length > 0) {
-        if (liveResult?.departures?.length) {
-          const merged = filterActiveDepartures(
-            mergeLiveOntoSchedule(pdf.departures, liveResult.departures),
-            now,
-            { stationId }
-          );
-          return {
-            source: "tfnsw-live+timetable-pdf",
-            departures: merged,
-            meta: { ...liveResult.meta, ...pdf.meta },
-          };
-        }
-        return pdf;
+        });
       }
     }
   }
 
-  if (liveResult?.departures?.length >= MIN_LIVE_DEPARTURES && !fullDay) {
-    return liveResult;
+  if (liveCount >= (fullDay ? MIN_FULLDAY_LIVE : MIN_LIVE_DEPARTURES)) {
+    return finish(liveResult);
+  }
+
+  if (liveCount > 0) {
+    return finish(liveResult);
   }
 
   if (pdfAvailable) {
@@ -244,24 +299,40 @@ async function fetchStationDeparturesInner(stationId, apiKey, { fullDay = false,
       ? buildFullDayDeparturesPayload(station, stationId, 3000)
       : buildPdfDeparturesPayload(station, stationId, 80);
     if (pdf?.departures?.length) {
-      pdf.departures = filterActiveDepartures(pdf.departures, now, {
-        stationId,
-        fullDay,
-      });
+      pdf.departures = filterActiveDepartures(pdf.departures, now, { stationId, fullDay });
       if (pdf.departures.length > 0) {
-        return pdf;
+        if (isBus) {
+          pdf.meta = {
+            ...pdf.meta,
+            scheduleSource: "transportnsw-gtfs-weekday",
+            weekendNote: isSydneyWeekend(now)
+              ? "Weekday GTFS times — live board unavailable"
+              : null,
+          };
+        }
+        return finish(pdf);
       }
     }
   }
 
-  if (liveResult?.departures?.length > 0) {
-    return liveResult;
+  if (config.allowMockData) {
+    const departures = buildMockDepartures(station, stationId, 8);
+    return finish({
+      source: "mock",
+      departures: filterActiveDepartures(departures, now, { stationId }),
+      meta: {
+        refreshedAt: now.toISOString(),
+        scheduleSource: isTfnswKeyConfigured() ? "transportnsw-unavailable" : "mock",
+      },
+    });
   }
 
-  const departures = buildMockDepartures(station, stationId, 8);
-  return {
-    source: "mock",
-    departures: filterActiveDepartures(departures, now, { stationId }),
-    meta: { refreshedAt: now.toISOString() },
-  };
+  return finish({
+    source: "unavailable",
+    departures: [],
+    meta: {
+      refreshedAt: now.toISOString(),
+      scheduleSource: "unavailable",
+    },
+  });
 }

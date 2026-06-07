@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Txt } from "../design";
+import { SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 
 export function AdminSegmentTabs<T extends string>({
@@ -17,7 +18,7 @@ export function AdminSegmentTabs<T extends string>({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 10 }}
+      contentContainerStyle={{ paddingHorizontal: SPACING.screen, gap: 8, paddingVertical: 10 }}
     >
       {tabs.map((t) => {
         const selected = active === t.key;
@@ -26,7 +27,7 @@ export function AdminSegmentTabs<T extends string>({
             key={t.key}
             onPress={() => onChange(t.key)}
             style={{
-              paddingHorizontal: 16,
+              paddingHorizontal: SPACING.cell,
               paddingVertical: 9,
               borderRadius: 12,
               backgroundColor: selected ? c.primary : c.card,
@@ -53,7 +54,7 @@ export function AdminStatRow({
 }) {
   const c = useColors();
   return (
-    <View style={{ flexDirection: "row", paddingHorizontal: 16, gap: 10, marginBottom: 4 }}>
+    <View style={{ flexDirection: "row", paddingHorizontal: SPACING.screen, gap: 10, marginBottom: 4 }}>
       {items.map((item) => (
         <View
           key={item.label}

@@ -4,6 +4,7 @@
 import type { Departure, ServiceAlert, TripItinerary } from "../services/tfnsw";
 import type { JourneyRoute, SampleAlert, SampleDeparture, Severity } from "../constants/sampleData";
 import { formatClock, formatTripClock, minutesUntil, parseTfnswTime } from "./tfnswTime";
+import { formatAlertRelativeTime } from "./serviceAlert";
 import { legModeLabel } from "./tripDisplay";
 import { trainOnlyTripSummary, transitLegs } from "./tripLegs";
 
@@ -33,17 +34,22 @@ export function departureToDisplay(d: Departure, index = 0): SampleDeparture {
   const when = asDate(d.realTime ?? d.departureTime ?? d.scheduledTime);
   const via =
     d.stops && d.stops.length > 2
-      ? d.stops
-          .slice(1, 3)
-          .map((s) => shortStop(s.station_name))
-          .filter(Boolean)
-          .join(", ")
+      ? d.stops.length > 5
+        ? `${d.stops.length - 1} stops`
+        : d.stops
+            .slice(1, 3)
+            .map((s) => shortStop(s.station_name))
+            .filter(Boolean)
+            .join(", ")
       : undefined;
+  const isBus = d.mode === "bus";
   return {
     id: `${d.routeNumber}-${d.platform}-${when.getTime()}-${index}`,
     route: d.routeNumber,
     destination: shortStop(d.destination),
     platform: cleanPlatform(d.platform),
+    transitMode: d.mode,
+    platformLabel: isBus ? "Stand" : d.mode === "ferry" ? "Wharf" : "Platform",
     via,
     minutes: minutesUntil(when),
     clock: formatClock(when),
@@ -85,7 +91,7 @@ export function tripToDisplay(
 
   const chips = transitLegs(t.legs).map((leg) => ({
     mode: leg.mode,
-    route: leg.routeNumber || leg.mode.toUpperCase(),
+    route: String(leg.routeNumber || leg.mode).toUpperCase(),
   }));
 
   const steps = trainSummary.legs.map((leg) => {
@@ -99,19 +105,31 @@ export function tripToDisplay(
         detail: `${formatClock(legDep)} – ${formatClock(legArr)} · ${leg.duration} min`,
       };
     }
-    const route = leg.routeNumber || leg.mode.toUpperCase();
-    const platform = leg.platform ? ` · Platform ${cleanPlatform(leg.platform)}` : "";
+    const route = String(leg.routeNumber || leg.mode).toUpperCase();
+    const platformRaw = leg.platform ? cleanPlatform(leg.platform) : "";
+    const platform =
+      platformRaw && platformRaw !== "—"
+        ? leg.mode === "bus"
+          ? ` · Stand ${platformRaw}`
+          : leg.mode === "ferry"
+            ? ` · Wharf ${platformRaw}`
+            : ` · Platform ${platformRaw}`
+        : "";
+    const stopNote =
+      leg.mode === "bus" && leg.stopTimes && leg.stopTimes.length > 2
+        ? ` · ${leg.stopTimes.length} stops`
+        : "";
     return {
       mode: leg.mode,
       route,
       label: `${legModeLabel(leg.mode, route)} to ${dest}`,
-      detail: `Board ${formatClock(legDep)} · Arrive ${formatClock(legArr)} · ${leg.duration} min${platform}`,
+      detail: `Board ${formatClock(legDep)} · Arrive ${formatClock(legArr)} · ${leg.duration} min${platform}${stopNote}`,
     };
   });
 
   const leaveInMinutes = Math.round((dep.getTime() - Date.now()) / 60000);
   const nowMs = Date.now();
-  const isPast = arr.getTime() < nowMs;
+  const isPast = dep.getTime() < nowMs;
 
   return {
     id: t.id,
@@ -130,6 +148,20 @@ export function tripToDisplay(
     steps,
     itinerary: t,
   };
+}
+
+export function tripViaLabel(t: TripItinerary): string | undefined {
+  const busLegs = t.legs.filter((l) => l.mode === "bus");
+  if (!busLegs.length) return undefined;
+  const parts = busLegs.map((leg) => {
+    const route = String(leg.routeNumber || "Bus").toUpperCase();
+    const dest = shortStop(leg.destinationName || "");
+    const stops = leg.stopTimes?.length ?? leg.stops?.length ?? 0;
+    if (stops > 2) return `Route ${route} · ${stops} stops to ${dest}`;
+    if (dest) return `Route ${route} to ${dest}`;
+    return `Route ${route}`;
+  });
+  return parts.join(" · ");
 }
 
 export function tripsToDisplay(
@@ -152,12 +184,7 @@ export function tripsToDisplay(
     counts.set(base, n + 1);
   }
 
-  return displayed.sort((a, b) => {
-    const aPast = !!a.isPast;
-    const bPast = !!b.isPast;
-    if (aPast !== bPast) return aPast ? 1 : -1; // upcoming first, earlier trips later
-    return (a.leaveInMinutes ?? 0) - (b.leaveInMinutes ?? 0);
-  });
+  return displayed.sort((a, b) => (a.leaveInMinutes ?? 0) - (b.leaveInMinutes ?? 0));
 }
 
 const LINE_RE = /\b(T\d+|M\d+|L\d+|F\d+)\b/i;
@@ -182,7 +209,7 @@ export function alertToDisplay(a: ServiceAlert): SampleAlert {
     lineName,
     title: a.title,
     description: a.description,
-    time: "",
+    time: formatAlertRelativeTime(a.updatedAt),
   };
 }
 

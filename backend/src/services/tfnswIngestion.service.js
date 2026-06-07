@@ -36,9 +36,10 @@ export function isOutageMode() {
 /** Cached departures with per-station TfNSW throttling */
 export async function getDeparturesWithCache(
   stationId,
-  { forceRefresh = false, fullDay = false } = {}
+  { forceRefresh = false, fullDay = false, routeFilter = null } = {}
 ) {
-  const cacheKey = `${cacheKeyForDepartures(stationId)}${fullDay ? ":fullday" : ""}`;
+  const routeKey = routeFilter ? `:route:${String(routeFilter).toUpperCase()}` : "";
+  const cacheKey = `${cacheKeyForDepartures(stationId)}${fullDay ? ":fullday" : ""}${routeKey}`;
   const cached = await cacheGetStale(cacheKey);
 
   if (!forceRefresh && cached.data && !cached.stale) {
@@ -59,6 +60,7 @@ export async function getDeparturesWithCache(
       const live = await fetchStationDepartures(stationId, config.tfnsw.apiKey, {
         fullDay,
         forceRefresh,
+        routeFilter,
       });
       await cacheSetWithStale(cacheKey, live, fullDay ? 45 : undefined);
       outageMode = live.source === "mock";
@@ -82,6 +84,7 @@ export async function getDeparturesWithCache(
   const live = await fetchStationDepartures(stationId, config.tfnsw.apiKey, {
     fullDay,
     forceRefresh,
+    routeFilter,
   });
   await cacheSetWithStale(cacheKey, live, fullDay ? 45 : undefined);
   return {

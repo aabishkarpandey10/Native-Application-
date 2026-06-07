@@ -10,6 +10,12 @@ const VALID_MODES = new Set<ServiceAlert["mode"]>([
 
 const VALID_SEVERITY = new Set<ServiceAlert["severity"]>(["critical", "warning", "info"]);
 
+const TRACKWORK_BLOB =
+  /\b(track\s*work|trackwork|planned maintenance|rail maintenance|weekend work|rail repair|buses replace trains?|replacement buses?|replacement bus|changed timetable|rail replacement|station upgrade|line closure|maintenance work)\b/i;
+
+const CRITICAL_BLOB =
+  /\b(cancel+ed|suspended|not stopping|major delay|significant delay|signal failure|power failure|emergency|evacuat|avoid travel|no trains|detour|significant delays|service disruption|services suspended)\b/i;
+
 export function normalizeAlertMode(mode: unknown): ServiceAlert["mode"] {
   const raw = String(mode ?? "train")
     .trim()
@@ -44,6 +50,37 @@ export function isActiveServiceAlert(title: string, description: string): boolea
   return true;
 }
 
+export function isTrackworkAlert(alert: Pick<ServiceAlert, "title" | "description" | "announcementType" | "isTrackwork">): boolean {
+  if (alert.isTrackwork === true) return true;
+  const announcement = String(alert.announcementType ?? "").toLowerCase();
+  if (announcement === "trackwork") return true;
+  const blob = `${alert.title} ${alert.description}`;
+  return TRACKWORK_BLOB.test(blob);
+}
+
+export function isCriticalAlert(
+  alert: Pick<ServiceAlert, "title" | "description" | "severity" | "announcementType" | "isTrackwork" | "isCritical">
+): boolean {
+  if (alert.isCritical === true) return true;
+  if (isTrackworkAlert(alert)) return false;
+  if (alert.severity === "critical") return true;
+  const blob = `${alert.title} ${alert.description}`;
+  return CRITICAL_BLOB.test(blob);
+}
+
+export function formatAlertRelativeTime(updatedAt?: string): string {
+  if (!updatedAt) return "";
+  const ts = Date.parse(updatedAt);
+  if (!Number.isFinite(ts)) return "";
+  const mins = Math.floor((Date.now() - ts) / 60_000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
 export function mapRawAlert(item: Record<string, unknown>): ServiceAlert | null {
   const id = String(item.id ?? "").trim();
   if (!id) return null;
@@ -60,7 +97,7 @@ export function mapRawAlert(item: Record<string, unknown>): ServiceAlert | null 
 
   if (!isActiveServiceAlert(title, description)) return null;
 
-  return {
+  const mapped: ServiceAlert = {
     id,
     mode: normalizeAlertMode(item.mode),
     title,
@@ -69,7 +106,21 @@ export function mapRawAlert(item: Record<string, unknown>): ServiceAlert | null 
     affectedRoutes: Array.isArray(affected)
       ? affected.map(String).filter(Boolean)
       : [String(affected)].filter(Boolean),
+    updatedAt: item.updatedAt ? String(item.updatedAt) : undefined,
+    announcementType: item.announcementType != null ? String(item.announcementType) : null,
+    isTrackwork: item.isTrackwork === true ? true : undefined,
+    isCritical: item.isCritical === true ? true : undefined,
+    url: item.url != null ? String(item.url) : null,
   };
+
+  if (mapped.isTrackwork == null) {
+    mapped.isTrackwork = isTrackworkAlert(mapped);
+  }
+  if (mapped.isCritical == null) {
+    mapped.isCritical = isCriticalAlert(mapped);
+  }
+
+  return mapped;
 }
 
 export function dedupeAlerts(alerts: ServiceAlert[]): ServiceAlert[] {

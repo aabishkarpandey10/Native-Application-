@@ -9,6 +9,8 @@ export type UseDeparturesOptions = {
   preview?: boolean;
   /** Rest-of-day timetable from Transport NSW PDF/GTFS + live overlay */
   fullDay?: boolean;
+  /** Filter to one route (bus/light rail) */
+  route?: string;
   enabled?: boolean;
 };
 
@@ -17,18 +19,25 @@ export function useDepartures(
   count = 20,
   options: UseDeparturesOptions = {}
 ) {
-  const { preview = false, fullDay = false, enabled = true } = options;
+  const { preview = false, fullDay = false, route, enabled = true } = options;
   const id = stopId ? normalizeStationId(stopId) : null;
   const queryClient = useQueryClient();
   const forceRefresh = useRef(false);
   const refreshMs = useRefreshIntervalMs("departures", preview ? 90_000 : 30_000);
 
   const query = useQuery({
-    queryKey: ["departures", id, count, preview ? "preview" : "full", fullDay ? "day" : "board"],
+    queryKey: [
+      "departures",
+      id,
+      count,
+      preview ? "preview" : "full",
+      fullDay ? "day" : "board",
+      route ?? "all",
+    ],
     queryFn: async () => {
       const refresh = forceRefresh.current || fullDay;
       forceRefresh.current = false;
-      return fetchDeparturesFeed(id!, count, { refresh, fullDay });
+      return fetchDeparturesFeed(id!, count, { refresh, fullDay, route });
     },
     enabled: enabled && !!id,
     staleTime: fullDay ? 120_000 : preview ? 90_000 : 25_000,

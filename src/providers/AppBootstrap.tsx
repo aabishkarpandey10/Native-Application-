@@ -1,6 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { SafeBackHandler } from "../components/SafeBackHandler";
 import { SplashScreen } from "../components/SplashScreen";
 import { scheduleDeparturesSeed } from "../database/departureSeed";
 import { fetchAppConfig } from "../services/appConfigService";
@@ -10,12 +12,14 @@ import {
   getSavedStationsFromDb,
   getSavedTripsFromDb,
 } from "../database/repository";
+import { PALETTE } from "../constants/design";
+import { logApiConfigStartup } from "../config/api";
 import { useStore } from "../store/store";
 import { hideNativeSplash, prepareNativeSplash } from "../utils/nativeSplash";
 import { DeferredStartupEffects } from "./DeferredStartupEffects";
 
 /** DB/API hydrate in background; no branded overlay (same instant paint as web). */
-const SPLASH_MAX_MS = Platform.OS === "web" ? 500 : 1200;
+const SPLASH_MAX_MS = 500;
 
 function hydrateStoreFromDb(
   dbFavorites: { station_id: string; station_name: string; transit_mode: string }[],
@@ -62,6 +66,10 @@ export function AppBootstrap({ children }: { children: ReactNode }) {
     setDeferredReady(true);
     void hideNativeSplash();
   };
+
+  useEffect(() => {
+    logApiConfigStartup();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -118,7 +126,9 @@ export function AppBootstrap({ children }: { children: ReactNode }) {
   }, [queryClient]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#000000" : "#EFEFF4" }}>
+    <View style={{ flex: 1, backgroundColor: PALETTE[isDark ? "dark" : "light"].bg }}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <SafeBackHandler />
       {children}
       {deferredReady ? <DeferredStartupEffects /> : null}
       <SplashScreen visible={showOverlay} />

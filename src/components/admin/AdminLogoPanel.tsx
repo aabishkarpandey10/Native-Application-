@@ -163,13 +163,13 @@ export function AdminLogoPanel({
         />
       </View>
 
-      <GroupedList inset={16}>
+      <GroupedList>
         <Cell
           minHeight={MIN_TOUCH}
           onPress={() => (Platform.OS === "web" ? pickImageWeb() : void pickImage())}
         >
           <Upload size={20} color={c.primary} strokeWidth={2} />
-          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
             Upload logo image
           </Txt>
           {busy ? <ActivityIndicator color={c.primary} /> : null}
@@ -182,7 +182,7 @@ export function AdminLogoPanel({
       </GroupedList>
 
       <SectionHeader title="Optional logo URL" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField
           label="Hosted logo URL"
           value={config.appLogoUrl ?? ""}

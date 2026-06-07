@@ -5,6 +5,7 @@ import {
   normalizeRouteNumber,
 } from "./tfnswHelpers.js";
 import { buildLineStopSequence } from "./stopSequence.js";
+import { buildBusLegStopSequence } from "./timedStopSequence.js";
 import { findBranchPath } from "./trainNetworkPath.js";
 import { normalizeItineraryTimes } from "./tripPlanner.js";
 
@@ -112,8 +113,9 @@ export function mapTfnswTripLeg(leg, origin, dest) {
   }
 
   let finalRouteNumber = routeNo;
-  // Skip heavy PDF stop expansion during trip search when TfNSW already sent a sequence.
-  const skipStopExpansion = stops.length >= 2;
+  // Bus: expand when TfNSW sent fewer than 4 timed stops (often just board + alight).
+  const skipStopExpansion =
+    legMode === "bus" ? stopTimes.length >= 4 : stopTimes.length >= 2;
 
   if (!skipStopExpansion && legMode === "train" && origin?.id && dest?.id) {
     const path = findBranchPath(origin.id, dest.id, routeNo || null);
@@ -130,6 +132,40 @@ export function mapTfnswTripLeg(leg, origin, dest) {
         stopTimes = seq;
         stops = seq.map((s) => s.station_name);
       }
+    }
+  }
+
+  if (legMode === "bus" && stopTimes.length < 4) {
+    const originCoord = leg.origin?.coord || leg.origin?.location?.coord;
+    const destCoord = leg.destination?.coord || leg.destination?.location?.coord;
+    let originLat;
+    let originLon;
+    let destLat;
+    let destLon;
+    if (Array.isArray(originCoord) && originCoord.length >= 2) {
+      originLon = Number(originCoord[0]);
+      originLat = Number(originCoord[1]);
+    }
+    if (Array.isArray(destCoord) && destCoord.length >= 2) {
+      destLon = Number(destCoord[0]);
+      destLat = Number(destCoord[1]);
+    }
+    const seq = buildBusLegStopSequence({
+      originName: leg.origin.name,
+      destinationName: leg.destination.name,
+      routeNumber: finalRouteNumber || routeNo,
+      destinationLabel: leg.transportation?.destination?.name || leg.destination.name,
+      depTime: depTime,
+      arrTime: arrTime,
+      originLat,
+      originLon,
+      destLat,
+      destLon,
+      partialStopTimes: stopTimes.length >= 2 ? stopTimes : null,
+    });
+    if (seq?.length >= 2) {
+      stopTimes = seq;
+      stops = seq.map((s) => s.station_name);
     }
   }
 
@@ -198,11 +234,12 @@ export function mapTfnswJourneys(journeys, origin, dest) {
   });
 }
 
-export function calcTfnswTripCount(origin, dest, includePast = false) {
-  if (includePast) return 12;
+export function calcTfnswTripCount(origin, dest, includePast = false, fullDay = false) {
+  if (fullDay) return 40;
+  if (includePast) return 20;
   const modes = [origin?.mode, dest?.mode].map((m) =>
     m === "lightrail" ? "light_rail" : m
   );
-  if (modes.includes("bus")) return 10;
+  if (modes.includes("bus")) return 12;
   return 8;
 }

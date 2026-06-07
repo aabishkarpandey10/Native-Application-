@@ -1,6 +1,7 @@
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Info } from "lucide-react-native";
+import { SPACING } from "../constants/design";
 import { Txt } from "./design";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useColors } from "../hooks/useColors";
@@ -18,7 +19,7 @@ export function AppConfigBanner() {
       <View
         style={{
           backgroundColor: "#B45309",
-          paddingHorizontal: 16,
+          paddingHorizontal: SPACING.screen,
           paddingVertical: 10,
         }}
       >
@@ -44,7 +45,7 @@ export function AppConfigBanner() {
         alignItems: "center",
         gap: 10,
         backgroundColor: bannerColor,
-        paddingHorizontal: 16,
+        paddingHorizontal: SPACING.screen,
         paddingVertical: 10,
       }}
     >

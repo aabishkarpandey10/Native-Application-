@@ -240,7 +240,7 @@ export async function upsertAlertsToDb(alerts: ServiceAlert[]) {
           a.description.slice(0, 4000),
           a.mode,
           a.severity,
-          a.affectedRoutes.join(",").slice(0, 500),
+          (a.affectedRoutes ?? []).join(",").slice(0, 500),
           now,
         ]
       );

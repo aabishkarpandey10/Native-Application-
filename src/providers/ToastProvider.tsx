@@ -8,9 +8,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Platform, Text, View } from "react-native";
+import { View } from "react-native";
+import { useSegments } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RADIUS, SEMANTIC, SPACING } from "../constants/design";
 import { getToastBottomOffset } from "../constants/layout";
+import { useColors } from "../hooks/useColors";
+import { Txt } from "../components/design/Txt";
 
 type ToastType = "success" | "info" | "error";
 
@@ -38,9 +42,12 @@ interface ToastProviderProps {
   aboveTabBar?: boolean;
 }
 
-export function ToastProvider({ children, aboveTabBar = true }: ToastProviderProps) {
+export function ToastProvider({ children, aboveTabBar }: ToastProviderProps) {
+  const c = useColors();
   const insets = useSafeAreaInsets();
-  const toastBottom = getToastBottomOffset(insets.bottom, aboveTabBar);
+  const segments = useSegments();
+  const onTabScreen = segments[0] === "(tabs)";
+  const toastBottom = getToastBottomOffset(insets.bottom, aboveTabBar ?? onTabScreen);
   const [toast, setToast] = useState<ToastItem | null>(null);
   const idRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,11 +61,28 @@ export function ToastProvider({ children, aboveTabBar = true }: ToastProviderPro
 
   const value = useMemo(() => ({ showToast }), [showToast]);
 
-  const colors = {
-    success: { bg: "bg-brand-secondary/15", border: "border-brand-secondary/35", icon: "#30D158" },
-    info: { bg: "bg-brand-primary/15", border: "border-brand-primary/35", icon: "#0A84FF" },
-    error: { bg: "bg-red-500/15", border: "border-red-500/35", icon: "#FF453A" },
-  };
+  const toastStyle = useMemo(() => {
+    switch (toast?.type) {
+      case "success":
+        return {
+          bg: c.isDark ? "#1A2E22" : "#ECFDF3",
+          border: c.isDark ? "#166534" : "#BBF7D0",
+          icon: SEMANTIC.success,
+        };
+      case "error":
+        return {
+          bg: c.isDark ? "#3B1F1F" : "#FEF2F2",
+          border: c.isDark ? "#7F1D1D" : "#FECACA",
+          icon: SEMANTIC.destructive,
+        };
+      default:
+        return {
+          bg: c.isDark ? "#1F2238" : "#EEF2FF",
+          border: c.isDark ? "#3730A3" : "#C7D2FE",
+          icon: c.primary,
+        };
+    }
+  }, [c.isDark, c.primary, toast?.type]);
 
   return (
     <ToastContext.Provider value={value}>
@@ -69,24 +93,34 @@ export function ToastProvider({ children, aboveTabBar = true }: ToastProviderPro
           style={{
             position: "absolute",
             bottom: toastBottom,
-            left: Platform.OS === "android" ? 12 : 16,
-            right: Platform.OS === "android" ? 12 : 16,
+            left: SPACING.screen,
+            right: SPACING.screen,
             zIndex: 99999,
             alignItems: "center",
           }}
         >
           <View
-            className={`flex-row items-center gap-2.5 px-4 py-3 rounded-xl border ${colors[toast.type].bg} ${colors[toast.type].border}`}
-            style={{ maxWidth: 400, width: "100%" }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderRadius: RADIUS.card,
+              borderWidth: 1,
+              backgroundColor: toastStyle.bg,
+              borderColor: toastStyle.border,
+              width: "100%",
+            }}
           >
             {toast.type === "success" ? (
-              <CheckCircle2 size={16} color={colors.success.icon} />
+              <CheckCircle2 size={16} color={toastStyle.icon} />
             ) : (
-              <Info size={16} color={colors[toast.type].icon} />
+              <Info size={16} color={toastStyle.icon} />
             )}
-            <Text className="text-white text-sm font-medium flex-1" numberOfLines={2}>
+            <Txt size={14} weight="500" color={c.text} style={{ flex: 1 }} numberOfLines={2}>
               {toast.message}
-            </Text>
+            </Txt>
           </View>
         </View>
       ) : null}

@@ -1,16 +1,19 @@
 import { useCallback, useMemo, useState } from "react";
 import { FlatList, Pressable, ScrollView, View } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-import { ChevronLeft } from "lucide-react-native";
-import { Chip, EmptyState, Txt } from "../design";
+import { BackButton, Chip, EmptyState, Txt } from "../design";
 import { ScreenTitle } from "../tripview/ScreenTitle";
-import { MIN_TOUCH, SPACING, TAB_BAR_HEIGHT } from "../../constants/design";
+import { HAIRLINE, SPACING } from "../../constants/design";
+import { getStackContentClearance, getTabBarContentClearance } from "../../constants/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { SampleAlert, Severity } from "../../constants/sampleData";
 import { formatSydneyTime } from "../../utils/tfnswTime";
 import { useColors } from "../../hooks/useColors";
 import { useRefreshControl } from "../../hooks/useRefreshControl";
 import { useServiceAlerts } from "../../hooks/useServiceAlerts";
+import { ApiRequestError } from "../../services/apiClient";
 import { alertsToDisplay } from "../../utils/displayAdapters";
+import { isCriticalAlert, isTrackworkAlert } from "../../utils/serviceAlert";
 import { LineBadge } from "../design/LineBadge";
 
 const SEV: Record<Severity, { color: string; label: string }> = {
@@ -31,8 +34,8 @@ function AlertCard({ alert }: { alert: SampleAlert }) {
       style={{
         backgroundColor: c.card,
         paddingHorizontal: SPACING.screen,
-        paddingVertical: 14,
-        borderBottomWidth: 0.5,
+        paddingVertical: 16,
+        borderBottomWidth: HAIRLINE,
         borderBottomColor: c.separator,
       }}
     >
@@ -60,13 +63,19 @@ function AlertCard({ alert }: { alert: SampleAlert }) {
 interface AlertsFeedProps {
   showBack?: boolean;
   onBack?: () => void;
+  /** Tab screens need extra clearance for the floating tab bar. */
+  tabScreen?: boolean;
 }
 
-export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
+export function AlertsFeed({ showBack, onBack, tabScreen = false }: AlertsFeedProps) {
   const c = useColors();
+  const insets = useSafeAreaInsets();
+  const listBottomPad = tabScreen
+    ? getTabBarContentClearance(insets.bottom)
+    : getStackContentClearance(insets.bottom);
   const focused = useIsFocused();
   const [filter, setFilter] = useState(FILTERS[0]);
-  const { alerts, meta, isLoading, isError, isRefetching, refetchFromTfnsw } = useServiceAlerts({
+  const { alerts, meta, isLoading, isError, error, isRefetching, refetchFromTfnsw } = useServiceAlerts({
     enabled: focused,
   });
 
@@ -74,26 +83,22 @@ export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
     await refetchFromTfnsw();
   });
 
-  const all = useMemo(() => {
-    if (alerts?.length) return alertsToDisplay(alerts);
-    return [];
-  }, [alerts]);
+  const filteredSource = useMemo(() => {
+    const source = alerts ?? [];
+    if (filter === "Critical only") return source.filter(isCriticalAlert);
+    if (filter === "Trackwork") return source.filter(isTrackworkAlert);
+    return source;
+  }, [alerts, filter]);
 
-  const visible = useMemo(() => {
-    let list = all;
-    if (filter === "Critical only") list = all.filter((a) => a.severity === "critical");
-    else if (filter === "Trackwork") {
-      list = all.filter(
-        (a) =>
-          /trackwork/i.test(a.title) ||
-          /trackwork|buses replace|planned maintenance|changed timetable/i.test(a.description)
-      );
-    }
-    return list.slice(0, MAX_LIST_ITEMS);
-  }, [filter, all]);
+  const visible = useMemo(
+    () => alertsToDisplay(filteredSource.slice(0, MAX_LIST_ITEMS)),
+    [filteredSource]
+  );
 
-  const criticalCount = all.filter((a) => a.severity === "critical").length;
-  const trackworkCount = all.filter((a) => /trackwork/i.test(a.title)).length;
+  const criticalCount =
+    meta?.criticalCount ?? (alerts ?? []).filter(isCriticalAlert).length;
+  const trackworkCount =
+    meta?.trackworkCount ?? (alerts ?? []).filter(isTrackworkAlert).length;
   const liveSource = meta?.tfnswLive !== false;
   const updatedLabel = meta?.asOf
     ? `Updated ${formatSydneyTime(meta.asOf, { hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true })}`
@@ -124,14 +129,14 @@ export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
             <Chip key={f} label={f} active={filter === f} onPress={() => setFilter(f)} />
           ))}
         </ScrollView>
-        {all.length > MAX_LIST_ITEMS ? (
+        {(alerts?.length ?? 0) > MAX_LIST_ITEMS ? (
           <Txt size={12} color={c.textSecondary} style={{ marginTop: 6 }}>
-            Showing first {MAX_LIST_ITEMS} of {all.length} alerts. Use filters to narrow results.
+            Showing first {MAX_LIST_ITEMS} of {alerts?.length ?? 0} alerts. Use filters to narrow results.
           </Txt>
         ) : null}
       </View>
     ),
-    [all.length, c.textSecondary, criticalCount, filter, isLoading, trackworkCount, updatedLabel, liveSource]
+    [alerts?.length, c.textSecondary, criticalCount, filter, isLoading, trackworkCount, updatedLabel]
   );
 
   const renderItem = useCallback(
@@ -145,9 +150,7 @@ export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
         title="Service Information"
         left={
           showBack && onBack ? (
-            <Pressable onPress={onBack} style={{ width: MIN_TOUCH, height: MIN_TOUCH, justifyContent: "center" }}>
-              <ChevronLeft size={26} color={c.text} strokeWidth={2.2} />
-            </Pressable>
+            <BackButton variant="plain" onPress={onBack} />
           ) : undefined
         }
       />
@@ -155,16 +158,33 @@ export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
       {isLoading && visible.length === 0 ? (
         <EmptyState title="Loading alerts" message="Fetching service updates from Transport NSW…" />
       ) : isError && visible.length === 0 ? (
-        <EmptyState title="Alerts unavailable" message="Pull down to refresh or check your connection." />
+        <EmptyState
+          title="Alerts unavailable"
+          message={
+            error instanceof ApiRequestError
+              ? error.message
+              : error instanceof Error
+                ? error.message
+                : "Pull down to refresh or check your connection."
+          }
+        />
       ) : visible.length === 0 ? (
         <>
           {listHeader}
           <EmptyState
-            title={filter === "Trackwork" ? "No trackwork listed" : "All clear"}
+            title={
+              filter === "Trackwork"
+                ? "No trackwork listed"
+                : filter === "Critical only"
+                  ? "No critical disruptions"
+                  : "All clear"
+            }
             message={
               filter === "Trackwork"
                 ? "No planned or ongoing trackwork from Transport NSW right now. Pull down to refresh."
-                : "No active service alerts. Resolved issues are removed automatically."
+                : filter === "Critical only"
+                  ? "No major service disruptions right now. Trackwork and minor delays are in other filters."
+                  : "No active service alerts. Resolved issues are removed automatically."
             }
           />
         </>
@@ -180,7 +200,7 @@ export function AlertsFeed({ showBack, onBack }: AlertsFeedProps) {
           windowSize={7}
           removeClippedSubviews
           contentContainerStyle={{
-            paddingBottom: TAB_BAR_HEIGHT + 24,
+            paddingBottom: listBottomPad,
             backgroundColor: c.card,
             borderTopWidth: 0.5,
             borderBottomWidth: 0.5,

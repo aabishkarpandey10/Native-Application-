@@ -11,6 +11,9 @@ dotenv.config({ path: join(rootDir, "backend/.env"), override: true });
 export const config = {
   port: Number(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || "development",
+  /** Demo timetables — off by default; set ALLOW_MOCK_DATA=true for local offline dev only. */
+  allowMockData: process.env.ALLOW_MOCK_DATA === "true",
+  logRequests: process.env.API_REQUEST_LOG === "true",
   tfnsw: {
     apiKey: process.env.TFNSW_API_KEY?.trim() || "",
     baseUrl: process.env.TFNSW_API_BASE || "https://api.transport.nsw.gov.au/v1/tp",

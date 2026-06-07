@@ -1,5 +1,10 @@
 import { getAlerts } from "./adminStore.js";
 import { isResolvedAlertText } from "./alertFilters.js";
+import {
+  countByCategory,
+  enrichAlertClassification,
+  isTrackworkAlert,
+} from "./alertClassification.js";
 import { fetchTransportNswGtfsAlerts } from "./gtfsRealtimeAlerts.js";
 import { isTfnswKeyConfigured, config } from "../src/config/index.js";
 import { mapProductClass } from "./tfnswHelpers.js";
@@ -84,14 +89,19 @@ function inferSeverity(message) {
     .toLowerCase();
 
   if (
+    announcement === "trackwork" ||
+    /trackwork|track work|planned maintenance|changed timetable|rail replacement|weekend work/i.test(
+      blob
+    )
+  ) {
+    return "warning";
+  }
+  if (
     /cancel+ed|suspended|not stopping|major delay|significant delay|avoid|no trains|buses replace|replacement bus|emergency|evacuat/i.test(
       blob
     )
   ) {
     return "critical";
-  }
-  if (announcement === "trackwork" || /trackwork|planned maintenance|buses replace/i.test(blob)) {
-    return "warning";
   }
   if (/delay|late|running late|allow extra|disruption|divert|altered/i.test(blob)) {
     return "warning";
@@ -268,8 +278,8 @@ function mergeAlertFeeds(...lists) {
   }
 
   return out.sort((a, b) => {
-    const trackA = /trackwork/i.test(a.title) ? 0 : 1;
-    const trackB = /trackwork/i.test(b.title) ? 0 : 1;
+    const trackA = isTrackworkAlert(a) ? 0 : 1;
+    const trackB = isTrackworkAlert(b) ? 0 : 1;
     if (trackA !== trackB) return trackA - trackB;
     const rank = { critical: 0, warning: 1, info: 2 };
     const dr = (rank[a.severity] ?? 2) - (rank[b.severity] ?? 2);
@@ -309,9 +319,11 @@ async function pullLiveTransportNswAlerts(apiKey) {
       addInfo.filter((a) => !adminIds.has(a.id)),
       adminAlerts
     )
-  ).slice(0, 120);
+  )
+    .map(enrichAlertClassification)
+    .slice(0, 120);
 
-  const trackworkCount = merged.filter((a) => /trackwork/i.test(a.title)).length;
+  const { trackworkCount, criticalCount } = countByCategory(merged);
 
   return {
     alerts: merged,
@@ -324,6 +336,7 @@ async function pullLiveTransportNswAlerts(apiKey) {
     tfnswLive: liveReachable,
     dataSource: "https://transportnsw.info",
     trackworkCount,
+    criticalCount,
     count: merged.length,
   };
 }

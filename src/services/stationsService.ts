@@ -15,11 +15,18 @@ export type StationFetchOptions = {
 };
 
 export function getStationsSync(): Station[] {
-  return cachedCoreStations ?? SYDNEY_STATIONS;
+  if (cachedCoreStations && cachedCoreStations.length > 0) {
+    return cachedCoreStations;
+  }
+  return SYDNEY_STATIONS;
 }
 
-export function setStationsCache(stations: Station[]) {
-  cachedCoreStations = stations;
+export function setStationsCache(stations: Station[] | null) {
+  cachedCoreStations = stations?.length ? stations : null;
+}
+
+export function clearStationsCache() {
+  cachedCoreStations = null;
 }
 
 function buildStationsPath(options: StationFetchOptions = {}): string {
@@ -45,13 +52,13 @@ export async function fetchStations(options: StationFetchOptions = {}): Promise<
 
 /** Core network only (no bus) — fast startup payload. */
 export async function fetchCoreStationsFromApi(): Promise<Station[]> {
-  if (cachedCoreStations) return cachedCoreStations;
+  if (cachedCoreStations?.length) return cachedCoreStations;
   if (loadCorePromise) return loadCorePromise;
 
   loadCorePromise = (async () => {
     const data = await fetchStations({ limit: 5000 });
     const list = data.length ? data : SYDNEY_STATIONS;
-    cachedCoreStations = list;
+    setStationsCache(list);
     return list;
   })();
 

@@ -168,10 +168,10 @@ export function AdminNetworkMapPanel({
         <Image source={previewSource} style={{ width: "100%", height: "100%" }} contentFit="contain" />
       </View>
 
-      <GroupedList inset={16}>
+      <GroupedList>
         <Cell minHeight={MIN_TOUCH} onPress={() => router.push("/map" as never)}>
           <Map size={20} color={c.primary} strokeWidth={2} />
-          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
             Preview full screen
           </Txt>
         </Cell>
@@ -180,7 +180,7 @@ export function AdminNetworkMapPanel({
           onPress={() => (Platform.OS === "web" ? pickImageWeb() : void pickImage())}
         >
           <Upload size={20} color={c.primary} strokeWidth={2} />
-          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
             Upload PNG or JPG
           </Txt>
           {busy ? <ActivityIndicator color={c.primary} /> : null}
@@ -193,7 +193,7 @@ export function AdminNetworkMapPanel({
       </GroupedList>
 
       <SectionHeader title="Optional image URL" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField
           label="Hosted map URL"
           value={config.networkMapUrl ?? ""}
@@ -203,7 +203,7 @@ export function AdminNetworkMapPanel({
       </GroupedList>
 
       <SectionHeader title="Settings text" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField
           label="Description on Settings screen"
           value={config.settingsMapDescription ?? ""}

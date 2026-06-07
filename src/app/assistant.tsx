@@ -13,9 +13,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Redirect } from "expo-router";
 import { useSafeBack } from "../hooks/useSafeBack";
 import { FEATURES } from "../constants/features";
+import { useAppFeatures } from "../hooks/useAppFeatures";
 import { ChevronLeft, Clock, MapPin, Mic, Navigation, Send, Sparkles } from "lucide-react-native";
 import { Txt } from "../components/design";
-import { interFamily } from "../constants/design";
+import { headerPaddingTop, resolveTextStyle, SPACING, safeBottomInset } from "../constants/design";
+import { getChatInputClearance } from "../constants/layout";
+import { keyboardAvoidingBehavior } from "../utils/keyboard";
 import { useColors } from "../hooks/useColors";
 import { useBackendStatus } from "../hooks/useBackendStatus";
 import { askAssistant, type AssistantContext } from "../services/aiService";
@@ -98,6 +101,7 @@ function Avatar() {
 }
 
 export default function AssistantScreen() {
+  const { aiChat } = useAppFeatures();
   const c = useColors();
   const goBack = useSafeBack();
   const insets = useSafeAreaInsets();
@@ -196,8 +200,8 @@ export default function AssistantScreen() {
       ? "Connected to backend"
       : "Offline — limited answers";
 
-  if (!FEATURES.assistant) {
-    return <Redirect href="/(tabs)/journey" />;
+  if (!FEATURES.assistant || !aiChat) {
+    return <Redirect href="/(tabs)/tools" />;
   }
 
   return (
@@ -206,7 +210,7 @@ export default function AssistantScreen() {
         colors={["#4a1480", "#6F2C91", "#5a2d82"]}
         start={{ x: 0.1, y: 0 }}
         end={{ x: 0.9, y: 1 }}
-        style={{ paddingTop: Math.max(insets.top, 12) + 4, paddingHorizontal: 16, paddingBottom: 16 }}
+        style={{ paddingTop: headerPaddingTop(insets.top), paddingHorizontal: SPACING.screen, paddingBottom: SPACING.cell }}
       >
         <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
           <Pressable
@@ -229,11 +233,18 @@ export default function AssistantScreen() {
         </View>
       </LinearGradient>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={keyboardAvoidingBehavior()}
+      >
         <ScrollView
           ref={scrollRef}
           style={{ flex: 1, backgroundColor: c.bg }}
-          contentContainerStyle={{ padding: 20, gap: 16 }}
+          contentContainerStyle={{
+            padding: SPACING.screen,
+            gap: 16,
+            paddingBottom: getChatInputClearance(insets.bottom),
+          }}
           showsVerticalScrollIndicator={false}
         >
           {messages.map((m) =>
@@ -327,12 +338,12 @@ export default function AssistantScreen() {
             backgroundColor: c.card,
             borderTopWidth: 1,
             borderTopColor: c.border,
-            paddingHorizontal: 16,
+            paddingHorizontal: SPACING.screen,
             paddingTop: 12,
-            paddingBottom: Math.max(insets.bottom, 12),
+            paddingBottom: safeBottomInset(insets.bottom),
           }}
         >
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", backgroundColor: c.muted, borderRadius: 16, paddingHorizontal: 16 }}>
+          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", backgroundColor: c.muted, borderRadius: 16, paddingHorizontal: SPACING.cell }}>
             <TextInput
               value={input}
               onChangeText={setInput}
@@ -340,7 +351,7 @@ export default function AssistantScreen() {
               placeholderTextColor={c.textSecondary}
               editable={!sending}
               onSubmitEditing={() => send(input)}
-              style={{ flex: 1, fontFamily: interFamily("400"), fontSize: 13, color: c.text, paddingVertical: 12 }}
+              style={{ flex: 1, ...resolveTextStyle("400"), fontSize: 13, color: c.text, paddingVertical: 12 }}
             />
             <Mic size={18} color={c.textSecondary} strokeWidth={2} />
           </View>

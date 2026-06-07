@@ -17,11 +17,8 @@ export class WebErrorBoundary extends Component<Props, State> {
   }
 
   render() {
-    if (Platform.OS !== "web") {
-      return this.props.children;
-    }
-
     if (this.state.error) {
+      const isWeb = Platform.OS === "web";
       return (
         <View
           style={{
@@ -47,8 +44,9 @@ export class WebErrorBoundary extends Component<Props, State> {
               lineHeight: 20,
             }}
           >
-            Open http://localhost:8085 after `npm run dev`, or rebuild with `npm run build` and
-            serve the `dist` folder. Check the browser console (F12) for details.
+            {isWeb
+              ? "Open http://localhost:8085 after `npm run dev`, or rebuild with `npm run build` and serve the `dist` folder. Check the browser console (F12) for details."
+              : "Shake the device and tap Reload, or restart `npm run dev`. Ensure your phone and PC are on the same Wi‑Fi and EXPO_PUBLIC_API_URL points to your PC's LAN IP."}
           </Text>
         </View>
       );

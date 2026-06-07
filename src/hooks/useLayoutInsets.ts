@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { headerPaddingTop } from "../constants/design";
 import {
+  getStackContentClearance,
+  getTabBarContentClearance,
   getTabBarHeight,
   getTabBarPaddingBottom,
   getToastBottomOffset,
-  STACK_SCROLL_BOTTOM_PADDING,
-  TAB_SCROLL_BOTTOM_PADDING,
 } from "../constants/layout";
 
 export function useLayoutInsets(options?: { tabScreen?: boolean }) {
@@ -16,12 +17,16 @@ export function useLayoutInsets(options?: { tabScreen?: boolean }) {
   return useMemo(
     () => ({
       insets,
+      headerTop: headerPaddingTop(insets.top),
       tabBarHeight: getTabBarHeight(insets.bottom),
       tabBarPaddingBottom: getTabBarPaddingBottom(insets.bottom),
-      scrollBottomPadding: tabScreen ? TAB_SCROLL_BOTTOM_PADDING : STACK_SCROLL_BOTTOM_PADDING,
+      tabContentBottomPadding: getTabBarContentClearance(insets.bottom),
+      stackContentBottomPadding: getStackContentClearance(insets.bottom),
+      scrollBottomPadding: tabScreen
+        ? getTabBarContentClearance(insets.bottom)
+        : getStackContentClearance(insets.bottom),
       toastBottom: getToastBottomOffset(insets.bottom, tabScreen),
-      /** For floating UI on map tab (above tab bar). */
-      floatingBottom: TAB_SCROLL_BOTTOM_PADDING,
+      floatingBottom: getTabBarContentClearance(insets.bottom),
       keyboardVerticalOffset: Platform.OS === "ios" ? insets.top + 8 : 0,
     }),
     [insets.bottom, insets.top, tabScreen]

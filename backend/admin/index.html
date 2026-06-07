@@ -37,6 +37,7 @@
 
       <nav class="tabs">
         <button class="tab active" data-tab="config" type="button">App</button>
+        <button class="tab" data-tab="logo" type="button">Logo</button>
         <button class="tab" data-tab="map" type="button">Map</button>
         <button class="tab" data-tab="stations" type="button">Stations</button>
         <button class="tab" data-tab="alerts" type="button">Alerts</button>
@@ -80,6 +81,19 @@
 
             <button type="submit" class="btn primary full">Save all settings</button>
           </form>
+        </section>
+
+        <section id="tab-logo" class="tab-panel hidden">
+          <div class="card stack-form">
+            <p class="muted" id="logo-source-label"></p>
+            <div id="logo-preview" class="map-preview logo-preview"></div>
+            <label>Upload logo (PNG/JPG) <input type="file" id="logo-file" accept="image/png,image/jpeg,image/webp" /></label>
+            <button id="logo-upload-btn" class="btn primary full" type="button">Upload selected file</button>
+            <button id="logo-reset-btn" class="btn danger-outline full" type="button">Reset to default logo</button>
+            <h2 class="form-section">Optional URL</h2>
+            <label>Hosted logo URL <input id="cfg-appLogoUrl" placeholder="https://…/logo.png" /></label>
+            <button id="logo-save-settings-btn" class="btn primary full" type="button">Save logo settings</button>
+          </div>
         </section>
 
         <section id="tab-map" class="tab-panel hidden">

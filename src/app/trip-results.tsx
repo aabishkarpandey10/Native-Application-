@@ -1,29 +1,35 @@
-import { useMemo, useState } from "react";
-import { Alert, FlatList, Pressable, View } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Alert, Pressable, SectionList, View, type SectionList as SectionListType } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeBack } from "../hooks/useSafeBack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ArrowUpDown, ChevronLeft, Clock, Locate, Settings } from "lucide-react-native";
-import { Txt } from "../components/design";
+import { ArrowUpDown, Clock, Locate, Settings } from "lucide-react-native";
+import { BackButton, Txt } from "../components/design";
+import { ScreenTitle } from "../components/tripview/ScreenTitle";
 import { TripDetailSheet } from "../components/tripview/TripDetailSheet";
 import { TripResultRow } from "../components/tripview/TripResultRow";
 import type { JourneyRoute } from "../constants/sampleData";
+import { FeatureGate } from "../components/FeatureGate";
+import { useAppFeatures } from "../hooks/useAppFeatures";
 import { useColors } from "../hooks/useColors";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useTripPlan } from "../hooks/useTripPlan";
 import { useStore } from "../store/store";
-import { tripsToDisplay } from "../utils/displayAdapters";
+import { tripViaLabel, tripsToDisplay } from "../utils/displayAdapters";
 import {
   formatRouteCodes,
   normalizeTripMode,
   resolveTripDisplayMode,
   tripAccentColor,
 } from "../utils/tripDisplay";
-import { shortStationName } from "../utils/tripViewFormat";
+import { buildTripScheduleSections, shortStationName } from "../utils/tripViewFormat";
+import { HAIRLINE, MIN_TOUCH, SPACING, safeBottomInset } from "../constants/design";
+import { getTripFooterClearance } from "../constants/layout";
 import { formatSydneyTime } from "../utils/tfnswTime";
 import { resolveStationByName } from "../utils/resolveStation";
 
 export default function TripResultsScreen() {
+  const { tripPlanner } = useAppFeatures();
   const c = useColors();
   const router = useRouter();
   const goBack = useSafeBack();
@@ -46,26 +52,66 @@ export default function TripResultsScreen() {
   const planMode = String(params.mode ?? "");
 
   const [swapped, setSwapped] = useState(false);
-  const [showEarlierTrips, setShowEarlierTrips] = useState(false);
+  const [upcomingOnly, setUpcomingOnly] = useState(false);
   const [selectedTrip, setSelectedTrip] = useState<JourneyRoute | null>(null);
   const origin = swapped ? toName : fromName;
   const dest = swapped ? fromName : toName;
 
   const { data: appConfig } = useAppConfig();
-  const tripPlanOptions = useMemo(
+  const stationIds = useMemo(
     () => ({
       originId: swapped ? toId : fromId,
       destinationId: swapped ? fromId : toId,
-      includePast: showEarlierTrips,
     }),
-    [swapped, fromId, toId, showEarlierTrips]
+    [swapped, fromId, toId]
   );
-  const { data, isLoading, isFetching, isError, refetch, dataUpdatedAt } = useTripPlan(
-    origin,
-    dest,
-    undefined,
-    tripPlanOptions
-  );
+
+  /** Fast upcoming trips — shown within ~2s while full-day loads in background. */
+  const fastPlan = useTripPlan(origin, dest, undefined, {
+    ...stationIds,
+    fullDay: false,
+    includePast: false,
+  });
+  const fullPlan = useTripPlan(origin, dest, undefined, {
+    ...stationIds,
+    fullDay: true,
+    includePast: true,
+    enabled: !upcomingOnly,
+  });
+
+  const isBusTrip =
+    planMode === "bus" || fromId.endsWith("_B") || toId.endsWith("_B");
+
+  const tripIsLive = (list: typeof fastPlan.data) =>
+    list?.some((t) => t.isLive === true || String(t.id || "").startsWith("real_trip_"));
+
+  const data = useMemo(() => {
+    if (upcomingOnly) return fastPlan.data;
+    const full = fullPlan.data;
+    const fast = fastPlan.data;
+    if (!isBusTrip) return full?.length ? full : fast;
+    if (full?.length && tripIsLive(full)) return full;
+    if (fast?.length && tripIsLive(fast)) return fast;
+    return full?.length ? full : fast;
+  }, [upcomingOnly, isBusTrip, fastPlan.data, fullPlan.data]);
+
+  const usingFullDay = !upcomingOnly && Boolean(fullPlan.data?.length) && data === fullPlan.data;
+  const isLoading = !data?.length && fastPlan.isLoading;
+  const isFetching = upcomingOnly ? fastPlan.isFetching : fullPlan.isFetching;
+  const isError =
+    upcomingOnly
+      ? fastPlan.isError
+      : fullPlan.isError && !fastPlan.data?.length && !fullPlan.data?.length;
+  const dataUpdatedAt = usingFullDay ? fullPlan.dataUpdatedAt : fastPlan.dataUpdatedAt;
+  const loadingFullDay =
+    !upcomingOnly && Boolean(fastPlan.data?.length) && fullPlan.isFetching && !fullPlan.data?.length;
+
+  const refetchFresh = useCallback(async () => {
+    const freshFast = await fastPlan.refetchFresh();
+    if (upcomingOnly) return freshFast;
+    const freshFull = await fullPlan.refetchFresh();
+    return freshFull ?? freshFast;
+  }, [fastPlan, fullPlan, upcomingOnly]);
 
   const routes = useMemo(() => {
     if (!data?.length) return [];
@@ -80,8 +126,39 @@ export default function TripResultsScreen() {
   }, [data, appConfig?.showWalkLegsInTrips, planMode, fromId, toId]);
 
   const hasLiveTrips = routes.some((r) => r.isLive);
-  const pastCount = routes.filter((r) => r.isPast).length;
-  const loadingEarlier = showEarlierTrips && isFetching && pastCount === 0;
+
+  const schedule = useMemo(
+    () =>
+      buildTripScheduleSections(routes, {
+        includePast: !upcomingOnly,
+      }),
+    [routes, upcomingOnly]
+  );
+  const { sections: tripSections, anchor, pastShown, upcomingCount } = schedule;
+
+  const listRef = useRef<SectionListType<JourneyRoute>>(null);
+  const didAnchorScroll = useRef(false);
+
+  useEffect(() => {
+    didAnchorScroll.current = false;
+  }, [origin, dest, upcomingOnly, routes.length]);
+
+  useEffect(() => {
+    if (didAnchorScroll.current || upcomingOnly || tripSections.length === 0) return;
+    const upSection = tripSections.find((s) => s.title === "Up next");
+    if (!upSection?.data.length) return;
+
+    const timer = setTimeout(() => {
+      listRef.current?.scrollToLocation({
+        sectionIndex: anchor.sectionIndex,
+        itemIndex: anchor.itemIndex,
+        animated: false,
+        viewPosition: 0,
+      });
+      didAnchorScroll.current = true;
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [tripSections, anchor, upcomingOnly]);
   const updatedLabel = dataUpdatedAt
     ? hasLiveTrips
       ? `Live trip times updated at ${formatSydneyTime(new Date(dataUpdatedAt), {
@@ -96,6 +173,8 @@ export default function TripResultsScreen() {
           hour12: true,
         })}`
     : "";
+
+  const footerClearance = getTripFooterClearance(insets.bottom);
 
   const savedTrip = useMemo(() => {
     const orig = resolveStationByName(origin) ?? { id: fromId, name: origin };
@@ -136,61 +215,46 @@ export default function TripResultsScreen() {
   };
 
   return (
+    <FeatureGate enabled={tripPlanner} title="Trip planner unavailable" message="Trip planning is turned off in admin settings.">
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View
-        style={{
-          paddingTop: insets.top + 4,
-          paddingHorizontal: 12,
-          paddingBottom: 12,
-          flexDirection: "row",
-          alignItems: "center",
-          borderBottomWidth: 0.5,
-          borderBottomColor: c.separator,
-        }}
-      >
-        <Pressable
-          onPress={goBack}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: c.muted,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <ChevronLeft size={22} color={c.text} strokeWidth={2.2} />
-        </Pressable>
+      <ScreenTitle
+        left={<BackButton onPress={goBack} />}
+        center={
+          <Pressable
+            onPress={() => setSwapped((s) => !s)}
+            accessibilityRole="button"
+            accessibilityLabel="Swap origin and destination"
+            style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, maxWidth: "100%" }}
+          >
+            <Txt size={16} weight="600" color={c.text} numberOfLines={1}>
+              {shortStationName(origin)}
+            </Txt>
+            <ArrowUpDown size={18} color={c.textSecondary} strokeWidth={2} />
+            <Txt size={16} weight="600" color={c.text} numberOfLines={1}>
+              {shortStationName(dest)}
+            </Txt>
+          </Pressable>
+        }
+        right={
+          <Pressable
+            onPress={() => void refetchFresh()}
+            accessibilityRole="button"
+            accessibilityLabel="Refresh trips"
+            style={{
+              width: MIN_TOUCH - 4,
+              height: MIN_TOUCH - 4,
+              borderRadius: (MIN_TOUCH - 4) / 2,
+              backgroundColor: c.muted,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Locate size={20} color={c.text} strokeWidth={2} />
+          </Pressable>
+        }
+      />
 
-        <Pressable
-          onPress={() => setSwapped((s) => !s)}
-          style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}
-        >
-          <Txt size={16} weight="600" color={c.text} numberOfLines={1}>
-            {shortStationName(origin)}
-          </Txt>
-          <ArrowUpDown size={18} color={c.textSecondary} strokeWidth={2} />
-          <Txt size={16} weight="600" color={c.text} numberOfLines={1}>
-            {shortStationName(dest)}
-          </Txt>
-        </Pressable>
-
-        <Pressable
-          onPress={() => void refetch()}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: c.muted,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Locate size={20} color={c.text} strokeWidth={2} />
-        </Pressable>
-      </View>
-
-      {isLoading && !showEarlierTrips && routes.length === 0 ? (
+      {isLoading && routes.length === 0 ? (
         <View style={{ padding: 32, alignItems: "center" }}>
           <Txt size={15} color={c.textSecondary}>
             Finding trips…
@@ -203,80 +267,111 @@ export default function TripResultsScreen() {
           </Txt>
           <Txt size={14} color={c.textSecondary} style={{ marginTop: 8, textAlign: "center" }}>
             {isError
-              ? "Check that the backend is running."
-              : "Try different station names."}
+              ? "Check that the backend is running and timetables are imported."
+              : "Try different station names or run npm run sync:all-timetables."}
           </Txt>
         </View>
       ) : (
-        <FlatList
-          data={routes}
+        <View style={{ flex: 1 }}>
+          <View style={{ marginHorizontal: SPACING.screen, marginTop: 10, marginBottom: 6, gap: 8 }}>
+            <View
+              style={{
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: c.separator,
+                backgroundColor: c.card,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+              }}
+            >
+              <Txt size={12} color={c.textSecondary}>
+                {upcomingOnly
+                  ? `${upcomingCount} upcoming trip${upcomingCount !== 1 ? "s" : ""} · tap for stops and changes`
+                  : `${upcomingCount} upcoming until end of service${pastShown > 0 ? ` · scroll up for last ${pastShown} earlier trip${pastShown !== 1 ? "s" : ""}` : ""}`}
+              </Txt>
+            </View>
+            <Pressable
+              onPress={() => setUpcomingOnly((v) => !v)}
+              accessibilityRole="button"
+              accessibilityLabel={upcomingOnly ? "Show full day timetable" : "Show upcoming trips only"}
+              style={({ pressed }) => ({
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: c.primary,
+                backgroundColor: pressed ? c.separator : c.card,
+                paddingVertical: 12,
+                paddingHorizontal: 14,
+              })}
+            >
+              <Clock size={18} color={c.primary} strokeWidth={2} />
+              <Txt size={15} weight="600" color={c.primary}>
+                {upcomingOnly ? "Show full day timetable" : "Upcoming trips only"}
+              </Txt>
+            </Pressable>
+            {loadingFullDay ? (
+              <Txt size={13} color={c.textSecondary} style={{ textAlign: "center" }}>
+                Loading rest of today…
+              </Txt>
+            ) : isFetching && !upcomingOnly ? (
+              <Txt size={13} color={c.textSecondary} style={{ textAlign: "center" }}>
+                Refreshing timetable…
+              </Txt>
+            ) : null}
+          </View>
+          <SectionList
+          ref={listRef}
+          style={{ flex: 1 }}
+          sections={tripSections}
           keyExtractor={(r) => r.id}
-          ListHeaderComponent={
-            <View style={{ marginHorizontal: 12, marginTop: 10, marginBottom: 6, gap: 8 }}>
+          stickySectionHeadersEnabled={false}
+          renderSectionHeader={({ section }) => (
+            <View
+              style={{
+                paddingHorizontal: SPACING.screen,
+                paddingTop: section.title === "Earlier today" ? 10 : 14,
+                paddingBottom: 8,
+                backgroundColor: c.bg,
+              }}
+            >
+              <Txt size={14} weight="700" color={c.text}>
+                {section.title}
+              </Txt>
+              <Txt size={12} color={c.textSecondary}>
+                {section.title === "Earlier today"
+                  ? `Last ${section.data.length} departed · scroll up · grey`
+                  : `${section.data.length} trip${section.data.length !== 1 ? "s" : ""} · scroll down for later`}
+              </Txt>
+            </View>
+          )}
+          renderSectionFooter={({ section }) =>
+            section.title === "Earlier today" ? (
               <View
                 style={{
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  borderColor: c.separator,
-                  backgroundColor: c.card,
-                  paddingHorizontal: 12,
-                  paddingVertical: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginHorizontal: SPACING.screen,
+                  marginTop: 4,
+                  marginBottom: 12,
+                  gap: 10,
                 }}
               >
-                <Txt size={12} color={c.textSecondary}>
-                  {showEarlierTrips && pastCount > 0
-                    ? `${pastCount} earlier trip${pastCount !== 1 ? "s" : ""} today in grey · tap for stops and changes.`
-                    : showEarlierTrips && loadingEarlier
-                      ? "Loading earlier trips from today's timetable…"
-                      : routes.some((r) => r.isPast)
-                        ? "Earlier trips today are shown in grey. Tap a trip for full stops and changes."
-                        : "Tap a trip to see stops, times, and any changes."}
+                <View style={{ flex: 1, height: 1, backgroundColor: c.separator }} />
+                <Txt size={12} weight="600" color={c.textSecondary}>
+                  Now
                 </Txt>
+                <View style={{ flex: 1, height: 1, backgroundColor: c.separator }} />
               </View>
-              {!showEarlierTrips ? (
-                <Pressable
-                  onPress={() => setShowEarlierTrips(true)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Show earlier trips today"
-                  style={({ pressed }) => ({
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    borderRadius: 10,
-                    borderWidth: 1,
-                    borderColor: c.primary,
-                    backgroundColor: pressed ? c.separator : c.card,
-                    paddingVertical: 12,
-                    paddingHorizontal: 14,
-                  })}
-                >
-                  <Clock size={18} color={c.primary} strokeWidth={2} />
-                  <Txt size={15} weight="600" color={c.primary}>
-                    Show earlier trips today
-                  </Txt>
-                </Pressable>
-              ) : loadingEarlier ? (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 8,
-                    paddingVertical: 10,
-                  }}
-                >
-                  <Txt size={14} color={c.textSecondary}>
-                    Loading earlier trips…
-                  </Txt>
-                </View>
-              ) : null}
-            </View>
+            ) : null
           }
           renderItem={({ item: r }) => {
             const displayMode = resolveTripDisplayMode(r, planMode, fromId, toId);
             const accent = tripAccentColor(r.chips, displayMode);
             const routeCode = formatRouteCodes(r.chips);
+            const isBusTrip = displayMode === "bus" || planMode === "bus";
             return (
               <TripResultRow
                 leaveInMinutes={r.leaveInMinutes ?? 0}
@@ -289,12 +384,15 @@ export default function TripResultsScreen() {
                 isPast={r.isPast}
                 onTime={!r.isPast}
                 realtime={!isError && !r.isPast && r.isLive === true}
+                viaLabel={r.itinerary ? tripViaLabel(r.itinerary) : undefined}
+                platformLabel={isBusTrip ? "Stand" : "Plat"}
                 onPress={() => setSelectedTrip(r)}
               />
             );
           }}
-          ListFooterComponent={<View style={{ height: 80 }} />}
+          ListFooterComponent={<View style={{ height: footerClearance }} />}
         />
+        </View>
       )}
 
       <TripDetailSheet
@@ -313,13 +411,13 @@ export default function TripResultsScreen() {
           left: 0,
           right: 0,
           bottom: 0,
-          paddingBottom: Math.max(insets.bottom, 12),
+          paddingBottom: safeBottomInset(insets.bottom),
           paddingTop: 10,
-          paddingHorizontal: 16,
+          paddingHorizontal: SPACING.screen,
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: c.isDark ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.92)",
-          borderTopWidth: 0.5,
+          backgroundColor: c.barBg,
+          borderTopWidth: HAIRLINE,
           borderTopColor: c.separator,
         }}
       >
@@ -347,5 +445,6 @@ export default function TripResultsScreen() {
         </Pressable>
       </View>
     </View>
+    </FeatureGate>
   );
 }

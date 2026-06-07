@@ -28,10 +28,13 @@ import { AdminSwitch } from "../../components/admin/AdminFields";
 import { AdminSegmentTabs, AdminStatRow } from "../../components/admin/AdminSegmentTabs";
 import type { AppConfig } from "../../types/appConfig";
 import { normalizeAppConfig } from "../../types/appConfig";
-import { GroupedList, SectionHeader, Txt } from "../../components/design";
+import { BackButton, GroupedList, SectionHeader, Txt } from "../../components/design";
 import { ScreenTitle } from "../../components/tripview/ScreenTitle";
 import { FEATURES } from "../../constants/features";
-import { MIN_TOUCH, SPACING, interFamily } from "../../constants/design";
+import { MIN_TOUCH, SPACING, resolveTextStyle } from "../../constants/design";
+import { getStackContentClearance } from "../../constants/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { keyboardAvoidingBehavior } from "../../utils/keyboard";
 import { useColors } from "../../hooks/useColors";
 import { useSafeBack } from "../../hooks/useSafeBack";
 import {
@@ -59,6 +62,7 @@ export default function AdminScreen() {
   const c = useColors();
   const goBack = useSafeBack();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [password, setPassword] = useState("");
@@ -133,16 +137,21 @@ export default function AdminScreen() {
   };
 
   if (!FEATURES.admin) {
-    return <Redirect href="/(tabs)/favourites" />;
+    return <Redirect href="/(tabs)/tools" />;
   }
 
   if (!loggedIn) {
     return (
       <KeyboardAvoidingView
         style={{ flex: 1, backgroundColor: c.bg }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={keyboardAvoidingBehavior()}
       >
-        <ScreenTitle title="Admin" left={null} />
+        <ScreenTitle
+          title="Admin"
+          left={
+            <BackButton variant="plain" onPress={goBack} />
+          }
+        />
         <View style={{ flex: 1, justifyContent: "center", paddingHorizontal: SPACING.screen }}>
           <View style={{ alignItems: "center", marginBottom: 28 }}>
             <View
@@ -203,11 +212,6 @@ export default function AdminScreen() {
             )}
           </Pressable>
 
-          <Pressable onPress={goBack} style={{ marginTop: 20, alignItems: "center", minHeight: MIN_TOUCH, justifyContent: "center" }}>
-            <Txt size={15} color={c.textSecondary}>
-              Back to app
-            </Txt>
-          </Pressable>
         </View>
       </KeyboardAvoidingView>
     );
@@ -217,11 +221,7 @@ export default function AdminScreen() {
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenTitle
         title="Admin"
-        left={
-          <Pressable onPress={goBack} style={{ width: MIN_TOUCH, height: MIN_TOUCH, justifyContent: "center" }}>
-            <ChevronRight size={22} color={c.text} style={{ transform: [{ rotate: "180deg" }] }} strokeWidth={2.2} />
-          </Pressable>
-        }
+        left={<BackButton variant="plain" onPress={goBack} />}
         right={
           <Pressable
             onPress={() => void load()}
@@ -234,7 +234,7 @@ export default function AdminScreen() {
 
       <View
         style={{
-          marginHorizontal: 16,
+          marginHorizontal: SPACING.screen,
           marginBottom: 8,
           marginTop: 2,
           borderRadius: 14,
@@ -270,7 +270,7 @@ export default function AdminScreen() {
       <AdminSegmentTabs tabs={TABS} active={tab} onChange={setTab} />
 
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 120 }}
+        contentContainerStyle={{ paddingBottom: getStackContentClearance(insets.bottom) }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -323,9 +323,9 @@ export default function AdminScreen() {
               onChangeText={setStationSearch}
               placeholder="Search by name or ID"
               placeholderTextColor={c.textSecondary}
-              style={{ ...inputStyle(c), marginHorizontal: 16, marginBottom: 12 }}
+              style={{ ...inputStyle(c), marginHorizontal: SPACING.screen, marginBottom: 12 }}
             />
-            <GroupedList inset={16}>
+            <GroupedList>
               {filteredStations.slice(0, 50).map((s) => (
                 <StationRow
                   key={s.id}
@@ -337,7 +337,7 @@ export default function AdminScreen() {
               ))}
             </GroupedList>
             {filteredStations.length > 50 ? (
-              <Txt size={12} color={c.textSecondary} style={{ padding: 16, textAlign: "center" }}>
+              <Txt size={12} color={c.textSecondary} style={{ padding: SPACING.cell, textAlign: "center" }}>
                 Showing first 50 — narrow your search to edit more.
               </Txt>
             ) : null}
@@ -361,7 +361,7 @@ export default function AdminScreen() {
         {tab === "alerts" ? (
           <View>
             <SectionHeader title={`Alerts (${alerts.length})`} />
-            <GroupedList inset={16}>
+            <GroupedList>
               {alerts.map((a, i) => (
                 <AlertRow
                   key={a.id}
@@ -395,7 +395,7 @@ export default function AdminScreen() {
                 ])
               }
               style={{
-                marginHorizontal: 16,
+                marginHorizontal: SPACING.screen,
                 marginTop: 10,
                 minHeight: MIN_TOUCH,
                 justifyContent: "center",
@@ -428,7 +428,7 @@ export default function AdminScreen() {
         ) : null}
 
         <SectionHeader title="Danger zone" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Pressable
             onPress={() =>
               Alert.alert("Reset defaults", "Restore all admin data to factory defaults?", [
@@ -447,7 +447,7 @@ export default function AdminScreen() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              padding: 16,
+              padding: SPACING.cell,
               minHeight: MIN_TOUCH,
               gap: 10,
             }}
@@ -462,7 +462,7 @@ export default function AdminScreen() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              padding: 16,
+              padding: SPACING.cell,
               minHeight: MIN_TOUCH,
               gap: 10,
             }}
@@ -488,7 +488,7 @@ function inputStyle(c: ReturnType<typeof useColors>) {
     minHeight: MIN_TOUCH,
     fontSize: 16,
     color: c.text,
-    fontFamily: interFamily("400"),
+    ...resolveTextStyle("400"),
   } as const;
 }
 
@@ -524,7 +524,7 @@ function StationRow({
         style={{ flexDirection: "row", alignItems: "center", padding: 14, minHeight: MIN_TOUCH }}
       >
         <Train size={18} color={c.primary} strokeWidth={2} />
-        <View style={{ flex: 1, marginLeft: 12 }}>
+        <View style={{ flex: 1, marginLeft: SPACING.iconGap }}>
           <Txt size={16} weight="600" color={c.text} numberOfLines={1}>
             {station.name}
           </Txt>
@@ -588,7 +588,7 @@ function MiniField({
           borderRadius: 8,
           paddingHorizontal: 10,
           paddingVertical: 8,
-          fontFamily: interFamily("400"),
+          ...resolveTextStyle("400"),
         }}
       />
     </View>
@@ -638,7 +638,7 @@ function SaveBar({ saving, onPress }: { saving: boolean; onPress: () => void }) 
       onPress={() => void onPress()}
       disabled={saving}
       style={{
-        marginHorizontal: 16,
+        marginHorizontal: SPACING.screen,
         marginTop: 16,
         flexDirection: "row",
         alignItems: "center",

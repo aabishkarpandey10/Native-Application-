@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { X } from "lucide-react-native";
-import { HAIRLINE, MIN_TOUCH, titleWeight } from "../../constants/design";
+import { HAIRLINE, MIN_TOUCH, RADIUS, SPACING, headerPaddingTop, titleWeight } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { Txt } from "../design/Txt";
 
@@ -17,28 +17,41 @@ export function ModalHeader({
 }) {
   const c = useColors();
   const insets = useSafeAreaInsets();
-  const fg = primary ? c.headerText : c.text;
-  const closeColor = primary ? c.headerText : c.text;
+  const fg = c.text;
+  const closeColor = c.text;
 
   return (
     <View
       style={{
-        paddingTop: insets.top,
-        backgroundColor: primary ? c.header : c.card,
-        borderBottomWidth: primary ? 0 : HAIRLINE,
+        paddingTop: headerPaddingTop(insets.top),
+        backgroundColor: c.bg,
+        borderBottomWidth: HAIRLINE,
         borderBottomColor: c.separator,
+        overflow: "hidden",
       }}
     >
+      {primary ? (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            backgroundColor: c.primary,
+          }}
+        />
+      ) : null}
       {!primary ? (
         <View
           style={{
             alignSelf: "center",
-            width: 36,
-            height: 5,
-            borderRadius: 3,
-            backgroundColor: c.separator,
-            marginTop: 8,
-            marginBottom: 4,
+            width: 40,
+            height: 4,
+            borderRadius: RADIUS.pill,
+            backgroundColor: c.border,
+            marginTop: 10,
+            marginBottom: 6,
           }}
         />
       ) : null}
@@ -48,7 +61,7 @@ export function ModalHeader({
           flexDirection: "row",
           alignItems: "center",
           minHeight: MIN_TOUCH,
-          paddingHorizontal: 8,
+          paddingHorizontal: SPACING.cell,
           paddingBottom: 10,
         }}
       >
@@ -67,11 +80,12 @@ export function ModalHeader({
           <X size={22} color={closeColor} strokeWidth={2.2} />
         </Pressable>
 
-        <View style={{ flex: 1, alignItems: "center", paddingHorizontal: 8 }}>
+        <View style={{ flex: 1, alignItems: "center", paddingHorizontal: SPACING.cell }}>
           <Txt
-            size={17}
+            size={18}
             weight={titleWeight()}
             color={fg}
+            tracking={-0.3}
             numberOfLines={1}
           >
             {title}

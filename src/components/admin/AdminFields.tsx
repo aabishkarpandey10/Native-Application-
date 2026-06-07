@@ -1,6 +1,6 @@
 import { Switch, TextInput, View } from "react-native";
 import { Txt } from "../design";
-import { interFamily } from "../../constants/design";
+import { SPACING, resolveTextStyle } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 
 export function AdminField({
@@ -18,7 +18,7 @@ export function AdminField({
 }) {
   const c = useColors();
   return (
-    <View style={{ padding: 16, borderBottomWidth: 0.5, borderBottomColor: c.separator }}>
+    <View style={{ padding: SPACING.cell, borderBottomWidth: 0.5, borderBottomColor: c.separator }}>
       <Txt size={13} color={c.textSecondary} style={{ marginBottom: 6 }}>
         {label}
       </Txt>
@@ -35,7 +35,7 @@ export function AdminField({
         style={{
           fontSize: 16,
           color: c.text,
-          fontFamily: interFamily("400"),
+          ...resolveTextStyle("400"),
           minHeight: multiline ? 72 : undefined,
           textAlignVertical: multiline ? "top" : "center",
           backgroundColor: c.muted,
@@ -66,7 +66,7 @@ export function AdminSwitch({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: 16,
+        padding: SPACING.cell,
         borderBottomWidth: 0.5,
         borderBottomColor: c.separator,
       }}
@@ -90,7 +90,7 @@ export function AdminNumber({
 }) {
   const c = useColors();
   return (
-    <View style={{ padding: 16, borderBottomWidth: 0.5, borderBottomColor: c.separator }}>
+    <View style={{ padding: SPACING.cell, borderBottomWidth: 0.5, borderBottomColor: c.separator }}>
       <Txt size={13} color={c.textSecondary} style={{ marginBottom: 6 }}>
         {label}
       </Txt>
@@ -102,7 +102,7 @@ export function AdminNumber({
         style={{
           fontSize: 16,
           color: c.text,
-          fontFamily: interFamily("400"),
+          ...resolveTextStyle("400"),
           backgroundColor: c.muted,
           borderRadius: 10,
           paddingHorizontal: 12,

@@ -34,7 +34,7 @@ export function LiveDepartureCard({ departure }: LiveDepartureCardProps) {
       >
         <View className="flex-row items-start justify-between mb-3">
           <View className="flex-row items-center flex-1 pr-3">
-            <ModeBadge mode={departure.mode} size="md" badgeClassName="mr-2.5" />
+            <ModeBadge mode={departure.mode} size="md" style={{ marginRight: 10 }} />
             {departure.routeNumber && departure.routeNumber !== "—" ? (
               <View
                 className="px-2 py-1 rounded-lg mr-2.5 items-center justify-center min-w-[36px]"

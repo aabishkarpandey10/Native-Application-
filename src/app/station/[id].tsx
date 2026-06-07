@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeBack } from "../../hooks/useSafeBack";
@@ -6,16 +6,16 @@ import { Accessibility, Car, ChevronRight, Star, Wifi, Zap } from "lucide-react-
 import {
   Cell,
   DepartureLoadingRows,
-  DepartureRow,
   EmptyState,
   GroupedList,
   IconBtn,
   LineBadge,
-  NavBar,
   Page,
   SectionHeader,
   Txt,
 } from "../../components/design";
+import { ScheduleBoard, ScheduleDepartureCard, ScheduleScreenHeader } from "../../components/schedule";
+import { SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { useDepartures } from "../../hooks/useDepartures";
 import { useStore } from "../../store/store";
@@ -23,6 +23,7 @@ import { departuresToDisplay } from "../../utils/displayAdapters";
 import { normalizeStationId } from "../../constants/stationAliases";
 import { useStationById } from "../../hooks/useStationById";
 import { LiveTrackingMap } from "../../components/live/LiveTrackingMap";
+import { getBusLinesForStation, type BusLine } from "../../constants/busNetworks";
 
 const FACILITIES = [
   { icon: Accessibility, label: "Step-free access", available: true },
@@ -44,6 +45,22 @@ export default function StationDetailScreen() {
   const addFavorite = useStore((s) => s.addFavorite);
   const removeFavorite = useStore((s) => s.removeFavorite);
   const isSaved = favorites.some((f) => f.station_id === stationId);
+
+  const [busLines, setBusLines] = useState<BusLine[]>([]);
+
+  useEffect(() => {
+    if (station?.mode !== "bus") {
+      setBusLines([]);
+      return;
+    }
+    let cancelled = false;
+    void getBusLinesForStation(stationId).then((lines) => {
+      if (!cancelled) setBusLines(lines);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [station?.mode, stationId]);
 
   const { data, isLoading, isError } = useDepartures(stationId, 8);
   const departures = useMemo(
@@ -72,16 +89,17 @@ export default function StationDetailScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar
+      <ScheduleScreenHeader
         title={stationName.replace(/\s+Station$/i, "")}
-        primary
+        subtitle="Station overview & departures"
         onBack={goBack}
+        live={departures.length > 0 && !isError}
         right={
           <IconBtn label={isSaved ? "Remove from saved stops" : "Save stop"} onPress={toggleSave}>
             <Star
               size={22}
-              color={isSaved ? "#FFD60A" : "#FFFFFF"}
-              fill={isSaved ? "#FFD60A" : "transparent"}
+              color={isSaved ? "#F59E0B" : c.textSecondary}
+              fill={isSaved ? "#F59E0B" : "transparent"}
               strokeWidth={2}
             />
           </IconBtn>
@@ -92,7 +110,7 @@ export default function StationDetailScreen() {
         {station?.lat != null && station?.lon != null ? (
           <>
             <SectionHeader title="Live tracking" />
-            <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+            <View style={{ paddingHorizontal: SPACING.screen, marginBottom: 8 }}>
               <LiveTrackingMap
                 lat={station.lat}
                 lng={station.lon}
@@ -119,29 +137,46 @@ export default function StationDetailScreen() {
         ) : departures.length === 0 ? (
           <EmptyState title="No upcoming departures" message="There may be no more services today at this stop." />
         ) : (
-          <GroupedList flat inset={0}>
-            {departures.map((d) => (
-              <DepartureRow key={d.id} departure={d} flat minHeight={62} />
-            ))}
-            <Cell
-              minHeight={48}
-              onPress={() => router.push(`/departures?stationId=${stationId}` as never)}
-              style={{ justifyContent: "center" }}
-            >
-              <Txt size={15} weight="600" color={c.primary} style={{ flex: 1 }}>
-                View full timetable
-              </Txt>
-              <ChevronRight size={18} color={c.primary} strokeWidth={2} />
-            </Cell>
-          </GroupedList>
+          <>
+            <ScheduleBoard>
+              {departures.map((d) => (
+                <ScheduleDepartureCard key={d.id} departure={d} />
+              ))}
+            </ScheduleBoard>
+            <View style={{ marginTop: 12, paddingHorizontal: SPACING.screen }}>
+              <GroupedList inset={0}>
+                <Cell
+                  minHeight={48}
+                  onPress={() => router.push(`/departures?stationId=${stationId}` as never)}
+                  style={{ justifyContent: "center" }}
+                >
+                  <Txt size={15} weight="600" color={c.primary} style={{ flex: 1 }}>
+                    View full timetable
+                  </Txt>
+                  <ChevronRight size={18} color={c.primary} strokeWidth={2} />
+                </Cell>
+              </GroupedList>
+            </View>
+          </>
         )}
 
         {station?.mode === "train" ? (
           <>
             <SectionHeader title="Lines" />
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: 16, paddingBottom: 8 }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: SPACING.screen, paddingBottom: 8 }}>
               {["T1", "T2", "T3", "T4", "T8", "T9"].map((l) => (
                 <LineBadge key={l} route={l} small />
+              ))}
+            </View>
+          </>
+        ) : null}
+
+        {station?.mode === "bus" && busLines.length > 0 ? (
+          <>
+            <SectionHeader title="Routes" />
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, paddingHorizontal: SPACING.screen, paddingBottom: 8 }}>
+              {busLines.map((l) => (
+                <LineBadge key={l.route} route={l.route} color={l.color} small />
               ))}
             </View>
           </>
@@ -154,7 +189,7 @@ export default function StationDetailScreen() {
             return (
               <Cell key={f.label} style={{ opacity: f.available ? 1 : 0.45 }}>
                 <Icon size={20} color={c.text} strokeWidth={2} />
-                <Txt size={15} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+                <Txt size={15} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
                   {f.label}
                 </Txt>
                 <Txt size={14} weight="600" color={f.available ? "#34C759" : c.textSecondary}>

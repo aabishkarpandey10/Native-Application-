@@ -12,6 +12,7 @@ import {
 } from "./data/adminStore.js";
 import { normalizeAppConfig } from "./data/appConfigDefaults.js";
 import { clearAlertsCache } from "./data/alertsService.js";
+import { invalidateStationCaches } from "./data/stationRegistry.js";
 import { clearDeparturesCache } from "./src/services/cache.service.js";
 import {
   clearUploadedNetworkMap,
@@ -67,6 +68,7 @@ export function registerAdminRoutes(app, { __dirname: adminDir }) {
   });
 
   app.post("/api/admin/reset", requireAdmin, (_req, res) => {
+    invalidateStationCaches();
     res.json(resetAppData());
   });
 
@@ -88,6 +90,7 @@ export function registerAdminRoutes(app, { __dirname: adminDir }) {
     const list = Array.isArray(req.body) ? req.body : req.body.stations;
     if (!Array.isArray(list)) return res.status(400).json({ error: "Expected stations array" });
     await clearDeparturesCache();
+    invalidateStationCaches();
     res.json(setStations(list));
   });
 
@@ -99,6 +102,7 @@ export function registerAdminRoutes(app, { __dirname: adminDir }) {
     const list = getStations().filter((s) => s.id !== station.id);
     list.push({ disabled: false, ...station });
     await clearDeparturesCache();
+    invalidateStationCaches();
     res.status(201).json(setStations(list));
   });
 
@@ -108,6 +112,7 @@ export function registerAdminRoutes(app, { __dirname: adminDir }) {
       s.id === id ? { ...s, disabled: true } : s
     );
     await clearDeparturesCache(id);
+    invalidateStationCaches();
     res.json(setStations(list));
   });
 

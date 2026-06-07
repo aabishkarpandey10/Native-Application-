@@ -10,6 +10,8 @@ const INDEX_PATH = path.join(TIMETABLES_DIR, "index.json");
 
 const LR_FILES = new Set(["l1-weekday.json", "l2-weekday.json", "l3-weekday.json"]);
 const METRO_FILES = new Set(["m1-weekday.json"]);
+const BUS_FILE = "bus-weekday.json";
+const BUS_FILES = new Set([BUS_FILE]);
 
 /** @type {Map<string, { stations: Record<string, { departures: object[] }> }>} */
 const fileCache = new Map();
@@ -76,7 +78,8 @@ export function rebuildTimetableIndex() {
   stationMergeCache.clear();
   lightRailMerged = null;
   metroMerged = null;
-  const index = readIndex();
+  const index = buildIndexFromDisk();
+  indexCache = index;
   try {
     fs.writeFileSync(INDEX_PATH, JSON.stringify(index));
   } catch {
@@ -146,6 +149,9 @@ function filesForStation(stationId) {
   if (/_M$/i.test(stationId)) {
     return [...METRO_FILES];
   }
+  if (/_B$/i.test(stationId)) {
+    return [BUS_FILE];
+  }
   return null;
 }
 
@@ -167,6 +173,14 @@ export function getStationTimetableData(stationId) {
   const files = filesForStation(stationId);
   if (!files?.length) return { stations: {} };
 
+  if (files.length === 1) {
+    const { stations } = loadFile(files[0]);
+    const entry = stations[stationId];
+    const payload = entry ? { stations: { [stationId]: entry } } : { stations: {} };
+    if (entry) stationMergeCache.set(stationId, payload);
+    return payload;
+  }
+
   const merged = mergeFiles(files);
   const entry = merged.stations[stationId];
   const payload = entry ? { stations: { [stationId]: entry } } : { stations: {} };
@@ -185,6 +199,25 @@ export function warmMetroTimetables() {
   if (metroMerged) return metroMerged;
   metroMerged = mergeFiles([...METRO_FILES]);
   return metroMerged;
+}
+
+/** Lazy — bus-weekday.json is large; first bus request loads into fileCache. */
+export function warmBusTimetableIndex() {
+  const index = readIndex();
+  const busStops = Object.keys(index.stationIndex || {}).filter((id) => /_B$/i.test(id));
+  if (busStops.length > 0) return { indexedStops: busStops.length, stationIndex: index.stationIndex };
+  if (!fs.existsSync(path.join(TIMETABLES_DIR, BUS_FILE))) {
+    return { indexedStops: 0 };
+  }
+  return rebuildTimetableIndex();
+}
+
+/** Pre-parse bus-weekday.json once so departures/trips avoid cold-load latency. */
+export function warmBusTimetableFile() {
+  const filePath = path.join(TIMETABLES_DIR, BUS_FILE);
+  if (!fs.existsSync(filePath)) return { stops: 0 };
+  const { stations } = loadFile(BUS_FILE);
+  return { stops: Object.keys(stations).length };
 }
 
 export function warmCoreTimetables() {
@@ -210,6 +243,17 @@ export function hasStationTimetable(stationId) {
     warmMetroTimetables();
     if (metroMerged?.stations[stationId]?.departures?.length) return true;
     return isOnMetroBranch(stationId);
+  }
+  if (/_B$/i.test(stationId)) {
+    const index = readIndex();
+    if (index.stationIndex[stationId]?.length) return true;
+    const files = filesForStation(stationId);
+    if (!files?.length) return false;
+    for (const file of files) {
+      const { stations } = loadFile(file);
+      if (stations[stationId]?.departures?.length) return true;
+    }
+    return false;
   }
   const files = filesForStation(stationId);
   if (!files?.length) return false;

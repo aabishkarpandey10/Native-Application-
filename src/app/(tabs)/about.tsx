@@ -1,17 +1,15 @@
-import { Linking, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+﻿import { Linking, View } from "react-native";
 import Constants from "expo-constants";
 import { Cell, GroupedList, Page, Txt } from "../../components/design";
 import { AppLogo } from "../../components/branding/AppLogo";
 import { ScreenTitle } from "../../components/tripview/ScreenTitle";
-import { MIN_TOUCH, SPACING, TAB_BAR_HEIGHT } from "../../constants/design";
+import { MIN_TOUCH, SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { useAppConfig } from "../../hooks/useAppConfig";
 import { useRefreshAppConfigOnFocus } from "../../hooks/useRefreshAppConfigOnFocus";
 
 export default function AboutScreen() {
   const c = useColors();
-  const insets = useSafeAreaInsets();
   const { data: appConfig } = useAppConfig();
   useRefreshAppConfigOnFocus();
   const version = Constants.expoConfig?.version ?? "1.0.0";
@@ -26,7 +24,7 @@ export default function AboutScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenTitle title="About" />
-      <Page bottomPad={TAB_BAR_HEIGHT + Math.max(insets.bottom, 8) + 28} contentStyle={{ paddingTop: 8 }}>
+      <Page tabScreen contentStyle={{ paddingTop: 8 }}>
         <View style={{ alignItems: "center", paddingVertical: 32 }}>
           <AppLogo size={88} config={appConfig} />
           <Txt size={22} weight="700" color={c.text} style={{ marginTop: 16 }}>
@@ -35,7 +33,7 @@ export default function AboutScreen() {
           <Txt
             size={14}
             color={c.textSecondary}
-            style={{ marginTop: 4, textAlign: "center", paddingHorizontal: 24 }}
+            style={{ marginTop: 4, textAlign: "center", paddingHorizontal: SPACING.screen }}
           >
             {tagline}
           </Txt>
@@ -44,7 +42,7 @@ export default function AboutScreen() {
           </Txt>
         </View>
 
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH} onPress={() => Linking.openURL(transportUrl)}>
             <Txt size={16} color={c.text} style={{ flex: 1 }}>
               Transport for NSW
@@ -61,7 +59,7 @@ export default function AboutScreen() {
           size={13}
           color={c.textSecondary}
           style={{
-            paddingHorizontal: SPACING.screen + 4,
+            paddingHorizontal: SPACING.screen,
             paddingTop: 24,
             lineHeight: 20,
             textAlign: "center",

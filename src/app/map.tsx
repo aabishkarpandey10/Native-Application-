@@ -1,14 +1,16 @@
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
 import { SydneyRailSchematicImage } from "../components/map/SydneyRailSchematicImage";
-import { Txt } from "../components/design";
+import { BackButton, Txt } from "../components/design";
 import { ScreenTitle } from "../components/tripview/ScreenTitle";
-import { MIN_TOUCH } from "../constants/design";
+import { SPACING } from "../constants/design";
+import { FeatureGate } from "../components/FeatureGate";
+import { useAppFeatures } from "../hooks/useAppFeatures";
 import { useColors } from "../hooks/useColors";
 import { useSafeBack } from "../hooks/useSafeBack";
 
 export default function MapScreen() {
+  const { maps } = useAppFeatures();
   const c = useColors();
   const goBack = useSafeBack("/(tabs)/tools");
 
@@ -19,36 +21,30 @@ export default function MapScreen() {
   const headerTitle = pickRole === "from" ? "From Station" : pickRole === "to" ? "To Station" : "Network map";
 
   return (
+    <FeatureGate enabled={maps} title="Maps unavailable" message="Network maps are turned off in admin settings.">
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenTitle
         title={headerTitle}
-        left={
-          <Pressable
-            onPress={goBack}
-            style={{ width: MIN_TOUCH, height: MIN_TOUCH, justifyContent: "center" }}
-          >
-            <ChevronLeft size={26} color={c.text} strokeWidth={2.2} />
-          </Pressable>
-        }
+        left={<BackButton variant="plain" onPress={goBack} />}
       />
 
       {pickRole ? (
-        <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+        <View style={{ paddingHorizontal: SPACING.screen, paddingBottom: 8 }}>
           <Txt size={14} color={c.textSecondary} style={{ lineHeight: 20 }}>
             Reference map only. Use By Name or By Distance in the station picker to choose your{" "}
             {pickRole === "from" ? "origin" : "destination"}.
           </Txt>
         </View>
       ) : viewOnly ? (
-        <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+        <View style={{ paddingHorizontal: SPACING.screen, paddingBottom: 8 }}>
           <Txt size={14} color={c.textSecondary} style={{ lineHeight: 20 }}>
-            View only — pinch to zoom and scroll. The map image is updated by your operator in the
-            admin panel.
+            View only — pinch to zoom and scroll. The map image is updated by your operator.
           </Txt>
         </View>
       ) : null}
 
       <SydneyRailSchematicImage />
     </View>
+    </FeatureGate>
   );
 }

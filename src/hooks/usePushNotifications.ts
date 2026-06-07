@@ -36,6 +36,7 @@ async function getNotificationsMod(): Promise<NotificationsMod | null> {
 async function unregisterDevicePushToken(token: string): Promise<void> {
   await fetchBackendJson("/api/push/unregister", {
     method: "DELETE",
+    throwOnError: false,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ expoPushToken: token, deviceId: getDeviceId() }),
   }).catch(() => {});

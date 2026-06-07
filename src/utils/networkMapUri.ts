@@ -2,7 +2,7 @@ import type { ImageSource } from "expo-image";
 import type { AppConfig } from "../types/appConfig";
 import { getBackendUrl } from "../services/apiClient";
 
-const BUNDLED_MAP = require("@/assets/images/sydney-metropolitan-rail-map.png");
+const BUNDLED_MAP = require("@/assets/images/sydney-metropolitan-rail-map.jpg");
 
 /** Direct image URLs only — blocks search pages and other non-image links. */
 export function sanitizeNetworkMapUrl(raw: string | null | undefined): string {

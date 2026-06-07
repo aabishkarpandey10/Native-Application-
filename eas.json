@@ -1,14 +1,17 @@
 {
   "cli": {
-    "version": ">= 9.0.0"
+    "version": ">= 16.0.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "environment": "development",
       "env": {
         "EXPO_PUBLIC_ENABLE_ADMIN": "false",
-        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       },
       "android": {
         "buildType": "apk"
@@ -16,25 +19,61 @@
     },
     "preview": {
       "distribution": "internal",
+      "environment": "preview",
       "env": {
         "EXPO_PUBLIC_ENABLE_ADMIN": "false",
-        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       },
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      }
+    },
+    "preview-simulator": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_ENABLE_ADMIN": "false",
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      },
+      "ios": {
+        "simulator": true
       }
     },
     "production": {
       "distribution": "store",
+      "environment": "production",
       "env": {
         "EXPO_PUBLIC_ENABLE_ADMIN": "false",
-        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false"
+        "EXPO_PUBLIC_ENABLE_ASSISTANT": "false",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       },
       "ios": {
         "simulator": false
       },
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "autoIncrement": true
+      }
+    },
+    "production-apk": {
+      "extends": "production",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production-ipa": {
+      "extends": "production",
+      "distribution": "internal",
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "apk"
       }
     }
   },

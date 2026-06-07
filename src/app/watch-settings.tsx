@@ -2,14 +2,15 @@ import { Platform, Pressable, Switch, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight, Clock, MapPin, Smartphone, Watch } from "lucide-react-native";
 import {
+  BackButton,
   Cell,
   Chip,
   GroupedList,
-  NavBar,
   Page,
   SectionHeader,
   Txt,
 } from "../components/design";
+import { ScreenTitle } from "../components/tripview/ScreenTitle";
 import { MIN_TOUCH, SPACING } from "../constants/design";
 import { useColors } from "../hooks/useColors";
 import { useSafeBack } from "../hooks/useSafeBack";
@@ -82,12 +83,12 @@ export default function WatchSettingsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar title="Watch settings" onBack={goBack} />
+      <ScreenTitle title="Watch settings" left={<BackButton variant="plain" onPress={goBack} />} />
 
       <Page>
         <View
           style={{
-            marginHorizontal: 16,
+            marginHorizontal: SPACING.screen,
             marginBottom: 8,
             padding: 14,
             borderRadius: 12,
@@ -110,10 +111,10 @@ export default function WatchSettingsScreen() {
         </View>
 
         <SectionHeader title="Sync" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH}>
             <Smartphone size={20} color={c.primary} strokeWidth={2} />
-            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
               Sync to watch
             </Txt>
             <Switch
@@ -176,8 +177,8 @@ export default function WatchSettingsScreen() {
             {favorites.length === 0 ? (
               <View
                 style={{
-                  marginHorizontal: 16,
-                  padding: 16,
+                  marginHorizontal: SPACING.screen,
+                  padding: SPACING.cell,
                   borderRadius: 10,
                   backgroundColor: c.card,
                   borderWidth: 1,
@@ -198,7 +199,7 @@ export default function WatchSettingsScreen() {
                 </Pressable>
               </View>
             ) : (
-              <GroupedList inset={16}>
+              <GroupedList>
                 {favorites.map((fav) => (
                   <Cell
                     key={fav.station_id}
@@ -218,7 +219,7 @@ export default function WatchSettingsScreen() {
                       }
                       strokeWidth={2}
                     />
-                    <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+                    <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
                       {shortStationName(fav.station_name)}
                     </Txt>
                     {watchSettings.primaryStopId === fav.station_id ? (
@@ -261,7 +262,7 @@ export default function WatchSettingsScreen() {
         </Txt>
 
         <SectionHeader title="What to sync" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH}>
             <Txt size={16} color={c.text} style={{ flex: 1 }}>
               Favourite stops
@@ -309,7 +310,7 @@ export default function WatchSettingsScreen() {
         </GroupedList>
 
         <SectionHeader title="Trip alarm on watch" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH}>
             <Txt size={16} color={c.text} style={{ flex: 1 }}>
               Haptic reminder
@@ -334,7 +335,7 @@ export default function WatchSettingsScreen() {
         <SectionHeader title="Summary" />
         <View
           style={{
-            marginHorizontal: 16,
+            marginHorizontal: SPACING.screen,
             padding: 14,
             borderRadius: 10,
             backgroundColor: c.card,
@@ -369,20 +370,20 @@ export default function WatchSettingsScreen() {
         </View>
 
         <SectionHeader title="Related" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell
             minHeight={MIN_TOUCH}
             onPress={() => router.push("/(tabs)/favourites" as never)}
           >
             <MapPin size={20} color={c.primary} strokeWidth={2} />
-            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
               Manage favourites
             </Txt>
             <ChevronRight size={20} color={c.textSecondary} strokeWidth={2} />
           </Cell>
           <Cell minHeight={MIN_TOUCH} onPress={() => router.push("/alarms" as never)}>
             <Clock size={20} color={c.primary} strokeWidth={2} />
-            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+            <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
               Trip alarms
             </Txt>
             <ChevronRight size={20} color={c.textSecondary} strokeWidth={2} />

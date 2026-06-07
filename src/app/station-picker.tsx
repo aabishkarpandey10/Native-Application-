@@ -1,22 +1,20 @@
-import { useCallback, useDeferredValue, useMemo, useState } from "react";
-import {
-  Pressable,
-  SectionList,
-  TextInput,
-  View,
-  type SectionListRenderItem,
-} from "react-native";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeBack } from "../hooks/useSafeBack";
-import { ChevronLeft } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Cell, GroupedList, SectionHeader, Txt } from "../components/design";
-import { MIN_TOUCH, SPACING, titleWeight } from "../constants/design";
+import { GroupedList, ListRow, SectionHeader, StackHeader, Txt } from "../components/design";
+import { MIN_TOUCH, RADIUS, SPACING, resolveTextStyle } from "../constants/design";
+import { getStackContentClearance } from "../constants/layout";
 import type { Station } from "../constants/stations";
-import { useBusStationSearch, useStations } from "../hooks/useStations";
+import { useBusStationSearch, useStations, useStationsSearch } from "../hooks/useStations";
+import { getStationsSync } from "../services/stationsService";
+import { getBusStopsForRoute } from "../constants/busNetworks";
+import { FeatureGate } from "../components/FeatureGate";
+import { useAppFeatures } from "../hooks/useAppFeatures";
 import { useColors } from "../hooks/useColors";
 import { useStore } from "../store/store";
-import { buildStationSections } from "../utils/stationSections";
+import { buildStationSections, type StationSection } from "../utils/stationSections";
 import { shortStationName } from "../utils/tripViewFormat";
 
 type SortMode = "name" | "distance";
@@ -94,7 +92,12 @@ function lineLabel(station: Station, mode: string): string | null {
   if (mode === "bus") return "Bus";
   if (mode !== "lightrail" && mode !== "train" && mode !== "metro") return null;
   if (station.id.endsWith("_LR")) {
-    if (station.id.includes("KINGSFORD") || station.id.includes("UNSWANZAC") || station.id.includes("ESMARKS") || station.id.includes("KENSINGTON")) {
+    if (
+      station.id.includes("KINGSFORD") ||
+      station.id.includes("UNSWANZAC") ||
+      station.id.includes("ESMARKS") ||
+      station.id.includes("KENSINGTON")
+    ) {
       return "L3";
     }
     if (
@@ -125,49 +128,39 @@ function lineLabel(station: Station, mode: string): string | null {
   return null;
 }
 
-type PickerListSection = {
-  title: string;
-  data: [Station[]];
-};
-
-function StationRows({
-  stations,
+function StationSectionBlock({
+  section,
   mode,
   onSelect,
 }: {
-  stations: Station[];
+  section: StationSection;
   mode: string;
   onSelect: (s: Station) => void;
 }) {
-  const c = useColors();
   return (
-    <GroupedList inset={SPACING.screen}>
-      {stations.map((station) => {
-        const badge = lineLabel(station, mode);
-        return (
-          <Cell
-            key={station.id}
-            onPress={() => onSelect(station)}
-            accessibilityLabel={shortStationName(station.name)}
-          >
-            <View style={{ flex: 1 }}>
-              <Txt size={17} color={c.text}>
-                {shortStationName(station.name)}
-              </Txt>
-              {badge ? (
-                <Txt size={13} color={c.textSecondary} style={{ marginTop: 2 }}>
-                  {badge}
-                </Txt>
-              ) : null}
-            </View>
-          </Cell>
-        );
-      })}
-    </GroupedList>
+    <View style={{ marginBottom: 8 }}>
+      <SectionHeader title={section.title} />
+      <GroupedList>
+        {section.data.map((station) => {
+          const badge = lineLabel(station, mode);
+          const label = shortStationName(station.name);
+          return (
+            <ListRow
+              key={station.id}
+              label={label}
+              subtitle={badge ?? undefined}
+              onPress={() => onSelect(station)}
+              accessibilityLabel={label}
+            />
+          );
+        })}
+      </GroupedList>
+    </View>
   );
 }
 
 export default function StationPickerScreen() {
+  const { tripPlanner } = useAppFeatures();
   const c = useColors();
   const router = useRouter();
   const goBack = useSafeBack();
@@ -177,19 +170,41 @@ export default function StationPickerScreen() {
     role?: string;
     mode?: string;
     flow?: string;
+    route?: string;
     fromId?: string;
     fromName?: string;
   }>();
 
   const role = params.role === "to" ? "to" : "from";
   const mode = String(params.mode ?? "train");
+  const busRoute = String(params.route ?? "").trim();
   const [search, setSearch] = useState("");
+  const [routeStopIds, setRouteStopIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!busRoute) {
+      setRouteStopIds([]);
+      return;
+    }
+    let cancelled = false;
+    void getBusStopsForRoute(busRoute).then((ids) => {
+      if (!cancelled) setRouteStopIds(ids);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [busRoute]);
+
   const [sort, setSort] = useState<SortMode>("name");
   const [showAll, setShowAll] = useState(mode !== "bus");
 
   const title = role === "from" ? "From station" : "To station";
   const isBus = mode === "bus";
-  const { data: coreStations = [], isLoading: coreLoading } = useStations(mode);
+  const { data: coreStations = [], isLoading: coreLoading, isFetching: coreFetching } = useStations(mode);
+  const effectiveCoreStations = useMemo(
+    () => (coreStations.length > 0 ? coreStations : getStationsSync()),
+    [coreStations]
+  );
   const searchTrim = search.trim();
   const deferredSearch = useDeferredValue(searchTrim);
   const busQuery = useBusStationSearch(deferredSearch, {
@@ -197,29 +212,44 @@ export default function StationPickerScreen() {
     lng: userLocation?.lng,
     enabled: isBus,
   });
-  const busStations = busQuery.data ?? [];
-  const isLoading = isBus ? busQuery.isLoading : coreLoading;
+  const routeStationsQuery = useStationsSearch({
+    mode: "bus",
+    ids: routeStopIds.slice(0, 200),
+    limit: 200,
+    enabled: isBus && busRoute.length > 0 && routeStopIds.length > 0,
+  });
+  const busStationsRaw = busQuery.data ?? [];
+  const busStations = useMemo(() => {
+    if (!busRoute) return busStationsRaw;
+    const routeList = routeStationsQuery.data ?? [];
+    if (routeList.length) return routeList;
+    const allowed = new Set(routeStopIds);
+    return busStationsRaw.filter((s) => allowed.has(s.id));
+  }, [busRoute, busStationsRaw, routeStationsQuery.data, routeStopIds]);
+  const isLoading = isBus
+    ? busQuery.isLoading || (busRoute ? routeStationsQuery.isLoading : false)
+    : coreLoading;
 
   const sections = useMemo(() => {
     if (isBus) {
       const q = searchTrim.toLowerCase();
+      const list = q.length >= 2
+        ? busStations.filter((s) => s.name.toLowerCase().includes(q))
+        : busStations;
+      if (busRoute) {
+        return list.length ? [{ title: `Route ${busRoute} stops`, data: list }] : [];
+      }
       if (q.length >= 2) {
-        return busStations.length
-          ? [{ title: "Results", data: busStations }]
-          : [];
+        return list.length ? [{ title: "Results", data: list }] : [];
       }
       if (sort === "distance" && userLocation) {
-        return busStations.length
-          ? [{ title: "Nearby bus stops", data: busStations }]
-          : [];
+        return list.length ? [{ title: "Nearby bus stops", data: list }] : [];
       }
-      return busStations.length
-        ? [{ title: "Popular", data: busStations }]
-        : [];
+      return list.length ? [{ title: "Popular", data: list }] : [];
     }
 
     const filter = modeFilter(mode);
-    let stations = coreStations.filter(filter);
+    let stations = effectiveCoreStations.filter(filter);
     const q = searchTrim.toLowerCase();
     if (q) {
       stations = stations.filter((s) => s.name.toLowerCase().includes(q));
@@ -228,19 +258,15 @@ export default function StationPickerScreen() {
 
     if (sort === "distance" && userLocation) {
       stations = [...stations].sort((a, b) => {
-        const da =
-          (a.lat - userLocation.lat) ** 2 + (a.lon - userLocation.lng) ** 2;
-        const db =
-          (b.lat - userLocation.lat) ** 2 + (b.lon - userLocation.lng) ** 2;
+        const da = (a.lat - userLocation.lat) ** 2 + (a.lon - userLocation.lng) ** 2;
+        const db = (b.lat - userLocation.lat) ** 2 + (b.lon - userLocation.lng) ** 2;
         return da - db;
       });
       return [{ title: "Nearby", data: stations }];
     }
 
     const popularIds = new Set(popularIdsForMode(mode));
-    const popular = popularIds.size
-      ? stations.filter((s) => popularIds.has(s.id))
-      : [];
+    const popular = popularIds.size ? stations.filter((s) => popularIds.has(s.id)) : [];
     const rest = stations.filter((s) => !popularIds.has(s.id));
     const letterSections = buildStationSections(rest);
     if (!showAll && popular.length > 0) {
@@ -250,7 +276,18 @@ export default function StationPickerScreen() {
       return [{ title: "Popular", data: popular }, ...letterSections];
     }
     return letterSections;
-  }, [mode, isBus, deferredSearch, searchTrim, sort, userLocation, coreStations, busStations, showAll]);
+  }, [
+    mode,
+    isBus,
+    busRoute,
+    deferredSearch,
+    searchTrim,
+    sort,
+    userLocation,
+    effectiveCoreStations,
+    busStations,
+    showAll,
+  ]);
 
   const flow = String(params.flow ?? "");
   const setAlarmDraft = useStore((s) => s.setAlarmDraft);
@@ -310,159 +347,128 @@ export default function StationPickerScreen() {
   const canShowAll =
     !isBus && !search.trim() && sort === "name" && popularIdsForMode(mode).length > 0;
 
-  const listSections = useMemo<PickerListSection[]>(
-    () =>
-      sections
-        .filter((section) => section.data.length > 0)
-        .map((section) => ({ title: section.title, data: [section.data] })),
-    [sections]
-  );
-
-  const renderSectionHeader = useCallback(
-    ({ section }: { section: PickerListSection }) => <SectionHeader title={section.title} />,
-    []
-  );
-
-  const renderItem: SectionListRenderItem<Station[], PickerListSection> = useCallback(
-    ({ item: stations }) => (
-      <View style={{ marginBottom: 12 }}>
-        <StationRows stations={stations} mode={mode} onSelect={onSelect} />
-      </View>
-    ),
-    [mode, onSelect]
-  );
+  const emptyMessage =
+    isLoading || coreFetching
+      ? "Loading stations…"
+      : isBus && searchTrim.length < 2
+        ? "Search for a bus stop above."
+        : searchTrim
+          ? "No stations match your search."
+          : "No stations available for this mode.";
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <View
-        style={{
-          paddingTop: insets.top,
-          paddingHorizontal: 8,
-          paddingBottom: 8,
-          flexDirection: "row",
-          alignItems: "center",
-          borderBottomWidth: 0.5,
-          borderBottomColor: c.separator,
-          backgroundColor: c.card,
-        }}
-      >
-        <Pressable
-          onPress={goBack}
-          style={{ width: 44, height: 44, alignItems: "center", justifyContent: "center" }}
+    <FeatureGate
+      enabled={tripPlanner}
+      title="Trip planner unavailable"
+      message="Trip planning is turned off in admin settings."
+    >
+      <View style={{ flex: 1, backgroundColor: c.bg }}>
+        <StackHeader title={title} onBack={goBack} />
+
+        <ScrollView
+          style={{ flex: 1 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: getStackContentClearance(insets.bottom) }}
         >
-          <ChevronLeft size={26} color={c.text} strokeWidth={2.2} />
-        </Pressable>
-        <Txt size={17} weight={titleWeight()} color={c.text} style={{ flex: 1, textAlign: "center" }}>
-          {title}
-        </Txt>
-        <View style={{ width: 44 }} />
-      </View>
-
-      <View style={{ paddingHorizontal: SPACING.screen, paddingTop: 12, paddingBottom: 8 }}>
-        <TextInput
-          value={search}
-          onChangeText={(text) => {
-            setSearch(text);
-            if (text.trim()) setShowAll(true);
-          }}
-          placeholder="Search stations"
-          placeholderTextColor={c.textSecondary}
-          autoCorrect={false}
-          clearButtonMode="while-editing"
-          style={{
-            backgroundColor: c.card,
-            borderRadius: 10,
-            paddingHorizontal: 14,
-            minHeight: MIN_TOUCH,
-            fontSize: 16,
-            color: c.text,
-            borderWidth: 0.5,
-            borderColor: c.separator,
-          }}
-        />
-        <View style={{ flexDirection: "row", gap: 8, marginTop: 10 }}>
-          {(
-            [
-              ["distance", "Nearby"],
-              ["name", "A–Z"],
-            ] as const
-          ).map(([key, label]) => {
-            const active = sort === key;
-            const disabled = key === "distance" && !userLocation;
-            return (
-              <Pressable
-                key={key}
-                disabled={disabled}
-                onPress={() => {
-                  setSort(key);
-                  if (key === "distance") setShowAll(true);
-                }}
-                style={{
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  borderRadius: 18,
-                  backgroundColor: active ? c.primary : c.muted,
-                  opacity: disabled ? 0.45 : 1,
-                }}
-              >
-                <Txt size={14} weight="600" color={active ? "#FFFFFF" : c.text}>
-                  {label}
-                </Txt>
-              </Pressable>
-            );
-          })}
-        </View>
-        {isLoading ? (
-          <Txt size={13} color={c.textSecondary} style={{ marginTop: 8 }}>
-            Loading stations…
-          </Txt>
-        ) : null}
-        {isBus && searchTrim.length < 2 ? (
-          <Txt size={13} color={c.textSecondary} style={{ marginTop: 8 }}>
-            Type at least 2 characters to search bus stops.
-          </Txt>
-        ) : null}
-      </View>
-
-      <SectionList
-        style={{ flex: 1 }}
-        sections={listSections}
-        keyExtractor={(stations, index) =>
-          `section-block-${index}-${stations[0]?.id ?? "empty"}`
-        }
-        renderSectionHeader={renderSectionHeader}
-        renderItem={renderItem}
-        stickySectionHeadersEnabled={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-        initialNumToRender={8}
-        maxToRenderPerBatch={6}
-        windowSize={9}
-        removeClippedSubviews
-        contentContainerStyle={{
-          paddingBottom: insets.bottom + 24,
-          flexGrow: listSections.length === 0 ? 1 : undefined,
-        }}
-        ListEmptyComponent={
-          <View style={{ padding: 24, alignItems: "center" }}>
-            <Txt size={15} color={c.textSecondary}>
-              {isBus && searchTrim.length < 2
-                ? "Search for a bus stop above."
-                : "No stations match your search."}
-            </Txt>
+          <View style={{ paddingHorizontal: SPACING.screen, paddingTop: 12, paddingBottom: 8 }}>
+            <TextInput
+              value={search}
+              onChangeText={(text) => {
+                setSearch(text);
+                if (text.trim()) setShowAll(true);
+              }}
+              placeholder="Search stations"
+              placeholderTextColor={c.textSecondary}
+              autoCorrect={false}
+              clearButtonMode="while-editing"
+              style={{
+                backgroundColor: c.card,
+                borderRadius: RADIUS.sm,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                minHeight: MIN_TOUCH,
+                fontSize: 16,
+                ...resolveTextStyle("400"),
+                color: c.text,
+                borderWidth: 0.5,
+                borderColor: c.separator,
+              }}
+            />
+            <View style={{ flexDirection: "row", marginTop: 10 }}>
+              {(
+                [
+                  ["distance", "Nearby"],
+                  ["name", "A–Z"],
+                ] as const
+              ).map(([key, label], index) => {
+                const active = sort === key;
+                const disabled = key === "distance" && !userLocation;
+                return (
+                  <Pressable
+                    key={key}
+                    disabled={disabled}
+                    onPress={() => {
+                      setSort(key);
+                      if (key === "distance") setShowAll(true);
+                    }}
+                    style={{
+                      marginLeft: index > 0 ? 8 : 0,
+                      paddingHorizontal: 14,
+                      paddingVertical: 8,
+                      borderRadius: 18,
+                      backgroundColor: active ? c.primary : c.muted,
+                      opacity: disabled ? 0.45 : 1,
+                    }}
+                  >
+                    <Txt size={14} weight="600" color={active ? "#FFFFFF" : c.text}>
+                      {label}
+                    </Txt>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {isLoading ? (
+              <Txt size={13} color={c.textSecondary} style={{ marginTop: 8 }}>
+                Loading stations…
+              </Txt>
+            ) : null}
+            {isBus && searchTrim.length < 2 ? (
+              <Txt size={13} color={c.textSecondary} style={{ marginTop: 8 }}>
+                Type at least 2 characters to search bus stops.
+              </Txt>
+            ) : null}
           </View>
-        }
-        ListFooterComponent={
-          canShowAll && !showAll ? (
+
+          {sections.length === 0 ? (
+            <View style={{ padding: 24, alignItems: "center" }}>
+              <Txt size={15} color={c.textSecondary} style={{ textAlign: "center", lineHeight: 22 }}>
+                {emptyMessage}
+              </Txt>
+            </View>
+          ) : (
+            sections.map((section) => (
+              <StationSectionBlock
+                key={section.title}
+                section={section}
+                mode={mode}
+                onSelect={onSelect}
+              />
+            ))
+          )}
+
+          {canShowAll && !showAll ? (
             <Pressable
               onPress={() => setShowAll(true)}
               style={{
                 marginHorizontal: SPACING.screen,
                 marginTop: 4,
+                marginBottom: 12,
                 paddingVertical: 14,
                 alignItems: "center",
                 backgroundColor: c.card,
-                borderRadius: 10,
+                borderRadius: RADIUS.sm,
                 borderWidth: 0.5,
                 borderColor: c.separator,
               }}
@@ -471,9 +477,9 @@ export default function StationPickerScreen() {
                 {mode === "bus" ? "Show all bus stops (A–Z)" : "Show all stations (A–Z)"}
               </Txt>
             </Pressable>
-          ) : null
-        }
-      />
-    </View>
+          ) : null}
+        </ScrollView>
+      </View>
+    </FeatureGate>
   );
 }

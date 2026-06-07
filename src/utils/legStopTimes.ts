@@ -32,6 +32,16 @@ export function buildLegTimetable(leg: TripLeg): Array<{ name: string; time: Dat
 
   if (names.length === 0) return [];
 
+  // Bus: don't fabricate evenly-spaced times — only show endpoints when timings are unknown.
+  if (leg.mode === "bus" && (!leg.stopTimes || leg.stopTimes.length < 2)) {
+    const from = leg.originName ? cleanStopName(leg.originName) : "";
+    const to = leg.destinationName ? cleanStopName(leg.destinationName) : "";
+    const out: Array<{ name: string; time: Date }> = [];
+    if (from) out.push({ name: from, time: leg.departure });
+    if (to && to !== from) out.push({ name: to, time: leg.arrival });
+    return out;
+  }
+
   const startMs = leg.departure.getTime();
   const endMs = leg.arrival.getTime();
   const span = Math.max(endMs - startMs, 60000);

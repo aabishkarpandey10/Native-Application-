@@ -18,9 +18,8 @@ export function isWebFallback() {
 }
 
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
-  if (!db) {
-    db = await SQLite.openDatabaseAsync(DB_NAME);
-  }
+  await initDatabase();
+  if (!db) throw new Error("SQLite database failed to initialize");
   return db;
 }
 
@@ -211,14 +210,21 @@ async function seedDatabase(database: SQLite.SQLiteDatabase) {
 export async function initDatabase(): Promise<void> {
   if (initPromise) return initPromise;
   initPromise = (async () => {
-    const database = await getDatabase();
-    await runMigrations(database);
-    await seedDatabase(database);
-    const cacheVer = await AsyncStorage.getItem(DEPARTURES_CACHE_KEY);
-    if (cacheVer !== "3") {
-      await database.runAsync("DELETE FROM departure_stops");
-      await database.runAsync("DELETE FROM departures");
-      await AsyncStorage.setItem(DEPARTURES_CACHE_KEY, "3");
+    try {
+      if (!db) {
+        db = await SQLite.openDatabaseAsync(DB_NAME);
+      }
+      await runMigrations(db);
+      await seedDatabase(db);
+      const cacheVer = await AsyncStorage.getItem(DEPARTURES_CACHE_KEY);
+      if (cacheVer !== "3") {
+        await db.runAsync("DELETE FROM departure_stops");
+        await db.runAsync("DELETE FROM departures");
+        await AsyncStorage.setItem(DEPARTURES_CACHE_KEY, "3");
+      }
+    } catch (err) {
+      initPromise = null;
+      throw err;
     }
   })();
   return initPromise;

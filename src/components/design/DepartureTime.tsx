@@ -10,11 +10,10 @@ interface DepartureTimeProps {
   clock?: string;
   minutes?: number;
   delayed?: boolean;
-  /** TripView timetable uses larger clock on the right */
   large?: boolean;
 }
 
-/** Right-aligned departure clock + live countdown (TripView style). */
+/** Compact departure clock for list previews (e.g. saved stops). */
 export function DepartureTime({ departsAt, clock, minutes = 0, delayed, large }: DepartureTimeProps) {
   useMinuteTicker(15_000);
   const c = useColors();
@@ -24,14 +23,14 @@ export function DepartureTime({ departsAt, clock, minutes = 0, delayed, large }:
   const liveClock = when ? formatClock(when) : (clock ?? "—");
 
   const color = countdownColor(liveMinutes, delayed);
-  const label = liveMinutes <= 0 ? "Due" : `${liveMinutes} min`;
+  const label = liveMinutes <= 0 ? "Now" : `${liveMinutes}m`;
 
   return (
-    <View style={{ alignItems: "flex-end", minWidth: large ? 72 : 56, flexShrink: 0 }}>
-      <Txt size={large ? 24 : 18} weight="600" color={delayed ? color : c.text} tabularNums>
+    <View style={{ alignItems: "flex-end", minWidth: large ? 72 : 52, flexShrink: 0 }}>
+      <Txt size={large ? 20 : 16} weight="700" color={c.text} tabularNums>
         {liveClock}
       </Txt>
-      <Txt size={13} weight="500" color={color} style={{ marginTop: 2 }}>
+      <Txt size={12} weight="600" color={color} style={{ marginTop: 3 }}>
         {label}
       </Txt>
     </View>

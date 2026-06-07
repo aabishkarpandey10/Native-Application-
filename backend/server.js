@@ -19,7 +19,6 @@ import { getLinesForStation, SYDNEY_TRAIN_LINES, LINE_STATION_IDS } from "./data
 import { formatItdDateTime, resolveTfnswStopId } from "./data/tfnswHelpers.js";
 import { parseTfnswTime, toIsoString } from "./data/tfnswTime.js";
 import { rankNearbyStations } from "./data/nearby.js";
-import { buildMockDepartures } from "./data/mockDepartures.js";
 import { buildLineStopSequence } from "./data/stopSequence.js";
 import { planTripsForStations, parseTripPlannerQuery } from "./data/tripPlanCore.js";
 import { buildMockTripItineraries } from "./data/tripPlanMock.js";
@@ -51,6 +50,16 @@ app.use(cors());
 app.use(express.json({ limit: "25mb" }));
 app.use(apiRateLimit);
 
+if (config.logRequests) {
+  app.use((req, res, next) => {
+    const started = Date.now();
+    res.on("finish", () => {
+      console.log(`[HTTP] ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - started}ms`);
+    });
+    next();
+  });
+}
+
 const TFNSW_API_KEY = config.tfnsw.apiKey;
 const TFNSW_API_BASE = config.tfnsw.baseUrl;
 
@@ -61,7 +70,7 @@ app.get("/", (_req, res) => {
   res.json({
     name: "Sydney Transit API",
     status: "ok",
-    health: "/api/status",
+    health: "/api/health",
     endpoints: [
       "/api/app-config",
       "/api/stations",
@@ -76,18 +85,52 @@ app.get("/", (_req, res) => {
   });
 });
 
-app.get("/api/status", async (_req, res) => {
+async function buildHealthPayload() {
   const tfnswConfigured = isTfnswKeyConfigured();
-  const tfnswLive = tfnswConfigured ? await testTfnswConnection() : false;
-  res.json({
+  let tfnswLive = false;
+  if (tfnswConfigured) {
+    try {
+      tfnswLive = await testTfnswConnection();
+    } catch {
+      tfnswLive = false;
+    }
+  }
+  const liveOrTimetable = tfnswLive
+    ? "https://transportnsw.info"
+    : tfnswConfigured
+      ? "timetable-fallback"
+      : "unavailable";
+  return {
     ok: true,
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
     tfnswConfigured,
     tfnswLive,
-    dataSource: tfnswLive ? "transport.nsw.gov.au" : tfnswConfigured ? "timetable-fallback" : "mock",
+    dataSource: liveOrTimetable,
+    scheduleSource: tfnswLive ? "transportnsw.info" : "local-timetable",
     openaiConfigured: !!(process.env.OPENAI_API_KEY?.trim()),
+    allowMockData: config.allowMockData,
     port: PORT,
-  });
-});
+  };
+}
+
+async function handleHealth(_req, res) {
+  try {
+    res.json(await buildHealthPayload());
+  } catch (err) {
+    res.status(503).json({
+      ok: false,
+      status: "unhealthy",
+      error: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+}
+
+app.get("/health", handleHealth);
+app.get("/api/health", handleHealth);
+app.get("/api/status", handleHealth);
 
 app.get("/api/app-config", (_req, res) => {
   res.json(getAppConfig());
@@ -146,28 +189,11 @@ app.get("/api/nearby", async (req, res) => {
   }
 
   const stationList = [
-    ...getCoreStations(),
+    ...getStations().filter((s) => !s.disabled),
     ...nearbyBusStops(lat, lng, { limit: 60 }),
-  ].filter((s) => !s.disabled);
+  ];
   const stops = rankNearbyStations(stationList, lat, lng, radius);
-  const result = await Promise.all(
-    stops.map(async (stop) => {
-      const station = stationList.find((s) => s.id === stop.station_id);
-      if (isTfnswKeyConfigured()) {
-        try {
-          const live = await getDeparturesWithCache(stop.station_id);
-          if (live.departures?.length) {
-            return { ...stop, next_departure: live.departures[0] };
-          }
-        } catch {
-          // fall through to mock
-        }
-      }
-      const deps = buildMockDepartures(station, stop.station_id, 1);
-      return { ...stop, next_departure: deps[0] || null };
-    })
-  );
-  res.json(result);
+  res.json(stops.slice(0, 20));
 });
 
 app.get("/api/lines", (req, res) => {
@@ -204,17 +230,22 @@ app.delete("/api/push/unregister", (req, res) => {
 
 // Real-time departures return all train networks (with optional real API fetcher)
 app.get("/api/departures", async (req, res) => {
-  const { stationId, refresh, fullDay } = req.query;
+  const { stationId, refresh, fullDay, route } = req.query;
   if (!stationId) return res.status(400).json({ error: "Missing stationId" });
   const id = normalizeStationId(String(stationId));
   const forceRefresh = refresh === "1" || refresh === "true";
   const wantFullDay = fullDay === "1" || fullDay === "true";
+  const routeFilter = route ? String(route).trim() : null;
   if (forceRefresh) {
     const { clearDeparturesCache } = await import("./src/services/cache.service.js");
     await clearDeparturesCache(id);
   }
   res.setHeader("Cache-Control", wantFullDay ? "private, max-age=30" : "private, max-age=15");
-  const result = await getDeparturesWithCache(id, { forceRefresh, fullDay: wantFullDay });
+  const result = await getDeparturesWithCache(id, {
+    forceRefresh,
+    fullDay: wantFullDay,
+    routeFilter,
+  });
   res.json(result);
 });
 
@@ -225,7 +256,11 @@ app.get("/api/trip", async (req, res) => {
     if (parsed.error) {
       return res.status(parsed.error.status).json({ error: parsed.error.message });
     }
-    res.setHeader("Cache-Control", "private, max-age=30");
+    const parsedFullDay = parsed.fullDay;
+    res.setHeader(
+      "Cache-Control",
+      parsedFullDay ? "private, max-age=300" : "private, max-age=60"
+    );
     const result = await planTripsForStations(
       parsed.origin,
       parsed.dest,
@@ -234,8 +269,9 @@ app.get("/api/trip", async (req, res) => {
       TFNSW_API_BASE,
       {
         includePast: parsed.includePast,
+        fullDay: parsed.fullDay,
         forceRefresh: parsed.forceRefresh,
-        buildMockItineraries: buildMockTripItineraries,
+        buildMockItineraries: config.allowMockData ? buildMockTripItineraries : undefined,
       }
     );
     res.json(result.itineraries);
@@ -345,14 +381,26 @@ if (adminEnabled) {
 
 const server = app.listen(PORT, "0.0.0.0", async () => {
   try {
-    const { warmLightRailTimetables, warmMetroTimetables } = await import(
-      "./data/timetableLoader.js"
-    );
+    const { warmLightRailTimetables, warmMetroTimetables, warmBusTimetableIndex } =
+      await import("./data/timetableLoader.js");
     const lr = warmLightRailTimetables();
     const metro = warmMetroTimetables();
     console.log(
       `Timetables preloaded: light rail ${Object.keys(lr.stations || {}).length} stops, metro ${Object.keys(metro.stations || {}).length} stops`
     );
+    setImmediate(async () => {
+      try {
+        const { warmBusTimetableFile } = await import("./data/timetableLoader.js");
+        const busIndex = warmBusTimetableIndex();
+        const count = busIndex?.indexedStops
+          ?? Object.keys(busIndex?.stationIndex || {}).filter((id) => /_B$/i.test(id)).length;
+        if (count > 0) console.log(`Bus timetable index: ${count} stops`);
+        const warmed = warmBusTimetableFile();
+        if (warmed.stops > 0) console.log(`Bus timetable data preloaded: ${warmed.stops} stops`);
+      } catch (e) {
+        console.warn("Bus timetable preload skipped:", e.message);
+      }
+    });
   } catch (e) {
     console.warn("Light rail timetable preload skipped:", e.message);
   }

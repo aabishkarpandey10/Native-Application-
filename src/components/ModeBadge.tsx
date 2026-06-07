@@ -1,40 +1,45 @@
-import { View, Text } from "react-native";
+import { View, Text, type TextStyle, type ViewStyle } from "react-native";
 import { getModeConfig, normalizeTransportMode } from "../constants/transportModes";
 
 interface ModeBadgeProps {
   mode: "train" | "metro" | "bus" | "lightrail" | "light_rail" | "ferry" | string;
   size?: "sm" | "md" | "lg";
-  textClassName?: string;
-  badgeClassName?: string;
+  style?: ViewStyle;
 }
 
-export function ModeBadge({
-  mode,
-  size = "md",
-  textClassName = "",
-  badgeClassName = "",
-}: ModeBadgeProps) {
+const BADGE_SIZE = { sm: 20, md: 28, lg: 40 } as const;
+const TEXT_SIZE: Record<"sm" | "md" | "lg", TextStyle["fontSize"]> = {
+  sm: 9,
+  md: 12,
+  lg: 16,
+};
+
+export function ModeBadge({ mode, size = "md", style }: ModeBadgeProps) {
   const config = getModeConfig(String(mode));
-
-  const badgeDimensions = {
-    sm: "w-5 h-5",
-    md: "w-7 h-7",
-    lg: "w-10 h-10",
-  };
-
-  const textDimensions = {
-    sm: "text-[9px]",
-    md: "text-[12px]",
-    lg: "text-[16px]",
-  };
+  const dim = BADGE_SIZE[size];
 
   return (
     <View
-      className={`items-center justify-center rounded-full ${badgeDimensions[size]} ${badgeClassName}`}
-      style={{ backgroundColor: config.color }}
+      style={[
+        {
+          width: dim,
+          height: dim,
+          borderRadius: dim / 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: config.color,
+        },
+        style,
+      ]}
     >
       <Text
-        className={`font-black text-white text-center tracking-tighter ${textDimensions[size]} ${textClassName}`}
+        style={{
+          fontSize: TEXT_SIZE[size],
+          fontWeight: "900",
+          color: "#FFFFFF",
+          textAlign: "center",
+          letterSpacing: -0.5,
+        }}
       >
         {config.char}
       </Text>

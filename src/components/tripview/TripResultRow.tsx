@@ -1,9 +1,9 @@
 import { Pressable, View } from "react-native";
-import { Users } from "lucide-react-native";
-import { SEMANTIC } from "../../constants/design";
+import { ArrowRight } from "lucide-react-native";
+import { HAIRLINE, RADIUS, SEMANTIC, SPACING, cardShadow } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { Txt } from "../design/Txt";
-import { TRIPVIEW_BLUE } from "../../utils/tripDisplay";
+import { BRAND_ACCENT } from "../../utils/tripDisplay";
 import { formatLeaveIn, shortStationName } from "../../utils/tripViewFormat";
 
 export interface TripResultRowProps {
@@ -11,6 +11,8 @@ export interface TripResultRowProps {
   originName: string;
   destName: string;
   originPlatform?: string;
+  viaLabel?: string;
+  platformLabel?: string;
   departClock: string;
   arriveClock: string;
   routeCode: string;
@@ -21,15 +23,18 @@ export interface TripResultRowProps {
   onPress?: () => void;
 }
 
+/** Card-based journey option — separate from TripView sidebar layout. */
 export function TripResultRow({
   leaveInMinutes,
   originName,
   destName,
   originPlatform,
+  viaLabel,
+  platformLabel = "Plat",
   departClock,
   arriveClock,
   routeCode,
-  accentColor = TRIPVIEW_BLUE,
+  accentColor = BRAND_ACCENT,
   onTime = true,
   realtime = true,
   isPast = false,
@@ -37,8 +42,6 @@ export function TripResultRow({
 }: TripResultRowProps) {
   const c = useColors();
   const leaveLabel = formatLeaveIn(leaveInMinutes);
-  const sidebarColor = isPast ? c.separator : accentColor;
-  const timeColor = isPast ? c.textSecondary : c.text;
   const routeColor = isPast ? c.textSecondary : accentColor;
 
   return (
@@ -46,72 +49,124 @@ export function TripResultRow({
       onPress={onPress}
       accessibilityRole="button"
       style={({ pressed }) => ({
-        flexDirection: "row",
-        minHeight: 88,
-        opacity: pressed ? 0.85 : isPast ? 0.72 : 1,
-        borderBottomWidth: 0.5,
-        borderBottomColor: c.separator,
+        marginHorizontal: SPACING.screen,
+        marginBottom: SPACING.section,
+        opacity: isPast ? 0.7 : pressed ? 0.94 : 1,
       })}
     >
       <View
-        style={{
-          width: 76,
-          backgroundColor: sidebarColor,
-          alignItems: "center",
-          justifyContent: "center",
-          paddingHorizontal: 6,
-        }}
+        style={[
+          {
+            backgroundColor: c.card,
+            borderRadius: RADIUS.card,
+            borderWidth: HAIRLINE,
+            borderColor: c.border,
+            padding: SPACING.cell,
+            overflow: "hidden",
+          },
+          cardShadow(c.isDark),
+        ]}
       >
-        <Txt size={15} weight="700" color={isPast ? c.text : "#FFFFFF"} style={{ textAlign: "center" }}>
-          {leaveLabel}
-        </Txt>
-      </View>
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            backgroundColor: isPast ? c.separator : routeColor,
+          }}
+        />
 
-      <View style={{ flex: 1, backgroundColor: c.bg, paddingVertical: 10, paddingHorizontal: 14 }}>
-        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
-          <Txt size={12} color={c.textSecondary} numberOfLines={1} style={{ flex: 1, marginRight: 8 }}>
-            {shortStationName(originName)}
-            {originPlatform ? ` Platform ${originPlatform}` : ""}
-          </Txt>
-          <Txt size={12} color={c.textSecondary} numberOfLines={1}>
-            {shortStationName(destName)}
-          </Txt>
-        </View>
-
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-          <Txt size={22} weight="700" color={timeColor}>
-            {departClock}
-          </Txt>
-          <Txt size={22} weight="700" color={timeColor}>
-            {arriveClock}
-          </Txt>
-        </View>
-
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 6 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-            {onTime && realtime ? (
-              <>
-                <View style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: SEMANTIC.success }} />
-                <Txt size={13} weight="600" color={SEMANTIC.success}>
-                  Live · on time
-                </Txt>
-              </>
-            ) : onTime && !isPast ? (
-              <Txt size={12} color={c.textSecondary}>
-                Scheduled timetable
-              </Txt>
-            ) : (
-              <Txt size={12} color={c.textSecondary}>
-                Real-time data unavailable
-              </Txt>
-            )}
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 6, maxWidth: "52%" }}>
-            <Users size={14} color={routeColor} strokeWidth={2} />
-            <Txt size={14} weight="600" color={routeColor} numberOfLines={2} style={{ textAlign: "right" }}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: RADIUS.pill,
+              backgroundColor: `${routeColor}18`,
+              borderWidth: 1,
+              borderColor: `${routeColor}33`,
+            }}
+          >
+            <Txt size={12} weight="700" color={routeColor}>
               {routeCode}
             </Txt>
           </View>
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              borderRadius: RADIUS.pill,
+              backgroundColor: c.muted,
+            }}
+          >
+            <Txt size={12} weight="600" color={isPast ? c.textSecondary : c.text}>
+              {leaveLabel}
+            </Txt>
+          </View>
+        </View>
+
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Txt size={12} color={c.textSecondary} numberOfLines={1}>
+              {shortStationName(originName)}
+              {originPlatform ? ` · ${platformLabel} ${originPlatform}` : ""}
+            </Txt>
+            <Txt
+              size={24}
+              weight="700"
+              color={isPast ? c.textSecondary : c.text}
+              tabularNums
+              style={{ marginTop: 4 }}
+            >
+              {departClock}
+            </Txt>
+          </View>
+
+          <View style={{ paddingHorizontal: 12, alignItems: "center" }}>
+            <ArrowRight size={18} color={isPast ? c.separator : c.textSecondary} strokeWidth={2} />
+          </View>
+
+          <View style={{ flex: 1, minWidth: 0, alignItems: "flex-end" }}>
+            <Txt size={12} color={c.textSecondary} numberOfLines={1} style={{ textAlign: "right" }}>
+              {shortStationName(destName)}
+            </Txt>
+            <Txt
+              size={24}
+              weight="700"
+              color={isPast ? c.textSecondary : c.text}
+              tabularNums
+              style={{ marginTop: 4 }}
+            >
+              {arriveClock}
+            </Txt>
+          </View>
+        </View>
+
+        {viaLabel ? (
+          <Txt size={12} color={c.textSecondary} numberOfLines={1} style={{ marginTop: 10 }}>
+            {viaLabel}
+          </Txt>
+        ) : null}
+
+        <View style={{ flexDirection: "row", alignItems: "center", marginTop: viaLabel ? 8 : 14, gap: 6 }}>
+          {onTime && realtime && !isPast ? (
+            <>
+              <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: SEMANTIC.success }} />
+              <Txt size={12} weight="600" color={SEMANTIC.success}>
+                Live from Transport NSW
+              </Txt>
+            </>
+          ) : onTime && !isPast ? (
+            <Txt size={12} color={c.textSecondary}>
+              Scheduled timetable
+            </Txt>
+          ) : (
+            <Txt size={12} color={c.textSecondary}>
+              {isPast ? "Earlier trip" : "Real-time unavailable"}
+            </Txt>
+          )}
         </View>
       </View>
     </Pressable>

@@ -165,7 +165,7 @@ function TransitLegBlock({
   return (
     <View className="py-2">
       <View className="flex-row items-start">
-        <ModeBadge mode={leg.mode} size="md" badgeClassName="mr-3 mt-0.5" />
+        <ModeBadge mode={leg.mode} size="md" style={{ marginRight: 12, marginTop: 2 }} />
         <View className="flex-1 min-w-0">
           <View className="flex-row items-center flex-wrap gap-x-1">
             <Text className="text-white text-sm font-bold" style={{ color }}>

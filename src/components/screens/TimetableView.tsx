@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
+import { FlatList, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight, Info, RefreshCw } from "lucide-react-native";
-import { Cell, Chip, DepartureLoadingRows, DepartureRow, EmptyState, GroupedList, IconBtn, NavBar, Txt } from "../design";
-import { SPACING, TAB_BAR_HEIGHT } from "../../constants/design";
+import { Chip, DepartureLoadingRows, EmptyState, GroupedList, Cell, IconBtn, Txt } from "../design";
+import { ScheduleDepartureCard, ScheduleScreenHeader } from "../schedule";
+import { SPACING } from "../../constants/design";
+import { getStackContentClearance } from "../../constants/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { SampleDeparture } from "../../constants/sampleData";
 import { useColors } from "../../hooks/useColors";
 import { useRefreshControl } from "../../hooks/useRefreshControl";
@@ -13,13 +16,13 @@ import { LiveTrackingMap } from "../live/LiveTrackingMap";
 interface TimetableViewProps {
   stationName: string;
   stationId?: string;
+  routeFilter?: string;
   departures: SampleDeparture[];
   onBack?: () => void;
   loading?: boolean;
   isError?: boolean;
   onRefresh?: () => void;
   live?: boolean;
-  /** Backend feed source: tfnsw-live, timetable-pdf, cached, mock, … */
   scheduleSource?: string | null;
 }
 
@@ -28,8 +31,14 @@ function sourceLabel(source: string | null | undefined, isError: boolean): strin
   if (source === "timetable-pdf-weekday") {
     return "Weekday PDF timetable · live board preferred on weekends";
   }
-  if (source === "tfnsw-live+timetable-pdf-fullday") {
-    return "Full day · Transport NSW timetable + live updates";
+  if (source === "tfnsw-live-fullday") {
+    return "Full day timetable · live times from Transport NSW";
+  }
+  if (source === "tfnsw-live+timetable-fullday" || source === "tfnsw-live+timetable-pdf-fullday") {
+    return "Full day · Transport NSW live + scheduled times";
+  }
+  if (source === "tfnsw-live+timetable-gtfs-fullday") {
+    return "Full day · Transport NSW + GTFS timetable";
   }
   if (source === "timetable-pdf-fullday") {
     return "Full day timetable · Transport NSW";
@@ -40,11 +49,23 @@ function sourceLabel(source: string | null | undefined, isError: boolean): strin
   }
   if (source === "tfnsw-live" || source === "live" || source === "tfnsw") return "Live departures · TfNSW";
   if (source === "cached") return "Cached departures · offline";
-  if (source === "mock") return "Sample departures · demo mode";
+  if (source === "mock" || source === "mock-fallback") {
+    return "Demo data blocked — configure live API on the server";
+  }
+  if (source === "unavailable") return "No departures available from Transport NSW";
   return "Upcoming departures";
 }
 
-/** Build platform filter chips from live departure data (not hardcoded ranges). */
+function buildRouteFilters(departures: SampleDeparture[]): string[] {
+  const routes = [...new Set(departures.map((d) => d.route).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, undefined, { numeric: true })
+  );
+  if (routes.length <= 1) return [];
+  const filters = ["All Routes"];
+  for (const r of routes.slice(0, 24)) filters.push(r);
+  return filters;
+}
+
 function buildPlatformFilters(departures: SampleDeparture[]): string[] {
   const nums = [...new Set(departures.map((d) => parseInt(d.platform, 10)).filter((n) => !Number.isNaN(n)))].sort(
     (a, b) => a - b
@@ -75,9 +96,15 @@ function matchesPlatformFilter(platform: string, filter: string): boolean {
   return true;
 }
 
+function matchesRouteFilter(route: string, filter: string): boolean {
+  if (filter === "All Routes") return true;
+  return route.toUpperCase() === filter.toUpperCase();
+}
+
 export function TimetableView({
   stationName,
   stationId = "CENTRAL_T",
+  routeFilter,
   departures,
   onBack,
   loading,
@@ -87,6 +114,7 @@ export function TimetableView({
   scheduleSource = null,
 }: TimetableViewProps) {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { data: station } = useStationById(stationId);
 
@@ -94,58 +122,80 @@ export function TimetableView({
     onRefresh?.();
   });
 
-  const filters = useMemo(() => buildPlatformFilters(departures), [departures]);
-  const [filter, setFilter] = useState("All Platforms");
+  const isBus = station?.mode === "bus";
+  const routeFilters = useMemo(
+    () => (isBus ? buildRouteFilters(departures) : []),
+    [departures, isBus]
+  );
+  const platformFilters = useMemo(
+    () => (!isBus ? buildPlatformFilters(departures) : []),
+    [departures, isBus]
+  );
+  const filters = routeFilters.length > 0 ? routeFilters : platformFilters;
 
-  const activeFilter = filters.includes(filter) ? filter : "All Platforms";
-  const rows = departures.filter((d) => matchesPlatformFilter(d.platform, activeFilter));
+  const defaultFilter = routeFilter
+    ? routeFilters.includes(routeFilter)
+      ? routeFilter
+      : "All Routes"
+    : routeFilters.length > 0
+      ? "All Routes"
+      : "All Platforms";
+
+  const [filter, setFilter] = useState(defaultFilter);
+
+  const activeFilter = filters.includes(filter) ? filter : defaultFilter;
+  const rows = departures.filter((d) =>
+    routeFilters.length > 0
+      ? matchesRouteFilter(d.route, activeFilter)
+      : matchesPlatformFilter(d.platform, activeFilter)
+  );
 
   const statusLine = sourceLabel(scheduleSource, !!isError);
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar
+      <ScheduleScreenHeader
         title={stationName.replace(/\s+Station$/i, "")}
-        primary
+        subtitle={statusLine}
         onBack={onBack}
-        subtitle={
-          <Txt size={14} color="rgba(255,255,255,0.9)">
-            {statusLine}
-          </Txt>
-        }
+        live={live && !isError}
         right={
           <IconBtn label="Refresh departures" onPress={onRefresh}>
-            <RefreshCw size={22} color="#FFFFFF" strokeWidth={2} />
+            <RefreshCw size={20} color={c.text} strokeWidth={2} />
           </IconBtn>
         }
         below={
           filters.length > 1 ? (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 8, paddingRight: 16 }}
-            >
+            <>
               {filters.map((f) => (
                 <Chip key={f} label={f} active={activeFilter === f} onPress={() => setFilter(f)} />
               ))}
-            </ScrollView>
-          ) : null
+            </>
+          ) : undefined
         }
       />
 
       <FlatList
         data={rows}
         keyExtractor={(d) => d.id}
-        renderItem={({ item }) => <DepartureRow departure={item} flat minHeight={62} />}
+        renderItem={({ item }) => (
+          <View style={{ paddingHorizontal: SPACING.screen, marginBottom: 10 }}>
+            <ScheduleDepartureCard departure={item} />
+          </View>
+        )}
         refreshControl={refreshControl}
-        contentContainerStyle={{ paddingBottom: TAB_BAR_HEIGHT + 24, flexGrow: rows.length === 0 ? 1 : undefined }}
+        contentContainerStyle={{
+          paddingTop: 12,
+          paddingBottom: getStackContentClearance(insets.bottom),
+          flexGrow: rows.length === 0 ? 1 : undefined,
+        }}
         initialNumToRender={28}
         maxToRenderPerBatch={40}
         windowSize={10}
         removeClippedSubviews
         ListHeaderComponent={
           station?.lat != null && station?.lon != null ? (
-            <View style={{ paddingHorizontal: SPACING.screen, paddingTop: 8, paddingBottom: 4 }}>
+            <View style={{ paddingHorizontal: SPACING.screen, paddingBottom: 12 }}>
               <LiveTrackingMap
                 lat={station.lat}
                 lng={station.lon}
@@ -168,19 +218,19 @@ export function TimetableView({
               message={
                 isError
                   ? "Check your connection and pull to refresh."
-                  : activeFilter !== "All Platforms"
-                    ? `Nothing on ${activeFilter} right now.`
+                  : activeFilter !== "All Platforms" && activeFilter !== "All Routes"
+                    ? `No services for ${activeFilter} right now.`
                     : "No more services scheduled for this stop."
               }
             />
           )
         }
         ListFooterComponent={
-          <View style={{ marginTop: SPACING.section }}>
-            <GroupedList>
+          <View style={{ marginTop: SPACING.section, paddingHorizontal: SPACING.screen }}>
+            <GroupedList inset={0}>
               <Cell onPress={() => router.push(`/station/${stationId}` as never)}>
                 <Info size={20} color={c.primary} strokeWidth={2} />
-                <Txt size={14} weight="500" color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+                <Txt size={14} weight="500" color={c.text} style={{ flex: 1, marginLeft: SPACING.iconGap }}>
                   Station Information
                 </Txt>
                 <ChevronRight size={18} color={c.textSecondary} strokeWidth={2} />

@@ -3,7 +3,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { Alert, Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Plus, Star, Trash2 } from "lucide-react-native";
 import {
   DepartureTime,
@@ -14,7 +13,9 @@ import {
   Txt,
 } from "../../components/design";
 import { ScreenTitle } from "../../components/tripview/ScreenTitle";
-import { MIN_TOUCH, TAB_BAR_HEIGHT } from "../../constants/design";
+import { cardShadow, LIST_ICON_SEPARATOR, MIN_TOUCH, RADIUS, SPACING } from "../../constants/design";
+import { FeatureGate } from "../../components/FeatureGate";
+import { useAppFeatures } from "../../hooks/useAppFeatures";
 import { useColors } from "../../hooks/useColors";
 import { useRefreshControl } from "../../hooks/useRefreshControl";
 import { useStore } from "../../store/store";
@@ -55,9 +56,9 @@ function TripsListRow({
         alignItems: "center",
         minHeight: ROW_MIN_HEIGHT,
         backgroundColor: c.card,
-        paddingLeft: 16,
-        paddingRight: 8,
-        paddingVertical: 10,
+        paddingLeft: SPACING.cell,
+        paddingRight: SPACING.cell,
+        paddingVertical: 12,
       }}
     >
       <Pressable
@@ -73,7 +74,7 @@ function TripsListRow({
         })}
       >
         <LineBadge route={route} />
-        <View style={{ flex: 1, marginLeft: 12, minWidth: 0, marginRight: 8 }}>
+        <View style={{ flex: 1, marginLeft: SPACING.iconGap, minWidth: 0, marginRight: SPACING.iconGap }}>
           <Txt size={17} weight="600" color={c.text} numberOfLines={1}>
             {title}
           </Txt>
@@ -94,8 +95,10 @@ function TripsListRow({
           flexShrink: 0,
           alignItems: "center",
           justifyContent: "center",
-          borderRadius: 10,
+          borderRadius: RADIUS.sm,
           backgroundColor: pressed ? c.separator : c.muted,
+          borderWidth: 1,
+          borderColor: c.border,
         })}
       >
         <Trash2 size={18} color={c.textSecondary} strokeWidth={2} />
@@ -190,8 +193,8 @@ const SavedStopRow = memo(function SavedStopRow({
 export default function FavouritesScreen() {
   const c = useColors();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
+  const { favourites: favouritesEnabled, tripPlanner } = useAppFeatures();
   const { favorites, savedTrips, removeFavorite, removeSavedTrip } = useStore();
   const screenFocused = useIsFocused();
 
@@ -201,14 +204,21 @@ export default function FavouritesScreen() {
 
   const { refreshControl } = useRefreshControl(onRefresh);
 
-  const empty = savedTrips.length === 0 && favorites.length === 0;
-  const tabClearance = TAB_BAR_HEIGHT + Math.max(insets.bottom, 8) + 32;
-
+  const visibleSavedTrips = tripPlanner ? savedTrips : [];
+  const empty = visibleSavedTrips.length === 0 && favorites.length === 0;
   return (
+    <FeatureGate
+      enabled={favouritesEnabled}
+      inline
+      title="Trips unavailable"
+      message="Saved trips and favourites are turned off in admin settings."
+      fallbackHref="/(tabs)/tools"
+    >
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <ScreenTitle
         title="Trips"
         right={
+          tripPlanner ? (
           <Pressable
             onPress={() => router.push("/new-trip" as never)}
             accessibilityRole="button"
@@ -219,7 +229,7 @@ export default function FavouritesScreen() {
               gap: 4,
               minHeight: MIN_TOUCH - 2,
               paddingHorizontal: 12,
-              borderRadius: 10,
+              borderRadius: RADIUS.button,
               backgroundColor: pressed ? c.separator : c.muted,
             })}
           >
@@ -228,22 +238,26 @@ export default function FavouritesScreen() {
               New
             </Txt>
           </Pressable>
+          ) : null
         }
       />
 
-      <Page refreshControl={refreshControl} bottomPad={tabClearance}>
+      <Page tabScreen refreshControl={refreshControl}>
         {empty ? (
-          <View style={{ paddingHorizontal: 16, paddingTop: 24 }}>
+          <View style={{ paddingHorizontal: SPACING.screen, paddingTop: 24 }}>
             <View
-              style={{
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: c.separator,
-                backgroundColor: c.card,
-                paddingHorizontal: 20,
-                paddingVertical: 32,
-                alignItems: "center",
-              }}
+              style={[
+                {
+                  borderRadius: RADIUS.card,
+                  borderWidth: 1,
+                  borderColor: c.border,
+                  backgroundColor: c.card,
+                  paddingHorizontal: 24,
+                  paddingVertical: 36,
+                  alignItems: "center",
+                },
+                cardShadow(c.isDark),
+              ]}
             >
               <View
                 style={{
@@ -268,32 +282,34 @@ export default function FavouritesScreen() {
               >
                 Plan a journey once, then keep it here for quick access.
               </Txt>
-              <Pressable
-                onPress={() => router.push("/new-trip" as never)}
-                accessibilityRole="button"
-                accessibilityLabel="Create new trip"
-                style={{
-                  marginTop: 20,
-                  backgroundColor: c.primary,
-                  paddingHorizontal: 24,
-                  minHeight: MIN_TOUCH,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                }}
-              >
-                <Txt size={16} weight="700" color="#FFFFFF">
-                  New trip
-                </Txt>
-              </Pressable>
+              {tripPlanner ? (
+                <Pressable
+                  onPress={() => router.push("/new-trip" as never)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create new trip"
+                  style={({ pressed }) => ({
+                    marginTop: 22,
+                    backgroundColor: pressed ? c.header : c.primary,
+                    paddingHorizontal: 28,
+                    minHeight: MIN_TOUCH,
+                    borderRadius: RADIUS.button,
+                    justifyContent: "center",
+                  })}
+                >
+                  <Txt size={16} weight="700" color="#FFFFFF">
+                    New trip
+                  </Txt>
+                </Pressable>
+              ) : null}
             </View>
           </View>
         ) : (
           <>
-            {savedTrips.length > 0 ? (
+            {visibleSavedTrips.length > 0 ? (
               <>
                 <SectionHeader title="My trips" />
-                <GroupedList inset={16} separatorInset={72}>
-                  {savedTrips.map((j) => (
+                <GroupedList separatorInset={LIST_ICON_SEPARATOR}>
+                  {visibleSavedTrips.map((j) => (
                     <SavedTripRow
                       key={j.id}
                       originName={j.origin_name}
@@ -329,7 +345,7 @@ export default function FavouritesScreen() {
             {favorites.length > 0 ? (
               <>
                 <SectionHeader title="Saved stops" />
-                <GroupedList inset={16} separatorInset={72}>
+                <GroupedList separatorInset={LIST_ICON_SEPARATOR}>
                   {favorites.map((s) => (
                     <SavedStopRow
                       key={s.station_id}
@@ -346,5 +362,6 @@ export default function FavouritesScreen() {
         )}
       </Page>
     </View>
+    </FeatureGate>
   );
 }

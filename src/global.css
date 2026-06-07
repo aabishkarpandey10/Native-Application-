@@ -3,12 +3,44 @@
 @tailwind utilities;
 
 :root {
+  --app-bg: #efeff4;
+  --app-card: #ffffff;
+  --app-text: #000000;
+  --app-text-secondary: #6d6d72;
+  --app-border: #c6c6c8;
+  --app-primary: #0079c1;
   --font-display:
     Inter, system-ui, -apple-system, Segoe UI, Roboto, ui-sans-serif, sans-serif, Apple Color Emoji,
     Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-rounded: "SF Pro Rounded", "Hiragino Maru Gothic ProN", Meiryo, "MS PGothic", sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
 }
 
+[data-theme="dark"] {
+  --app-bg: #000000;
+  --app-card: #1c1c1e;
+  --app-text: #ffffff;
+  --app-text-secondary: #98989d;
+  --app-border: #38383a;
+  --app-primary: #0a84ff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}

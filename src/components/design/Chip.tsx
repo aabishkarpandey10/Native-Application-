@@ -1,5 +1,5 @@
 import { Pressable } from "react-native";
-import { MIN_TOUCH } from "../../constants/design";
+import { MIN_TOUCH, RADIUS, SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 import { Txt } from "./Txt";
 
@@ -19,15 +19,17 @@ export function Chip({ label, active, onPress }: ChipProps) {
       accessibilityState={{ selected: active }}
       accessibilityLabel={label}
       style={({ pressed }) => ({
-        backgroundColor: active ? c.primary : c.muted,
-        borderRadius: 999,
-        paddingHorizontal: 16,
+        backgroundColor: active ? c.primary : c.card,
+        borderRadius: RADIUS.pill,
+        paddingHorizontal: SPACING.cell,
         minHeight: MIN_TOUCH - 8,
         justifyContent: "center",
-        opacity: pressed ? 0.7 : 1,
+        borderWidth: active ? 0 : 1,
+        borderColor: c.border,
+        opacity: pressed ? 0.85 : 1,
       })}
     >
-      <Txt size={13} weight="600" color={active ? "#FFFFFF" : c.textSecondary}>
+      <Txt size={13} weight="600" color={active ? "#FFFFFF" : c.text}>
         {label}
       </Txt>
     </Pressable>

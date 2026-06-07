@@ -16,7 +16,7 @@ export function AdminConfigForm({
   return (
     <View>
       <SectionHeader title="Branding" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField label="App name" value={config.appName} onChange={(v) => set("appName", v)} />
         <AdminField label="Tagline" value={config.tagline} onChange={(v) => set("tagline", v)} />
         <AdminField
@@ -44,7 +44,7 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Appearance" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField
           label="Default theme"
           value={config.defaultTheme}
@@ -65,7 +65,7 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Notifications" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminSwitch
           label="Service alerts on by default (new users)"
           value={config.notificationsDefaultOn}
@@ -80,7 +80,7 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Features" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminSwitch label="Trip planner" value={config.featureTripPlanner} onChange={(v) => set("featureTripPlanner", v)} />
         <AdminSwitch label="Maps" value={config.featureMaps} onChange={(v) => set("featureMaps", v)} />
         <AdminSwitch label="Service alerts tab" value={config.featureAlerts} onChange={(v) => set("featureAlerts", v)} />
@@ -89,7 +89,7 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Live data (seconds)" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminNumber label="Alerts refresh" value={config.alertsRefreshSec} onChange={(v) => set("alertsRefreshSec", v)} />
         <AdminNumber
           label="Departures refresh"
@@ -104,13 +104,13 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Links" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField label="Transport for NSW URL" value={config.linkTransportNsw} onChange={(v) => set("linkTransportNsw", v)} />
         <AdminField label="Open data URL" value={config.linkOpenData} onChange={(v) => set("linkOpenData", v)} />
       </GroupedList>
 
       <SectionHeader title="In-app text" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminField
           label="About disclaimer"
           value={config.aboutDisclaimer}
@@ -120,7 +120,7 @@ export function AdminConfigForm({
       </GroupedList>
 
       <SectionHeader title="Trips" />
-      <GroupedList inset={16}>
+      <GroupedList>
         <AdminSwitch
           label="Show walking legs in trip details"
           value={config.showWalkLegsInTrips}

@@ -1,10 +1,10 @@
 {
   "expo": {
     "name": "Sydney Transit",
-    "slug": "sydney-transit",
+    "slug": "nativeapplication",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "sydneytransit",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -18,11 +18,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#0079C1"
       },
       "package": "com.sydneytransit.app",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": ["INTERNET", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
     },
     "web": {
       "bundler": "metro",
@@ -34,7 +34,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#0079C1",
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 160
         }
       ],
@@ -52,8 +52,7 @@
           "sounds": []
         }
       ],
-      "expo-sqlite",
-      "@sentry/react-native"
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true,

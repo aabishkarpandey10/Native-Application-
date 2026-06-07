@@ -9,12 +9,14 @@ import { departuresToDisplay } from "../utils/displayAdapters";
 
 export default function DeparturesScreen() {
   const goBack = useSafeBack();
-  const { stationId } = useLocalSearchParams<{ stationId?: string }>();
+  const { stationId, route } = useLocalSearchParams<{ stationId?: string; route?: string }>();
   const id = normalizeStationId(stationId ?? "CENTRAL_T");
+  const routeFilter = String(route ?? "").trim() || undefined;
   const { data: station } = useStationById(id);
   const name = station?.name ?? "Station";
   const { data, isLoading, isFetching, isError, refetchFresh } = useDepartures(id, 5000, {
     fullDay: true,
+    route: routeFilter,
   });
   const departures = useMemo(
     () => (data?.departures ? departuresToDisplay(data.departures) : []),
@@ -26,6 +28,7 @@ export default function DeparturesScreen() {
     <TimetableView
       stationName={name}
       stationId={id}
+      routeFilter={routeFilter}
       departures={departures}
       scheduleSource={data?.source ?? null}
       live={live}

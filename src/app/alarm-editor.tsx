@@ -3,15 +3,16 @@ import { Alert, Pressable, Switch, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ArrowUpDown, ChevronRight } from "lucide-react-native";
 import {
+  BackButton,
   Cell,
   Chip,
   GroupedList,
-  NavBar,
   Page,
   SectionHeader,
   Txt,
 } from "../components/design";
-import { MIN_TOUCH, SPACING } from "../constants/design";
+import { ScreenTitle } from "../components/tripview/ScreenTitle";
+import { MIN_TOUCH, SPACING, resolveTextStyle } from "../constants/design";
 import { useColors } from "../hooks/useColors";
 import { useSafeBack } from "../hooks/useSafeBack";
 import { useStore, type AlarmTrip } from "../store/store";
@@ -159,11 +160,14 @@ export default function AlarmEditorScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar title={editingId ? "Edit alarm trip" : "Set alarm trip"} onBack={goBack} />
+      <ScreenTitle
+        title={editingId ? "Edit alarm trip" : "Set alarm trip"}
+        left={<BackButton variant="plain" onPress={goBack} />}
+      />
 
       <Page>
         <SectionHeader title="Trip" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell onPress={() => pickStation("from")} minHeight={MIN_TOUCH}>
             <Txt size={13} color={c.textSecondary} style={{ width: 72 }}>
               From
@@ -184,15 +188,15 @@ export default function AlarmEditorScreen() {
           </Cell>
           <Cell onPress={swapStations} minHeight={MIN_TOUCH}>
             <ArrowUpDown size={20} color={c.primary} strokeWidth={2} />
-            <Txt size={16} weight="500" color={c.primary} style={{ marginLeft: 12 }}>
+            <Txt size={16} weight="500" color={c.primary} style={{ marginLeft: SPACING.iconGap }}>
               Swap origin and destination
             </Txt>
           </Cell>
         </GroupedList>
 
         <SectionHeader title="Alarm details" />
-        <GroupedList inset={16}>
-          <View style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: c.card }}>
+        <GroupedList>
+          <View style={{ paddingHorizontal: SPACING.cell, paddingVertical: 12, backgroundColor: c.card }}>
             <Txt size={13} color={c.textSecondary}>
               Label (optional)
             </Txt>
@@ -229,7 +233,7 @@ export default function AlarmEditorScreen() {
                 flex: 1,
                 textAlign: "center",
                 fontSize: 22,
-                fontWeight: "600",
+                ...resolveTextStyle("600"),
                 color: c.text,
                 backgroundColor: c.card,
                 borderRadius: 10,
@@ -252,7 +256,7 @@ export default function AlarmEditorScreen() {
                 flex: 1,
                 textAlign: "center",
                 fontSize: 22,
-                fontWeight: "600",
+                ...resolveTextStyle("600"),
                 color: c.text,
                 backgroundColor: c.card,
                 borderRadius: 10,
@@ -286,7 +290,7 @@ export default function AlarmEditorScreen() {
         <SectionHeader title="Summary" />
         <View
           style={{
-            marginHorizontal: 16,
+            marginHorizontal: SPACING.screen,
             padding: 14,
             borderRadius: 10,
             backgroundColor: c.card,
@@ -322,7 +326,7 @@ export default function AlarmEditorScreen() {
           ) : null}
         </View>
 
-        <GroupedList inset={16} style={{ marginTop: 16 }}>
+        <GroupedList style={{ marginTop: 16 }}>
           <Cell minHeight={MIN_TOUCH}>
             <Txt size={16} color={c.text} style={{ flex: 1 }}>
               Alarm enabled
@@ -338,7 +342,7 @@ export default function AlarmEditorScreen() {
         <Pressable
           onPress={() => void onSave()}
           style={({ pressed }) => ({
-            marginHorizontal: 16,
+            marginHorizontal: SPACING.screen,
             marginTop: 24,
             minHeight: MIN_TOUCH + 4,
             borderRadius: 10,

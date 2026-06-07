@@ -3,6 +3,11 @@ backend/node_modules
 .expo
 dist
 web-build
+.cache
+build-output
+.agents
+android
+ios
 .git
 .gitignore
 *.md
@@ -11,8 +16,6 @@ terminals
 .env
 backend/.env
 backend/data/app-data.json
-ios
-android
 example
 npm-debug.log*
 .DS_Store

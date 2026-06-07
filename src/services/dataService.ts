@@ -1,8 +1,6 @@
 import {
   cacheDeparturesToDb,
   getDeparturesFromDb,
-  getNearbyFromDb,
-  getTripsFromDb,
   upsertAlertsToDb,
 } from "../database/repository";
 import { resolveStationByName } from "../utils/resolveStation";
@@ -17,7 +15,7 @@ import {
 } from "./stationsService";
 import { parseTfnswTime, toIsoString } from "../utils/tfnswTime";
 import { dedupeAlerts, isActiveServiceAlert, mapRawAlert } from "../utils/serviceAlert";
-import { fetchBackendJson } from "./apiClient";
+import { assertLiveDataSource, fetchBackendJson } from "./apiClient";
 import { getRouteHexColor } from "../utils/transitColors";
 
 function mapApiDeparture(item: Record<string, unknown>): Departure {
@@ -139,7 +137,7 @@ export type DeparturesFeed = {
 export async function fetchDeparturesWithDb(
   stopId: string,
   count = 10,
-  options?: { refresh?: boolean; fullDay?: boolean }
+  options?: { refresh?: boolean; fullDay?: boolean; route?: string }
 ): Promise<DeparturesFeed> {
   const stationId = normalizeStationId(stopId);
   await ensureStationsLoaded();
@@ -148,22 +146,30 @@ export async function fetchDeparturesWithDb(
   const params = new URLSearchParams({ stationId });
   if (options?.refresh) params.set("refresh", "1");
   if (options?.fullDay) params.set("fullDay", "1");
+  if (options?.route?.trim()) params.set("route", options.route.trim());
   const data = await fetchBackendJson<{ source?: string; departures?: unknown[] } | unknown[]>(
     `/api/departures?${params.toString()}`,
-    { timeoutMs: options?.fullDay ? 45_000 : 15_000 }
+    { timeoutMs: options?.fullDay ? 60_000 : 15_000 }
   );
   const source =
     data && typeof data === "object" && !Array.isArray(data)
       ? (data.source as string) ?? null
       : null;
+  assertLiveDataSource(source, `/api/departures?stationId=${stationId}`);
   const rawList = unwrapDeparturesPayload(data);
   const trustBackendSchedule =
     source === "timetable-pdf" ||
     source === "timetable-pdf-weekday" ||
     source === "timetable-pdf-fullday" ||
+    source === "tfnsw-live" ||
+    source === "tfnsw-live-fullday" ||
     source === "tfnsw-live+timetable-pdf" ||
     source === "tfnsw-live+timetable-pdf-fullday" ||
-    source === "mock";
+    source === "tfnsw-live+timetable-fullday" ||
+    source === "tfnsw-live+timetable-gtfs" ||
+    source === "tfnsw-live+timetable-gtfs-fullday" ||
+    source === "unavailable" ||
+    source === "cached";
   let list = trustBackendSchedule
     ? rawList
     : await filterDeparturesByStationMode(stationId, rawList, stations);
@@ -210,6 +216,8 @@ export type AlertsFeedMeta = {
   source: string | null;
   tfnswLive: boolean;
   count: number;
+  trackworkCount?: number;
+  criticalCount?: number;
 };
 
 export type AlertsFeed = {
@@ -223,6 +231,8 @@ type AlertsApiPayload = {
   source?: string;
   tfnswLive?: boolean;
   count?: number;
+  trackworkCount?: number;
+  criticalCount?: number;
 };
 
 function buildMeta(
@@ -242,6 +252,8 @@ function buildMeta(
     source: data.source ?? null,
     tfnswLive: !!data.tfnswLive,
     count: data.count ?? alertCount,
+    trackworkCount: data.trackworkCount,
+    criticalCount: data.criticalCount,
   };
 }
 
@@ -257,19 +269,12 @@ const MAX_CLIENT_ALERTS = 100;
 
 export async function fetchAlertsWithDb(forceRefresh = true): Promise<AlertsFeed> {
   const path = forceRefresh ? "/api/alerts?refresh=1" : "/api/alerts";
-  const fetchOnce = () =>
-    fetchBackendJson<Record<string, unknown>[] | AlertsApiPayload>(path, {
-      timeoutMs: 30_000,
-    });
-
-  let data = await fetchOnce();
-  if (data === null) {
-    data = await fetchOnce();
-  }
-
-  const apiOk = data !== null;
+  const data = await fetchBackendJson<Record<string, unknown>[] | AlertsApiPayload>(path, {
+    timeoutMs: 30_000,
+  });
 
   if (data && !Array.isArray(data) && Array.isArray(data.alerts)) {
+    assertLiveDataSource(data.source ?? null, path);
     const mapped = dedupeAlerts(
       data.alerts
         .map((item) => mapRawAlert(item))
@@ -291,33 +296,20 @@ export async function fetchAlertsWithDb(forceRefresh = true): Promise<AlertsFeed
     return { alerts: mapped, meta: buildMeta(null, mapped.length) };
   }
 
-  if (apiOk) {
-    await cacheAlertsSafe([]);
-    return {
-      alerts: [],
-      meta: { asOf: null, source: "transportnsw", tfnswLive: true, count: 0 },
-    };
-  }
-
+  await cacheAlertsSafe([]);
   return {
     alerts: [],
-    meta: {
-      asOf: null,
-      source: "transportnsw-unavailable",
-      tfnswLive: false,
-      count: 0,
-    },
+    meta: { asOf: null, source: "transportnsw", tfnswLive: true, count: 0 },
   };
 }
 
 export async function fetchNearbyWithDb(lat: number, lng: number, radius = 2000) {
   const list = await fetchBackendJson<Record<string, unknown>[]>(
-    `/api/nearby?lat=${lat}&lng=${lng}&radius=${radius}`
+    `/api/nearby?lat=${lat}&lng=${lng}&radius=${radius}`,
+    { timeoutMs: 20_000 }
   );
-  if (list && list.length > 0) {
-    return list.map(mapNearbyStop);
-  }
-  return getNearbyFromDb(lat, lng, radius);
+  if (!list?.length) return [];
+  return list.map(mapNearbyStop);
 }
 
 export type PlanTripOptions = {
@@ -325,7 +317,29 @@ export type PlanTripOptions = {
   destinationId?: string;
   /** Load earlier trips today (slower — on demand only). */
   includePast?: boolean;
+  /** Full service-day timetable (04:00 Sydney → end of day). */
+  fullDay?: boolean;
+  /** Bypass server cache (pull-to-refresh). */
+  forceRefresh?: boolean;
 };
+
+function inferStationModeFromId(id: string): Station["mode"] {
+  if (id.endsWith("_LR")) return "lightrail";
+  if (id.endsWith("_B")) return "bus";
+  if (id.endsWith("_F")) return "ferry";
+  if (id.startsWith("METRO_") || id.includes("_M")) return "metro";
+  return "train";
+}
+
+function stationStub(id: string, name: string): Station {
+  return {
+    id,
+    name: name.trim() || id,
+    lat: 0,
+    lon: 0,
+    mode: inferStationModeFromId(id),
+  };
+}
 
 async function resolveStationForTrip(
   name: string,
@@ -333,17 +347,16 @@ async function resolveStationForTrip(
 ): Promise<Station | undefined> {
   if (stationId) {
     const id = normalizeStationId(stationId);
-    const cached = findStationById(id, getStationsSync());
+    const cached =
+      findStationById(id, getStationsSync()) ??
+      findStationById(id, SYDNEY_STATIONS);
     if (cached) return cached;
-    const fetched = await fetchStationById(id);
-    if (fetched) return fetched;
+    return stationStub(id, name);
   }
+  const local = resolveStationByName(name, getStationsSync());
+  if (local) return local;
   await ensureStationsLoaded();
-  const stations = getStationsSync();
-  if (stationId) {
-    return findStationById(normalizeStationId(stationId), stations);
-  }
-  return resolveStationByName(name, stations) ?? undefined;
+  return resolveStationByName(name, getStationsSync()) ?? undefined;
 }
 
 export async function planTripWithDb(
@@ -359,15 +372,24 @@ export async function planTripWithDb(
   if (!orig || !dest) return [];
 
   const departParam = departure ? `&departAt=${encodeURIComponent(toIsoString(departure))}` : "";
-  const pastParam = options?.includePast ? "&includePast=1&refresh=1" : "";
+  const pastParam = options?.includePast ? "&includePast=1" : "";
+  const fullDayParam = options?.fullDay ? "&fullDay=1" : "";
+  const refreshParam = options?.forceRefresh ? "&refresh=1" : "";
   const journeys = await fetchBackendJson<Record<string, unknown>[]>(
-    `/api/trip?originId=${encodeURIComponent(orig.id)}&destinationId=${encodeURIComponent(dest.id)}${departParam}${pastParam}`,
+    `/api/trip?originId=${encodeURIComponent(orig.id)}&destinationId=${encodeURIComponent(dest.id)}${departParam}${pastParam}${fullDayParam}${refreshParam}`,
     {
       timeoutMs:
-        options?.includePast || orig.mode === "bus" || dest.mode === "bus" ? 25_000 : 14_000,
+        options?.fullDay || options?.includePast || orig.mode === "bus" || dest.mode === "bus"
+          ? 12_000
+          : 5_000,
     }
   );
   if (journeys && journeys.length > 0) {
+    for (const jny of journeys) {
+      if (String(jny.id || "").startsWith("mock_trip_")) {
+        assertLiveDataSource("mock-fallback", "/api/trip");
+      }
+    }
     return journeys.map((jny) => {
       const dep = parseTfnswTime(jny.departureTime as string);
       const arr = parseTfnswTime(jny.arrivalTime as string);
@@ -435,13 +457,13 @@ export async function planTripWithDb(
           destinationStopId: leg.destinationStopId as string | undefined,
           platform: leg.platform as string,
           destinationPlatform: leg.destinationPlatform as string | undefined,
-          routeNumber: leg.routeNumber as string,
+          routeNumber: String(leg.routeNumber ?? ""),
         };
         }),
       };
     });
   }
-  return getTripsFromDb(orig.id, dest.id);
+  return [];
 }
 
 export type LiveVehiclesFeed = {

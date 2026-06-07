@@ -1,17 +1,17 @@
 /** @type {import('tailwindcss').Config} */
+/** Keep in sync with src/constants/design.ts PALETTE + SEMANTIC. */
 module.exports = {
-  // NOTE: Update this to include the paths to all of your component files.
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
         surface: {
-          base: "#0A0A0C",
-          raised: "#111114",
-          card: "#1A1A1F",
-          elevated: "#222228",
-          border: "#2C2C32",
+          base: "#EFEFF4",
+          raised: "#FFFFFF",
+          card: "#FFFFFF",
+          elevated: "#FFFFFF",
+          border: "#C6C6C8",
         },
         transit: {
           train: "#F06724",
@@ -22,16 +22,16 @@ module.exports = {
           subway: "#00A9CE",
         },
         brand: {
-          primary: "#0A84FF",
-          secondary: "#30D158",
-          background: "#0A0A0C",
-          card: "#1A1A1F",
-          text: "#FFFFFF",
-          textMuted: "#8E8E93",
-          border: "#2C2C32",
+          primary: "#0079C1",
+          secondary: "#34C759",
+          background: "#EFEFF4",
+          card: "#FFFFFF",
+          text: "#000000",
+          textMuted: "#6D6D72",
+          border: "#C6C6C8",
         },
       },
     },
   },
   plugins: [],
-}
+};

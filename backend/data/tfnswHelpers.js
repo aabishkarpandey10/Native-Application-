@@ -1,9 +1,155 @@
 /** TfNSW Trip Planner helpers (NSW product classes + stop resolution) */
 
-import { parseApiTime, toIsoString, getSydneyItdDateTime } from "./tfnswTime.js";
+import {
+  parseApiTime,
+  toIsoString,
+  getSydneyItdDateTime,
+  sydneyServiceDayStart,
+} from "./tfnswTime.js";
 import { extractSydneyLineCode, getLineColor } from "./lineColors.js";
 
 const stopIdCache = new Map();
+const TFNSW_FETCH_TIMEOUT_MS = Number(process.env.TFNSW_FETCH_TIMEOUT_MS) || 12_000;
+const TFNSW_FULLDAY_TIMEOUT_MS = Number(process.env.TFNSW_FULLDAY_TIMEOUT_MS) || 20_000;
+
+async function tfnswFetch(url, apiKey, timeoutMs = TFNSW_FETCH_TIMEOUT_MS) {
+  return fetch(url, {
+    headers: { Authorization: `Apikey ${apiKey}`, Accept: "application/json" },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+}
+
+function busCoordName(station) {
+  const lat = station?.lat ?? station?.latitude;
+  const lon = station?.lon ?? station?.longitude;
+  if (lat == null || lon == null) return null;
+  return `${lon}:${lat}:EPSG:4326`;
+}
+
+/** Live departure board from transportnsw.info (stop ID with coord fallback for bus). */
+export async function fetchDepartureBoardEvents(station, apiKey, apiBase, stopId, now = new Date()) {
+  return fetchDepartureBoardEventsAt(station, apiKey, apiBase, stopId, now, TFNSW_FETCH_TIMEOUT_MS);
+}
+
+async function fetchDepartureBoardEventsAt(
+  station,
+  apiKey,
+  apiBase,
+  stopId,
+  now = new Date(),
+  timeoutMs = TFNSW_FETCH_TIMEOUT_MS
+) {
+  const { dateStr, timeStr } = getSydneyItdDateTime(now);
+  const stationMode = station?.mode || "train";
+
+  async function pull(type, name) {
+    const url = `${apiBase}/departure_mon?outputFormat=rapidJSON&coordOutputFormat=EPSG%3A4326&mode=direct&type_dm=${type}&name_dm=${encodeURIComponent(name)}&itdDate=${dateStr}&itdTime=${timeStr}&TfNSWDM=true`;
+    const response = await tfnswFetch(url, apiKey, timeoutMs);
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.stopEvents || [];
+  }
+
+  let events = [];
+  let boardRef = stopId || null;
+
+  if (stopId) {
+    events = await pull("stop", stopId);
+  }
+
+  let filtered = events.filter((ev) => matchesStationMode(ev, stationMode));
+
+  if (station?.mode === "bus" && filtered.length === 0) {
+    const coord = busCoordName(station);
+    if (coord) {
+      const coordEvents = await pull("coord", coord);
+      const coordFiltered = coordEvents.filter((ev) => matchesStationMode(ev, stationMode));
+      if (coordFiltered.length > 0) {
+        events = coordEvents;
+        filtered = coordFiltered;
+        boardRef = coord;
+      }
+    }
+  }
+
+  if (filtered.length === 0 && station?.mode === "bus" && !stopId) {
+    const coord = busCoordName(station);
+    if (coord) {
+      events = await pull("coord", coord);
+      filtered = events.filter((ev) => matchesStationMode(ev, stationMode));
+      boardRef = coord;
+    }
+  }
+
+  return { events: filtered, boardRef, stationMode };
+}
+
+/**
+ * Paginate departure_mon through the Sydney service day (transportnsw.info timetable).
+ */
+export async function fetchFullDayDepartureBoardEvents(
+  station,
+  apiKey,
+  apiBase,
+  stopId,
+  { maxEvents = 800, maxPages = 24 } = {}
+) {
+  const dayStart = sydneyServiceDayStart();
+  const dayEnd = new Date(dayStart.getTime() + 24 * 3600 * 1000 - 60_000);
+  let cursor = new Date(Math.max(dayStart.getTime(), Date.now() - 10 * 60_000));
+
+  const collected = [];
+  const seen = new Set();
+  let boardRef = stopId || null;
+
+  for (let page = 0; page < maxPages && collected.length < maxEvents; page++) {
+    const { events, boardRef: ref } = await fetchDepartureBoardEventsAt(
+      station,
+      apiKey,
+      apiBase,
+      stopId,
+      cursor,
+      TFNSW_FULLDAY_TIMEOUT_MS
+    );
+    if (ref) boardRef = ref;
+    if (!events.length) break;
+
+    let latestMs = cursor.getTime();
+    let added = 0;
+
+    for (const ev of events) {
+      const raw = ev.departureTimePlanned || ev.departureTimeEstimated;
+      if (!raw) continue;
+      const t = parseApiTime(raw).getTime();
+      const route = normalizeRouteNumber(ev.transportation || {});
+      const dest = String(ev.transportation?.destination?.name || "").trim();
+      const key = `${route}|${dest}|${Math.floor(t / 60_000)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (t < dayStart.getTime() || t >= dayEnd.getTime()) continue;
+      collected.push(ev);
+      added++;
+      if (t > latestMs) latestMs = t;
+    }
+
+    if (added === 0) break;
+    const nextCursor = new Date(latestMs + 60_000);
+    if (nextCursor.getTime() >= dayEnd.getTime()) break;
+    if (nextCursor.getTime() <= cursor.getTime()) {
+      cursor = new Date(cursor.getTime() + 30 * 60_000);
+    } else {
+      cursor = nextCursor;
+    }
+  }
+
+  collected.sort(
+    (a, b) =>
+      parseApiTime(a.departureTimePlanned || a.departureTimeEstimated).getTime() -
+      parseApiTime(b.departureTimePlanned || b.departureTimeEstimated).getTime()
+  );
+
+  return { events: collected.slice(0, maxEvents), boardRef };
+}
 
 function normalizeQueryName(name) {
   return String(name || "")
@@ -70,9 +216,7 @@ async function stopHasModeDepartures(stopId, stationMode, apiKey, apiBase) {
   try {
     const { dateStr, timeStr } = getSydneyItdDateTime(new Date());
     const url = `${apiBase}/departure_mon?outputFormat=rapidJSON&coordOutputFormat=EPSG%3A4326&mode=direct&type_dm=stop&name_dm=${stopId}&itdDate=${dateStr}&itdTime=${timeStr}&TfNSWDM=true`;
-    const response = await fetch(url, {
-      headers: { Authorization: `Apikey ${apiKey}`, Accept: "application/json" },
-    });
+    const response = await tfnswFetch(url, apiKey);
     if (!response.ok) return false;
     const data = await response.json();
     const events = data.stopEvents || [];
@@ -119,7 +263,7 @@ export function inferEventMode(event) {
   if (/^L\d+/i.test(route)) return "light_rail";
   if (/^T\d+/i.test(route)) return "train";
   if (/^(CCN|BMT|SCO|HUN|SPL)$/i.test(route)) return "train";
-  if (/^\d{3}$/.test(route)) return "bus";
+  if (/^\d{1,4}[A-Z0-9]*$/i.test(route)) return "bus";
 
   const name = (transportation.name || transportation.disassembledName || "").toLowerCase();
   if (name.includes("ferry")) return "ferry";
@@ -251,20 +395,47 @@ export function parseStopEvent(event, stationId) {
   };
 }
 
+async function cacheVerifiedStopId(station, stopId, apiKey, apiBase) {
+  if (!stopId) return null;
+  if (station.mode === "bus" || station.mode === "ferry") {
+    const ok = await stopHasModeDepartures(stopId, station.mode, apiKey, apiBase);
+    if (!ok) return null;
+  }
+  stopIdCache.set(station.id, stopId);
+  return stopId;
+}
+
 export async function resolveTfnswStopId(station, apiKey, apiBase, mappedStopId) {
   if (!station) return null;
   const cached = stopIdCache.get(station.id);
   if (cached) return cached;
 
+  const mustVerify = station.mode === "ferry";
+  const trustMappedBusId = station.mode === "bus" && Boolean(station.tfnswStopId || mappedStopId);
+
   if (mappedStopId) {
-    stopIdCache.set(station.id, mappedStopId);
-    return mappedStopId;
+    if (mustVerify) {
+      const verified = await cacheVerifiedStopId(station, mappedStopId, apiKey, apiBase);
+      if (verified) return verified;
+    } else {
+      stopIdCache.set(station.id, mappedStopId);
+      return mappedStopId;
+    }
   }
 
   const mapped = station.tfnswStopId;
   if (mapped) {
-    stopIdCache.set(station.id, mapped);
-    return mapped;
+    if (trustMappedBusId) {
+      stopIdCache.set(station.id, mapped);
+      return mapped;
+    }
+    if (mustVerify) {
+      const verified = await cacheVerifiedStopId(station, mapped, apiKey, apiBase);
+      if (verified) return verified;
+    } else {
+      stopIdCache.set(station.id, mapped);
+      return mapped;
+    }
   }
 
   const searchTerms = buildStopSearchTerms(station.name);
@@ -273,9 +444,7 @@ export async function resolveTfnswStopId(station, apiKey, apiBase, mappedStopId)
     for (const term of searchTerms) {
       const sfType = station.mode === "bus" ? "any" : "stop";
       const url = `${apiBase}/stop_finder?outputFormat=rapidJSON&coordOutputFormat=EPSG%3A4326&type_sf=${sfType}&name_sf=${encodeURIComponent(term)}&TfNSWDM=true`;
-      const response = await fetch(url, {
-        headers: { Authorization: `Apikey ${apiKey}`, Accept: "application/json" },
-      });
+      const response = await tfnswFetch(url, apiKey);
       if (!response.ok) continue;
       const data = await response.json();
       const locations = (data.locations || []).filter(

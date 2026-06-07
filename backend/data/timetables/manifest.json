@@ -1,5 +1,5 @@
 {
-  "importedAt": "2026-06-04T11:54:27.881Z",
+  "importedAt": "2026-06-06T08:43:33.371Z",
   "lines": [
     {
       "route": "T1",
@@ -89,6 +89,39 @@
       "source": "https://transportnsw.info/documents/timetables/93-T9-Northern-Line-20250419.pdf",
       "stationCount": 31,
       "tripCount": 10978
+    },
+    {
+      "route": "L1",
+      "routes": [
+        "L1"
+      ],
+      "lineName": "L1 Dulwich Hill Line",
+      "validFrom": "2026-01-19",
+      "source": "https://transportnsw.info/documents/timetables/93-L1-Dulwich-Hill-Line-20260119.pdf",
+      "stationCount": 13,
+      "tripCount": 382
+    },
+    {
+      "route": "L2",
+      "routes": [
+        "L2"
+      ],
+      "lineName": "L2 Randwick Line",
+      "validFrom": "2026-01-19",
+      "source": "https://transportnsw.info/documents/timetables/93-L2-Randwick-Line-20260119.pdf",
+      "stationCount": 14,
+      "tripCount": 990
+    },
+    {
+      "route": "L3",
+      "routes": [
+        "L3"
+      ],
+      "lineName": "L3 Kingsford Line",
+      "validFrom": "2026-01-19",
+      "source": "https://transportnsw.info/documents/timetables/93-L3-Kingsford-Line-20260119.pdf",
+      "stationCount": 15,
+      "tripCount": 978
     }
   ]
 }

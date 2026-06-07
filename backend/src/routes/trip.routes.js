@@ -24,8 +24,9 @@ async function handleTripPlanner(req, res) {
       config.tfnsw.baseUrl,
       {
         includePast: parsed.includePast,
+        fullDay: parsed.fullDay,
         forceRefresh: parsed.forceRefresh,
-        buildMockItineraries: buildMockTripItineraries,
+        buildMockItineraries: config.allowMockData ? buildMockTripItineraries : undefined,
       }
     );
     return res.json({

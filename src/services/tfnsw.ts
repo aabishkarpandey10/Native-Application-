@@ -1,4 +1,3 @@
-import { Station } from "../constants/stations";
 import {
   fetchAlertsWithDb,
   fetchDeparturesWithDb,
@@ -31,6 +30,11 @@ export interface ServiceAlert {
   severity: 'critical' | 'warning' | 'info';
   affectedRoutes: string[];
   expiresAt?: Date;
+  updatedAt?: string;
+  announcementType?: string | null;
+  isTrackwork?: boolean;
+  isCritical?: boolean;
+  url?: string | null;
 }
 
 export interface TripLeg {
@@ -82,7 +86,7 @@ class TfNswService {
   async fetchDeparturesFeed(
     stopId: string,
     count: number = 10,
-    options?: { refresh?: boolean; fullDay?: boolean }
+    options?: { refresh?: boolean; fullDay?: boolean; route?: string }
   ): Promise<DeparturesFeed> {
     return fetchDeparturesWithDb(stopId, count, options);
   }
@@ -135,99 +139,6 @@ class TfNswService {
     });
     return feed.vehicles;
   }
-
-  // 7. getMockData
-  getMockData(type: 'departures' | 'alerts' | 'nearbyStops', stopId?: string): Departure[] | ServiceAlert[] | any[] {
-    const now = new Date();
-    if (type === 'departures') {
-      return [
-        {
-          destination: "Newcastle",
-          platform: "3",
-          departureTime: new Date(now.getTime() + 4 * 60000),
-          mode: "train",
-          routeNumber: "T1",
-          delayMinutes: 0,
-          scheduledTime: new Date(now.getTime() + 4 * 60000),
-          realTime: new Date(now.getTime() + 4 * 60000),
-          lineColor: "#F6891F",
-        },
-        {
-          destination: "Waterfall",
-          platform: "5",
-          departureTime: new Date(now.getTime() + 12 * 60000),
-          mode: "train",
-          routeNumber: "T4",
-          delayMinutes: 0,
-          scheduledTime: new Date(now.getTime() + 12 * 60000),
-          realTime: new Date(now.getTime() + 12 * 60000),
-          lineColor: "#E62B1E",
-        },
-        {
-          destination: "Strathfield",
-          platform: "2",
-          departureTime: new Date(now.getTime() + 18 * 60000),
-          mode: "train",
-          routeNumber: "T8",
-          delayMinutes: 0,
-          scheduledTime: new Date(now.getTime() + 18 * 60000),
-          realTime: new Date(now.getTime() + 18 * 60000),
-          lineColor: "#009374",
-        },
-      ];
-    }
-
-    if (type === 'alerts') {
-      return [
-        {
-          id: "alert_t1",
-          mode: "train",
-          title: "T1 Western Line Trackwork",
-          description: "Buses replace trains between Penrith and St Marys due to planned trackwork.",
-          severity: "warning",
-          affectedRoutes: ["T1"],
-          expiresAt: new Date(now.getTime() + 8 * 3600000),
-        },
-        {
-          id: "alert_l2",
-          mode: "light_rail",
-          title: "L2 Randwick Light Rail Delay",
-          description: "Delays due to an incident at Surry Hills.",
-          severity: "critical",
-          affectedRoutes: ["L2"],
-        },
-      ];
-    }
-
-    return [];
-  }
-
-  private generateMockItineraries(orig: Station, dest: Station, date: Date): TripItinerary[] {
-    const list: TripItinerary[] = [];
-    for (let i = 0; i < 3; i++) {
-      const departureTime = new Date(date.getTime() + (5 + i * 15) * 60000);
-      const duration = 15;
-      const arrivalTime = new Date(departureTime.getTime() + duration * 60000);
-      list.push({
-        id: `mock_trip_${i}`,
-        duration,
-        departureTime,
-        arrivalTime,
-        legs: [
-          {
-            mode: orig.mode === "lightrail" ? "light_rail" : (orig.mode as any),
-            departure: departureTime,
-            arrival: arrivalTime,
-            duration,
-            stops: [orig.name, dest.name],
-            platform: "Platform 3",
-            routeNumber: orig.mode === "train" ? "T1" : "M1",
-          },
-        ],
-      });
-    }
-    return list;
-  }
 }
 
 export const tfnswService = new TfNswService();
@@ -238,6 +149,5 @@ export const fetchServiceAlerts = tfnswService.fetchServiceAlerts.bind(tfnswServ
 export const fetchNearbyStops = tfnswService.fetchNearbyStops.bind(tfnswService);
 export const planTrip = tfnswService.planTrip.bind(tfnswService);
 export const parseGTFSRealtime = tfnswService.parseGTFSRealtime.bind(tfnswService);
-export const getMockData = tfnswService.getMockData.bind(tfnswService);
 export const getVehiclePositions = tfnswService.getVehiclePositions.bind(tfnswService);
 export type { VehiclePosition as TfNswVehiclePosition };

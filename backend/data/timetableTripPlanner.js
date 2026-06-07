@@ -1,4 +1,6 @@
+import { BUS_LINE_BRANCHES, BUS_STATION_BY_ID } from "./busNetworkData.js";
 import { buildLineStopSequence } from "./stopSequence.js";
+import { METRO_LINE_STATION_IDS } from "./metroNetworkData.js";
 import { LIGHT_RAIL_LINE_STATION_IDS } from "./sydneyNetworks.js";
 import { SYDNEY_STATIONS } from "./sydneyStations.js";
 import {
@@ -16,6 +18,8 @@ import { parseTfnswTime, toIsoString } from "./tfnswTime.js";
 import {
   getActiveScheduledRows,
   getDayScheduleRows,
+  getRestOfDayScheduleRows,
+  getScheduleRowsForTripPlan,
   getUpcomingScheduledRows,
 } from "./customTimetables.js";
 import {
@@ -42,6 +46,7 @@ function stationRoutes(stationId) {
 const ALL_STATIONS = [
   ...SYDNEY_STATIONS,
   ...Object.values(TRAIN_STATION_BY_ID || {}),
+  ...Object.values(BUS_STATION_BY_ID || {}),
 ];
 
 const STATION_NAME_BY_ID = Object.fromEntries(ALL_STATIONS.map((s) => [s.id, s.name]));
@@ -63,12 +68,127 @@ function routeForRow(row) {
   return String(row?.routeNumber || "").toUpperCase();
 }
 
+function directServingRoutes(origin, dest) {
+  const originMode = origin?.mode === "lightrail" ? "light_rail" : origin?.mode;
+
+  if (originMode === "light_rail") {
+    return new Set(
+      stationRoutes(origin.id).filter(
+        (r) => /^L\d/i.test(r) && lightRailPathIdsOnRoute(origin.id, dest.id, r).length >= 2
+      )
+    );
+  }
+
+  if (originMode === "metro") {
+    return new Set(
+      stationRoutes(origin.id).filter(
+        (r) => /^M\d/i.test(r) && metroPathIdsOnRoute(origin.id, dest.id, r).length >= 2
+      )
+    );
+  }
+
+  if (originMode === "bus" || dest?.mode === "bus") {
+    const routes = new Set();
+    for (const branch of BUS_LINE_BRANCHES) {
+      if (busPathIdsOnBranch(origin.id, dest.id, branch.route).length >= 2) {
+        routes.add(String(branch.route).toUpperCase());
+      }
+    }
+    return routes;
+  }
+
+  return new Set(
+    stationRoutes(origin.id).filter(
+      (r) =>
+        !/^L\d/i.test(r) &&
+        (stationsConnectedOnRoute(origin.id, dest.id, r) || findBranchPath(origin.id, dest.id, r))
+    )
+  );
+}
+
+function filterRowsForRoutes(rows, routeSet) {
+  if (!routeSet?.size) return rows;
+  return rows.filter(({ row }) => {
+    const r = routeForRow(row);
+    for (const sr of routeSet) {
+      if (routeLabelsMatch(r, sr)) return true;
+    }
+    return false;
+  });
+}
+
+/** Cached branch lookup — avoids repeated findBranchPath per departure row. */
+function buildFastTrainReachResolver(origin, dest) {
+  const branchCache = new Map();
+  const perStopMin = 4;
+
+  return (row, depTime) => {
+    const route = routeForRow(row);
+    let branchPath = branchCache.get(route);
+    if (branchPath === undefined) {
+      branchPath = findBranchPath(origin.id, dest.id, route);
+      branchCache.set(route, branchPath);
+    }
+    if (!branchPath?.stationIds?.length) return { ok: false };
+
+    const displayRoute = routeLabelsMatch(row.routeNumber, branchPath.route)
+      ? row.routeNumber
+      : branchPath.route;
+    const seq = branchPath.stationIds.map((id, i) => ({
+      station_name: STATION_NAME_BY_ID[id] || id,
+      time: toIsoString(new Date(depTime.getTime() + i * perStopMin * 60_000)),
+    }));
+    const destLabel = dest.name.replace(/\s+Station$/i, "");
+    const lastName = seq[seq.length - 1]?.station_name;
+    if (!destinationMatches(lastName, destLabel) && !destinationMatches(lastName, dest.name)) {
+      return { ok: false };
+    }
+    const duration = durationFromStopTimes(seq, (seq.length - 1) * perStopMin);
+    return {
+      ok: true,
+      stops: seq.map((s) => s.station_name),
+      stopTimes: seq,
+      duration,
+      routeNumber: displayRoute,
+    };
+  };
+}
+
 function lightRailPathIdsOnRoute(originId, destId, route) {
   const ids = LIGHT_RAIL_LINE_STATION_IDS[route] || [];
   const from = ids.indexOf(originId);
   const to = ids.indexOf(destId);
   if (from === -1 || to === -1) return [];
   return from <= to ? ids.slice(from, to + 1) : ids.slice(to, from + 1).reverse();
+}
+
+function metroPathIdsOnRoute(originId, destId, route) {
+  const ids = METRO_LINE_STATION_IDS[route] || [];
+  const from = ids.indexOf(originId);
+  const to = ids.indexOf(destId);
+  if (from === -1 || to === -1) return [];
+  return from <= to ? ids.slice(from, to + 1) : ids.slice(to, from + 1).reverse();
+}
+
+function busPathIdsOnBranch(originId, destId, routeNumber) {
+  for (const branch of BUS_LINE_BRANCHES) {
+    if (String(branch.route) !== String(routeNumber)) continue;
+    const ids = branch.stationIds || [];
+    const from = ids.indexOf(originId);
+    const to = ids.indexOf(destId);
+    if (from === -1 || to === -1) continue;
+    return from <= to ? ids.slice(from, to + 1) : ids.slice(to, from + 1).reverse();
+  }
+  return [];
+}
+
+function legModeForRoute(routeNumber, fallbackMode = "train") {
+  const r = String(routeNumber || "").toUpperCase();
+  if (/^M\d+/.test(r)) return "metro";
+  if (/^L\d+/.test(r)) return "light_rail";
+  if (/^\d{1,4}[A-Z]?$/.test(r) || /^B\d/.test(r)) return "bus";
+  if (fallbackMode === "lightrail") return "light_rail";
+  return fallbackMode || "train";
 }
 
 function stationPathIdsOnRoute(originId, destId, route) {
@@ -110,6 +230,53 @@ function tripReachesDestination(origin, dest, row, depTime, options = {}) {
   const destLabel = dest.name.replace(/\s+Station$/i, "");
   const perStop = 4;
   const isLightRailRoute = /^L\d+/i.test(row.routeNumber);
+  const isMetroRoute = /^M\d+/i.test(row.routeNumber);
+  const isBusRoute =
+    origin?.mode === "bus" ||
+    dest?.mode === "bus" ||
+    /^\d{1,4}[A-Z]?$/i.test(String(row.routeNumber || ""));
+
+  if (isMetroRoute) {
+    const pathIds = metroPathIdsOnRoute(origin.id, dest.id, row.routeNumber);
+    if (pathIds.length < 2) return { ok: false };
+    if (!fastMode) {
+      const timed = pickTimedStopSequence(origin, dest, row, depTime);
+      if (timed && timed.length >= 2) {
+        const dep = parseTfnswTime(timed[0].time);
+        const arr = parseTfnswTime(timed[timed.length - 1].time);
+        const duration = Math.max(1, Math.round((arr.getTime() - dep.getTime()) / 60000));
+        return {
+          ok: true,
+          stops: timed.map((s) => s.station_name),
+          stopTimes: timed,
+          duration,
+          routeNumber: row.routeNumber,
+        };
+      }
+    }
+    return syntheticStopSequence(pathIds, depTime, 3, row.routeNumber);
+  }
+
+  if (isBusRoute && !isLightRailRoute) {
+    const pathIds = busPathIdsOnBranch(origin.id, dest.id, row.routeNumber);
+    if (pathIds.length < 2) return { ok: false };
+    if (!fastMode) {
+      const timed = pickTimedStopSequence(origin, dest, row, depTime);
+      if (timed && timed.length >= 2) {
+        const dep = parseTfnswTime(timed[0].time);
+        const arr = parseTfnswTime(timed[timed.length - 1].time);
+        const duration = Math.max(1, Math.round((arr.getTime() - dep.getTime()) / 60000));
+        return {
+          ok: true,
+          stops: timed.map((s) => s.station_name),
+          stopTimes: timed,
+          duration,
+          routeNumber: row.routeNumber,
+        };
+      }
+    }
+    return syntheticStopSequence(pathIds, depTime, 2, row.routeNumber);
+  }
 
   if (isLightRailRoute) {
     const pathIds = lightRailPathIdsOnRoute(origin.id, dest.id, row.routeNumber);
@@ -191,19 +358,44 @@ function planDirectTripsFromTimetable(
   departDate,
   maxResults,
   includePast,
-  fastMode = true
+  fastMode = true,
+  fullDay = false
 ) {
-  const rowLimit = includePast ? 80 : 32;
-  const rows = includePast
-    ? getDayScheduleRows(origin.id, departDate, rowLimit)
-    : getUpcomingScheduledRows(origin.id, departDate, rowLimit);
+  const servingRoutes = directServingRoutes(origin, dest);
+  const rows = filterRowsForRoutes(
+    fullDay
+      ? getScheduleRowsForTripPlan(origin.id, departDate, {
+          includePast: true,
+          pastLimit: 8,
+          upcomingLimit: 900,
+        })
+      : includePast
+        ? getDayScheduleRows(origin.id, departDate, 500)
+        : getUpcomingScheduledRows(origin.id, departDate, Math.min(64, maxResults * 6)),
+    servingRoutes
+  );
   if (!rows.length) return [];
+
+  const originMode = origin?.mode === "lightrail" ? "light_rail" : origin?.mode;
+  const fastTrainReach =
+    fastMode && originMode === "train"
+      ? buildFastTrainReachResolver(origin, dest)
+      : null;
+
+  const reachCache = new Map();
+  const cachedReach = (row, depTime) => {
+    const key = `${routeForRow(row)}|${depTime.getTime()}`;
+    if (reachCache.has(key)) return reachCache.get(key);
+    const reach = tripReachesDestination(origin, dest, row, depTime, { fastMode });
+    reachCache.set(key, reach);
+    return reach;
+  };
 
   const candidates = [];
   for (const entry of rows) {
-    if (!includePast && candidates.length >= maxResults * 2) break;
+    if (!fullDay && !includePast && candidates.length >= maxResults * 2) break;
     const { row, when: depTime, index } = entry;
-    const reach = tripReachesDestination(origin, dest, row, depTime, { fastMode });
+    const reach = fastTrainReach ? fastTrainReach(row, depTime) : cachedReach(row, depTime);
     if (!reach.ok) continue;
 
     const arrTime =
@@ -226,7 +418,7 @@ function planDirectTripsFromTimetable(
 
   candidates.sort((a, b) => a.depTime.getTime() - b.depTime.getTime());
 
-  const bounded = includePast ? candidates : candidates.slice(0, maxResults);
+  const bounded = fullDay ? candidates : candidates.slice(0, maxResults);
 
   return bounded.map(({ row, depTime, arrTime, duration, stopNames, stopTimes, routeNumber }, i) =>
     normalizeItineraryTimes({
@@ -238,7 +430,7 @@ function planDirectTripsFromTimetable(
       transfersCount: 0,
       legs: [
         {
-          mode: /^L\d+/i.test(row.routeNumber) ? "light_rail" : "train",
+          mode: legModeForRoute(routeNumber || row.routeNumber, originMode),
           originName: origin.name,
           destinationName: dest.name,
           originId: origin.id,
@@ -263,40 +455,77 @@ export function planTripsFromTimetable(
   maxResults = 8,
   options = {}
 ) {
-  const { includePast = false, fastMode = true } = options;
+  const { includePast = false, fastMode = true, fullDay = false } = options;
   if (!origin?.id || !dest?.id || origin.id === dest.id) return [];
 
   const originMode = origin?.mode === "lightrail" ? "light_rail" : origin?.mode;
   const destMode = dest?.mode === "lightrail" ? "light_rail" : dest?.mode;
+  const cap = fullDay ? Math.min(maxResults, 500) : maxResults;
+  const past = fullDay || includePast;
 
   if (originMode === "light_rail" && destMode === "light_rail") {
-    const lr = planLightRailTripsFromTimetable(origin, dest, departDate, maxResults, {
-      includePast,
+    const lr = planLightRailTripsFromTimetable(origin, dest, departDate, cap, {
+      includePast: past,
       fastMode,
+      fullDay,
     });
     if (lr.length > 0) return lr;
+  }
+
+  if (originMode === "metro" && destMode === "metro") {
+    const metro = planDirectTripsFromTimetable(
+      origin,
+      dest,
+      departDate,
+      cap,
+      past,
+      fastMode,
+      fullDay
+    );
+    if (metro.length > 0) return metro;
+  }
+
+  if (originMode === "bus" && destMode === "bus") {
+    const bus = planDirectTripsFromTimetable(
+      origin,
+      dest,
+      departDate,
+      cap,
+      past,
+      fastMode,
+      fullDay
+    );
+    if (bus.length > 0) return bus;
   }
 
   const direct = planDirectTripsFromTimetable(
     origin,
     dest,
     departDate,
-    maxResults,
-    includePast,
-    fastMode
+    cap,
+    past,
+    fastMode,
+    fullDay
   );
   if (direct.length > 0) return direct;
 
   // Many Sydney train trips require a CBD transfer (e.g. Auburn → Circular Quay).
-  // If we have timetable coverage but no direct row matches, attempt a single-transfer plan.
   if (originMode === "train" && destMode === "train") {
-    return buildTrainTransferTrips(origin, dest, departDate, maxResults, includePast, fastMode);
+    return buildTrainTransferTrips(origin, dest, departDate, cap, past, fastMode, fullDay);
   }
 
   return [];
 }
 
-function buildTrainTransferTrips(origin, dest, departDate, maxResults, includePast, fastMode = true) {
+function buildTrainTransferTrips(
+  origin,
+  dest,
+  departDate,
+  maxResults,
+  includePast,
+  fastMode = true,
+  fullDay = false
+) {
   const originRoutes = stationRoutes(origin.id).filter((r) => !/^L\d+$/i.test(r));
   const destRoutes = stationRoutes(dest.id).filter((r) => !/^L\d+$/i.test(r));
   if (!originRoutes.length || !destRoutes.length) return [];
@@ -308,11 +537,12 @@ function buildTrainTransferTrips(origin, dest, departDate, maxResults, includePa
   const firstLegCache = new Map();
 
   const getSecondRows = (interchangeId, r2) => {
-    const cacheKey = `${interchangeId}|${r2}|${includePast ? 1 : 0}`;
+    const cacheKey = `${interchangeId}|${r2}|${includePast ? 1 : 0}|${fullDay ? 1 : 0}`;
     if (secondRowsCache.has(cacheKey)) return secondRowsCache.get(cacheKey);
-    const secondRows = includePast
-      ? getDayScheduleRows(interchangeId, departDate, 80)
-      : getUpcomingScheduledRows(interchangeId, departDate, 36);
+    const secondRows =
+      fullDay || includePast
+        ? getRestOfDayScheduleRows(interchangeId, departDate, fullDay ? 600 : 80)
+        : getUpcomingScheduledRows(interchangeId, departDate, 48);
     const filtered = secondRows
       .filter(({ row }) => routeLabelsMatch(routeForRow(row), r2))
       .sort((a, b) => a.when.getTime() - b.when.getTime());
@@ -321,15 +551,16 @@ function buildTrainTransferTrips(origin, dest, departDate, maxResults, includePa
   };
 
   const getFirstLegTrips = (interchange) => {
-    const cacheKey = `${origin.id}|${interchange.id}|${includePast ? 1 : 0}`;
+    const cacheKey = `${origin.id}|${interchange.id}|${includePast ? 1 : 0}|${fullDay ? 1 : 0}`;
     if (firstLegCache.has(cacheKey)) return firstLegCache.get(cacheKey);
     const trips = planDirectTripsFromTimetable(
       origin,
       interchange,
       departDate,
-      includePast ? 6 : 4,
-      includePast,
-      fastMode
+      fullDay ? 60 : includePast ? 8 : 6,
+      includePast || fullDay,
+      fastMode,
+      fullDay
     );
     firstLegCache.set(cacheKey, trips);
     return trips;
@@ -339,7 +570,7 @@ function buildTrainTransferTrips(origin, dest, departDate, maxResults, includePa
     for (const r2 of destRoutes) {
       if (findBranchPath(origin.id, dest.id, r1) && routeLabelsMatch(r1, r2)) continue;
 
-      const interchanges = findTrainInterchanges(r1, r2, origin.id, dest.id).slice(0, 4);
+      const interchanges = findTrainInterchanges(r1, r2, origin.id, dest.id).slice(0, fullDay ? 2 : 3);
       for (const interchangeId of interchanges) {
         const interchangeName = STATION_NAME_BY_ID[interchangeId] || interchangeId;
         const interchange = { ...origin, id: interchangeId, name: interchangeName };
@@ -425,7 +656,7 @@ function buildTrainTransferTrips(origin, dest, departDate, maxResults, includePa
   const sorted = out.sort(
     (a, b) => parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
   );
-  return includePast ? sorted : sorted.slice(0, maxResults);
+  return sorted.slice(0, maxResults);
 }
 
 /*
@@ -440,11 +671,13 @@ function buildDirectTripsOnRoute(
   route,
   maxResults,
   includePast,
-  fastMode = true
+  fastMode = true,
+  fullDay = false
 ) {
-  const rows = includePast
-    ? getDayScheduleRows(origin.id, departDate, 80)
-    : getUpcomingScheduledRows(origin.id, departDate, 48);
+  const rows =
+    fullDay || includePast
+      ? getDayScheduleRows(origin.id, departDate, fullDay ? 5000 : 80)
+      : getUpcomingScheduledRows(origin.id, departDate, 48);
   const candidates = rows
     .filter(({ row }) => routeForRow(row) === route)
     .map(({ row, when: depTime }) => {
@@ -600,7 +833,8 @@ export function planLightRailTripsFromTimetable(
   maxResults = 8,
   options = {}
 ) {
-  const { includePast = false, fastMode = true } = options;
+  const { includePast = false, fastMode = true, fullDay = false } = options;
+  const past = fullDay || includePast;
   if (!isLightRailStation(origin) || !isLightRailStation(dest)) return [];
   if (origin.id === dest.id) return [];
 
@@ -609,7 +843,7 @@ export function planLightRailTripsFromTimetable(
   const shared = originRoutes.filter((r) => destRoutes.includes(r));
 
   const direct = shared.flatMap((route) =>
-    buildDirectTripsOnRoute(origin, dest, departDate, route, maxResults, includePast, fastMode)
+    buildDirectTripsOnRoute(origin, dest, departDate, route, maxResults, past, fastMode, fullDay)
   );
   if (direct.length >= maxResults) {
     return direct
@@ -617,7 +851,7 @@ export function planLightRailTripsFromTimetable(
       .slice(0, maxResults);
   }
 
-  const transfer = buildTransferTrips(origin, dest, departDate, maxResults, includePast);
+  const transfer = buildTransferTrips(origin, dest, departDate, maxResults, past);
 
   return [...direct, ...transfer]
     .sort((a, b) => new Date(a.departureTime).getTime() - new Date(b.departureTime).getTime())

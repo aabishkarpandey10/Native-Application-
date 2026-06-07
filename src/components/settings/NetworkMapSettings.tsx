@@ -3,9 +3,9 @@ import { Pressable, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, Map } from "lucide-react-native";
-import { Cell, GroupedList, SectionHeader, Txt } from "../design";
-import { MIN_TOUCH, SPACING } from "../../constants/design";
+import { Map } from "lucide-react-native";
+import { GroupedList, ListRow, SectionHeader, Txt } from "../design";
+import { SPACING } from "../../constants/design";
 import { useAppConfig } from "../../hooks/useAppConfig";
 import { useColors } from "../../hooks/useColors";
 import {
@@ -98,13 +98,11 @@ export function NetworkMapSettings() {
       </Pressable>
 
       <GroupedList>
-        <Cell minHeight={MIN_TOUCH} onPress={openMap}>
-          <Map size={20} color={c.primary} strokeWidth={2} />
-          <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
-            View network map
-          </Txt>
-          <ChevronRight size={20} color={c.textSecondary} strokeWidth={2} />
-        </Cell>
+        <ListRow
+          label="View network map"
+          icon={<Map size={20} color={c.primary} strokeWidth={2} />}
+          onPress={openMap}
+        />
       </GroupedList>
       <Txt
         size={13}

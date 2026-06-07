@@ -9,6 +9,7 @@ import {
   SYDNEY_METRO_STATIONS,
   METRO_STATION_BY_ID,
 } from "./metroNetworkData.js";
+import { getStations } from "./adminStore.js";
 
 export const POPULAR_METRO_STATION_IDS = [
   "TALLAWONG_M",
@@ -42,6 +43,24 @@ export const POPULAR_BUS_STOP_IDS = [
 let coreStationsCache = null;
 let coreByIdCache = null;
 
+export function invalidateStationCaches() {
+  coreStationsCache = null;
+  coreByIdCache = null;
+}
+
+/** Admin-merged stations visible in the app (respects disabled + custom stations). */
+export function getPublicStations() {
+  return getStations().filter((s) => !s.disabled);
+}
+
+function overlayStation(base) {
+  if (!base?.id) return base;
+  const merged = getStations().find((s) => s.id === base.id);
+  if (!merged) return base;
+  if (merged.disabled) return null;
+  return { ...base, ...merged, disabled: false };
+}
+
 function buildCoreStations() {
   const trains = GREATER_SYDNEY_TRAIN_STATIONS.map((s) => ({ ...s, mode: "train", disabled: false }));
   const lightRail = SYDNEY_LIGHT_RAIL_STOPS.map((s) => ({ ...s, disabled: false }));
@@ -64,11 +83,13 @@ function getCoreById() {
 
 export function getStationById(id) {
   if (!id) return null;
+  const fromAdmin = getStations().find((s) => s.id === id);
+  if (fromAdmin) return fromAdmin.disabled ? null : fromAdmin;
   return (
-    BUS_STATION_BY_ID[id] ??
-    LIGHT_RAIL_STATION_BY_ID[id] ??
-    METRO_STATION_BY_ID[id] ??
-    getCoreById()[id] ??
+    overlayStation(BUS_STATION_BY_ID[id]) ??
+    overlayStation(LIGHT_RAIL_STATION_BY_ID[id]) ??
+    overlayStation(METRO_STATION_BY_ID[id]) ??
+    overlayStation(getCoreById()[id]) ??
     null
   );
 }
@@ -146,8 +167,10 @@ export function resolveStationsForApi({
   }
 
   if (modeNorm === "lightrail" || modeNorm === "light_rail") {
-    let list = SYDNEY_LIGHT_RAIL_STOPS;
-    if (popular === "1" || popular === "true") return getPopularLightRailStops();
+    let list = SYDNEY_LIGHT_RAIL_STOPS.map((s) => overlayStation(s)).filter(Boolean);
+    if (popular === "1" || popular === "true") {
+      return getPopularLightRailStops().map((s) => overlayStation(s)).filter(Boolean);
+    }
     if (query && query.length >= 2) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -161,8 +184,10 @@ export function resolveStationsForApi({
   }
 
   if (modeNorm === "metro") {
-    let list = SYDNEY_METRO_STATIONS;
-    if (popular === "1" || popular === "true") return getPopularMetroStations();
+    let list = SYDNEY_METRO_STATIONS.map((s) => overlayStation(s)).filter(Boolean);
+    if (popular === "1" || popular === "true") {
+      return getPopularMetroStations().map((s) => overlayStation(s)).filter(Boolean);
+    }
     if (query && query.length >= 2) {
       const q = query.toLowerCase();
       list = list.filter(
@@ -186,7 +211,7 @@ export function resolveStationsForApi({
     return getPopularBusStops();
   }
 
-  let list = getCoreStations();
+  let list = getPublicStations();
   if (modeNorm) {
     const m = modeNorm === "light_rail" ? "lightrail" : modeNorm;
     list = list.filter((s) => s.mode === m);

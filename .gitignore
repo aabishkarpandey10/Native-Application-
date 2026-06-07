@@ -43,6 +43,14 @@ backend/data/uploads/
 # local GTFS / sync caches
 .cache/
 
+# Release build artifacts (build locally with npm run build:android:release)
+build-output/
+*.apk
+*.aab
+
+# Generated bus timetable (347MB+) — run: node scripts/merge-bus-gtfs-timetables.mjs
+backend/data/timetables/bus-weekday.json
+
 # generated native folders
 /ios
 /android

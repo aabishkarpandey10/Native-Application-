@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchCoreStationsFromApi,
   fetchStations,
+  getStationsSync,
   setStationsCache,
   type StationFetchOptions,
 } from "../services/stationsService";
@@ -14,10 +15,13 @@ export function useStations(mode?: string) {
     queryFn: async () => {
       if (isBus) return [];
       const list = await fetchCoreStationsFromApi();
-      setStationsCache(list);
-      return list;
+      const resolved = list.length > 0 ? list : getStationsSync();
+      setStationsCache(resolved);
+      return resolved;
     },
     enabled: !isBus,
+    initialData: () => getStationsSync(),
+    placeholderData: () => getStationsSync(),
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
     refetchOnMount: false,

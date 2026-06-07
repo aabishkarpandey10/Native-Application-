@@ -1,42 +1,81 @@
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { RADIUS, SEMANTIC } from "../constants/design";
+import { useColors } from "../hooks/useColors";
 import { useBackendStatus } from "../hooks/useBackendStatus";
+import { Txt } from "./design/Txt";
 
 export function BackendStatusBadge() {
+  const c = useColors();
   const { data, isLoading, isError } = useBackendStatus();
 
   if (isLoading) {
     return (
-      <View className="flex-row items-center gap-1.5 px-2.5 py-2 rounded-xl bg-surface-card border border-surface-border shrink-0">
-        <ActivityIndicator size="small" color="#71717A" />
-        <Text className="text-zinc-500 text-[10px] font-medium">API</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+          borderRadius: RADIUS.card,
+          backgroundColor: c.card,
+          borderWidth: 1,
+          borderColor: c.border,
+          flexShrink: 0,
+        }}
+      >
+        <ActivityIndicator size="small" color={c.textSecondary} />
+        <Txt size={10} weight="500" color={c.textSecondary}>
+          API
+        </Txt>
       </View>
     );
   }
 
   if (isError || !data || data.ok === false) {
     return (
-      <View className="px-2.5 py-2 rounded-xl bg-amber-500/10 border border-amber-500/25 shrink-0">
-        <Text className="text-amber-400 text-[10px] font-semibold">Offline</Text>
+      <View
+        style={{
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+          borderRadius: RADIUS.card,
+          backgroundColor: c.isDark ? "#3B2F1A" : "#FFFBEB",
+          borderWidth: 1,
+          borderColor: c.isDark ? "#92400E" : "#FDE68A",
+          flexShrink: 0,
+        }}
+      >
+        <Txt size={10} weight="600" color={SEMANTIC.warning}>
+          Offline
+        </Txt>
       </View>
     );
   }
 
   const live = data.tfnswLive;
-  const label = live ? "Live" : data.tfnswConfigured ? "Mock" : "Local";
+  const label = live
+    ? "Live"
+    : data.tfnswConfigured
+      ? "Scheduled"
+      : data.dataSource === "mock"
+        ? "Demo"
+        : "Offline";
 
   return (
     <View
-      className={`px-2.5 py-2 rounded-xl border shrink-0 ${
-        live
-          ? "bg-emerald-500/10 border-emerald-500/30"
-          : "bg-surface-card border-surface-border"
-      }`}
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: RADIUS.card,
+        borderWidth: 1,
+        flexShrink: 0,
+        backgroundColor: live ? (c.isDark ? "#1A2E22" : "#ECFDF3") : c.card,
+        borderColor: live ? (c.isDark ? "#166534" : "#BBF7D0") : c.border,
+      }}
     >
-      <Text
-        className={`text-[10px] font-semibold ${live ? "text-emerald-400" : "text-zinc-400"}`}
-      >
+      <Txt size={10} weight="600" color={live ? SEMANTIC.success : c.textSecondary}>
         {label}
-      </Text>
+      </Txt>
     </View>
   );
 }

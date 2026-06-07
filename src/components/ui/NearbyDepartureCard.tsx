@@ -29,7 +29,7 @@ export function NearbyDepartureCard({ departure, onPress }: NearbyDepartureCardP
       style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}
       className="flex-row items-center bg-surface-card border border-surface-border rounded-2xl p-4 mb-2.5"
     >
-      <ModeBadge mode={departure.mode} size="md" badgeClassName="mr-2.5" />
+      <ModeBadge mode={departure.mode} size="md" style={{ marginRight: 10 }} />
       {departure.routeNumber && departure.routeNumber !== "—" ? (
         <View
           className="px-2 py-1 rounded-lg mr-2 items-center justify-center min-w-[32px]"

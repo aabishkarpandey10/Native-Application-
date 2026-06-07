@@ -1,7 +1,8 @@
 import { Alert, Pressable, Switch, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Bell, Plus, Trash2 } from "lucide-react-native";
-import { Cell, GroupedList, NavBar, Page, SectionHeader, Txt } from "../components/design";
+import { BackButton, Cell, GroupedList, Page, SectionHeader, Txt } from "../components/design";
+import { ScreenTitle } from "../components/tripview/ScreenTitle";
 import { MIN_TOUCH, SPACING } from "../constants/design";
 import { useColors } from "../hooks/useColors";
 import { useStore, type AlarmTrip } from "../store/store";
@@ -84,11 +85,11 @@ export default function AlarmsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar title="Trip alarms" onBack={goBack} />
+      <ScreenTitle title="Trip alarms" left={<BackButton variant="plain" onPress={goBack} />} />
 
       <Page>
         <SectionHeader title="Notifications" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH}>
             <Txt size={16} color={c.text} style={{ flex: 1 }}>
               Enable notifications
@@ -111,7 +112,7 @@ export default function AlarmsScreen() {
           accessibilityRole="button"
           accessibilityLabel="Set alarm trip"
           style={({ pressed }) => ({
-            marginHorizontal: 16,
+            marginHorizontal: SPACING.screen,
             marginBottom: 16,
             flexDirection: "row",
             alignItems: "center",
@@ -120,7 +121,7 @@ export default function AlarmsScreen() {
             minHeight: MIN_TOUCH,
             borderRadius: 10,
             backgroundColor: pressed ? c.separator : c.primary,
-            paddingHorizontal: 16,
+            paddingHorizontal: SPACING.cell,
           })}
         >
           <Plus size={22} color="#FFFFFF" strokeWidth={2.4} />
@@ -133,7 +134,7 @@ export default function AlarmsScreen() {
         {alarmTrips.length === 0 ? (
           <View
             style={{
-              marginHorizontal: 16,
+              marginHorizontal: SPACING.screen,
               padding: 24,
               borderRadius: 12,
               backgroundColor: c.card,
@@ -151,7 +152,7 @@ export default function AlarmsScreen() {
             </Txt>
           </View>
         ) : (
-          <GroupedList inset={16}>
+          <GroupedList>
             {alarmTrips.map((alarm) => (
               <Cell key={alarm.id} minHeight={72}>
                 <Pressable

@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
+import { useSafeBack } from "../../hooks/useSafeBack";
 import { ArrowUpDown, Train, TramFront } from "lucide-react-native";
-import { NavBar, Page, Txt } from "../../components/design";
-import { interFamily, MIN_TOUCH, SEMANTIC, SPACING } from "../../constants/design";
+import { BackButton, Page, Txt } from "../../components/design";
+import { ScreenTitle } from "../../components/tripview/ScreenTitle";
+import { MIN_TOUCH, SEMANTIC, SPACING, resolveTextStyle } from "../../constants/design";
+import { keyboardAvoidingBehavior } from "../../utils/keyboard";
 import { formatRouteCodes, tripAccentColor } from "../../utils/tripDisplay";
 import { getRouteHexColor } from "../../utils/transitColors";
 import { type JourneyRoute } from "../../constants/sampleData";
@@ -156,7 +159,7 @@ function StationField({ value, onChange, onFocus, placeholder, marker, rounded }
         placeholder={placeholder}
         placeholderTextColor={c.textSecondary}
         accessibilityLabel={placeholder}
-        style={{ flex: 1, fontSize: 16, color: c.text, fontFamily: interFamily("500"), fontWeight: "500" }}
+        style={{ flex: 1, fontSize: 16, color: c.text, ...resolveTextStyle("500") }}
       />
     </View>
   );
@@ -260,16 +263,18 @@ export default function JourneyScreen() {
     setTimeout(() => setSavedFlash(false), 2000);
   };
 
+  const goBack = useSafeBack("/(tabs)/tools");
+
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <NavBar title="Plan Trip" primary />
+      <ScreenTitle title="Plan Trip" left={<BackButton variant="plain" onPress={goBack} />} />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={keyboardAvoidingBehavior()}
         keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
       >
-      <Page bottomPad={32}>
+      <Page tabScreen>
         <View
           style={{
             backgroundColor: c.card,
@@ -434,7 +439,7 @@ export default function JourneyScreen() {
                       : isCurrentTripSaved
                         ? SEMANTIC.destructive
                         : c.primary,
-                    paddingHorizontal: 16,
+                    paddingHorizontal: SPACING.cell,
                     minHeight: MIN_TOUCH - 4,
                     borderRadius: 8,
                     justifyContent: "center",

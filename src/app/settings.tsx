@@ -1,24 +1,51 @@
-import { Linking, Pressable, Switch, View } from "react-native";
+import { useRef } from "react";
+import { Linking, Switch, View, type ViewStyle } from "react-native";
+import { useRouter } from "expo-router";
 import { useSafeBack } from "../hooks/useSafeBack";
-import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
-import { ChevronRight, Moon, Sun } from "lucide-react-native";
-import { Cell, GroupedList, NavBar, Page, SectionHeader, Txt } from "../components/design";
+import { Moon, Sun } from "lucide-react-native";
+import { ADMIN_UNLOCK_TAP_COUNT, FEATURES } from "../constants/features";
+import { BackButton, Cell, GroupedList, ListRow, Page, SectionHeader, Txt } from "../components/design";
+import { ScreenTitle } from "../components/tripview/ScreenTitle";
 import { AppLogo } from "../components/branding/AppLogo";
 import { NetworkMapSettings } from "../components/settings/NetworkMapSettings";
-import { MIN_TOUCH, SPACING } from "../constants/design";
+import { MIN_TOUCH, ROW_ICON_SIZE, SPACING } from "../constants/design";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useRefreshAppConfigOnFocus } from "../hooks/useRefreshAppConfigOnFocus";
 import { useColors } from "../hooks/useColors";
 import { useStore } from "../store/store";
 
+const iconSlot: ViewStyle = {
+  width: ROW_ICON_SIZE,
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+
 export default function SettingsScreen() {
   const c = useColors();
+  const router = useRouter();
   const goBack = useSafeBack("/(tabs)/tools");
   const { data: appConfig } = useAppConfig();
   useRefreshAppConfigOnFocus();
   const { theme, setTheme, enableNotifications, setEnableNotifications } = useStore();
   const version = Constants.expoConfig?.version ?? "1.0.0";
+  const versionTapCount = useRef(0);
+  const versionTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const onVersionPress = () => {
+    if (!FEATURES.admin) return;
+    if (versionTapTimer.current) clearTimeout(versionTapTimer.current);
+    versionTapCount.current += 1;
+    if (versionTapCount.current >= ADMIN_UNLOCK_TAP_COUNT) {
+      versionTapCount.current = 0;
+      router.push("/admin" as never);
+      return;
+    }
+    versionTapTimer.current = setTimeout(() => {
+      versionTapCount.current = 0;
+    }, 2500);
+  };
 
   const allowTheme = appConfig?.allowUserTheme !== false;
   const transportUrl = appConfig?.linkTransportNsw ?? "https://transportnsw.info";
@@ -32,27 +59,29 @@ export default function SettingsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
-      <StatusBar style={c.isDark ? "light" : "dark"} />
-      <NavBar title="Settings" onBack={goBack} />
+      <ScreenTitle title="Settings" left={<BackButton variant="plain" onPress={goBack} />} />
 
       <Page>
         {allowTheme ? (
           <>
             <SectionHeader title="Appearance" />
-            <GroupedList inset={16}>
+            <GroupedList>
               <Cell minHeight={MIN_TOUCH}>
-                {theme === "dark" ? (
-                  <Moon size={20} color={c.primary} strokeWidth={2} />
-                ) : (
-                  <Sun size={20} color={c.primary} strokeWidth={2} />
-                )}
-                <Txt size={16} color={c.text} style={{ flex: 1, marginLeft: 12 }}>
+                <View style={iconSlot}>
+                  {theme === "dark" ? (
+                    <Moon size={20} color={c.primary} strokeWidth={2} />
+                  ) : (
+                    <Sun size={20} color={c.primary} strokeWidth={2} />
+                  )}
+                </View>
+                <Txt size={16} color={c.text} style={{ flex: 1, minWidth: 0, marginLeft: SPACING.iconGap }}>
                   Dark mode
                 </Txt>
                 <Switch
                   value={theme === "dark"}
                   onValueChange={(v) => setTheme(v ? "dark" : "light")}
                   trackColor={{ false: c.separator, true: c.primary }}
+                  style={{ flexShrink: 0 }}
                 />
               </Cell>
             </GroupedList>
@@ -64,15 +93,16 @@ export default function SettingsScreen() {
         )}
 
         <SectionHeader title="Notifications" />
-        <GroupedList inset={16}>
+        <GroupedList>
           <Cell minHeight={MIN_TOUCH}>
-            <Txt size={16} color={c.text} style={{ flex: 1 }}>
+            <Txt size={16} color={c.text} style={{ flex: 1, minWidth: 0 }}>
               Service alerts
             </Txt>
             <Switch
               value={enableNotifications}
               onValueChange={setEnableNotifications}
               trackColor={{ false: c.separator, true: c.primary }}
+              style={{ flexShrink: 0 }}
             />
           </Cell>
         </GroupedList>
@@ -93,25 +123,15 @@ export default function SettingsScreen() {
             {appConfig?.appName ?? "Sydney Transit"}
           </Txt>
         </View>
-        <GroupedList inset={16}>
-          <Cell minHeight={MIN_TOUCH}>
-            <Txt size={16} color={c.text}>Version</Txt>
-            <Txt size={16} color={c.textSecondary}>
-              {version}
-            </Txt>
-          </Cell>
-          <Cell minHeight={MIN_TOUCH} onPress={() => Linking.openURL(transportUrl)}>
-            <Txt size={16} color={c.text} style={{ flex: 1 }}>
-              Transport for NSW
-            </Txt>
-            <ChevronRight size={20} color={c.textSecondary} strokeWidth={2} />
-          </Cell>
-          <Cell minHeight={MIN_TOUCH} onPress={() => Linking.openURL(openDataUrl)}>
-            <Txt size={16} color={c.text} style={{ flex: 1 }}>
-              Open data & API
-            </Txt>
-            <ChevronRight size={20} color={c.textSecondary} strokeWidth={2} />
-          </Cell>
+        <GroupedList>
+          <ListRow
+            label="Version"
+            value={version}
+            showChevron={false}
+            onPress={FEATURES.admin ? onVersionPress : undefined}
+          />
+          <ListRow label="Transport for NSW" onPress={() => Linking.openURL(transportUrl)} />
+          <ListRow label="Open data & API" onPress={() => Linking.openURL(openDataUrl)} />
         </GroupedList>
 
         <Txt

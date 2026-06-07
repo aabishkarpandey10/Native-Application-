@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { checkBackendHealth } from "../services/apiClient";
+import { getApiBaseUrl } from "../config/api";
+import { ApiRequestError, checkBackendHealth } from "../services/apiClient";
 
 export function useBackendStatus() {
   return useQuery({
@@ -7,12 +8,11 @@ export function useBackendStatus() {
     queryFn: async () => {
       const status = await checkBackendHealth();
       if (!status?.ok) {
-        return {
-          ok: false,
-          tfnswConfigured: false,
-          tfnswLive: false,
-          dataSource: "unavailable",
-        };
+        throw new ApiRequestError("Backend health check failed", {
+          path: "/api/health",
+          url: getApiBaseUrl(),
+          hint: "Verify EXPO_PUBLIC_API_URL was set before building the APK",
+        });
       }
       return status;
     },

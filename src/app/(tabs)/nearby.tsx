@@ -5,26 +5,26 @@ import { useSafeBack } from "../../hooks/useSafeBack";
 import { navigationCanPop } from "../../utils/navigationBack";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Location from "expo-location";
-import { ChevronLeft, ChevronRight, Map as MapIcon, MapPin, RefreshCw } from "lucide-react-native";
+import { ChevronRight, Map as MapIcon, MapPin, RefreshCw } from "lucide-react-native";
 import {
-  DepartureRow,
+  BackButton,
   DepartureLoadingRows,
   EmptyState,
-  GroupedList,
   IconBtn,
   Page,
   SectionHeader,
   Txt,
 } from "../../components/design";
+import { ScheduleBoard, ScheduleDepartureCard } from "../../components/schedule";
 import { ScreenTitle } from "../../components/tripview/ScreenTitle";
 import { MIN_TOUCH, SPACING } from "../../constants/design";
-import { NEARBY_STATIONS, type SampleDeparture } from "../../constants/sampleData";
 import { useColors } from "../../hooks/useColors";
 import { useDepartures } from "../../hooks/useDepartures";
 import { useLocation } from "../../hooks/useLocation";
 import { useLocationLabel } from "../../hooks/useLocationLabel";
 import { useNearbyStops } from "../../hooks/useNearbyStops";
 import { useRefreshControl } from "../../hooks/useRefreshControl";
+import { ApiRequestError } from "../../services/apiClient";
 import { departuresToDisplay } from "../../utils/displayAdapters";
 
 const DEFAULT_LOCATION = { lat: -33.8688, lng: 151.2093 };
@@ -38,19 +38,22 @@ interface NearbyStation {
   id: string;
   name: string;
   distance: string;
-  fallback: SampleDeparture[];
+}
+
+function apiErrorMessage(error: unknown): string {
+  if (error instanceof ApiRequestError) return error.message;
+  if (error instanceof Error) return error.message;
+  return "Could not reach the Sydney Transit API.";
 }
 
 function NearestBoard({ station }: { station: NearbyStation }) {
+  const c = useColors();
   const router = useRouter();
-  const { data, isLoading, isError } = useDepartures(station.id, 8);
+  const { data, isLoading, isError, error } = useDepartures(station.id, 8);
 
   const departures = useMemo(
-    () =>
-      data?.departures && data.departures.length > 0
-        ? departuresToDisplay(data.departures).slice(0, 6)
-        : station.fallback.slice(0, 6),
-    [data?.departures, station.fallback]
+    () => (data?.departures ? departuresToDisplay(data.departures).slice(0, 6) : []),
+    [data?.departures]
   );
 
   return (
@@ -61,28 +64,30 @@ function NearestBoard({ station }: { station: NearbyStation }) {
       ) : isError && departures.length === 0 ? (
         <EmptyState
           title="Could not load departures"
-          message="Pull down to refresh or check your connection."
+          message={apiErrorMessage(error)}
         />
+      ) : departures.length === 0 ? (
+        <EmptyState title="No departures" message="No upcoming services for this stop." />
       ) : (
-        <GroupedList flat inset={0}>
-          {departures.map((d) => (
-            <DepartureRow
-              key={d.id}
-              departure={d}
-              flat
-              minHeight={62}
-              onPress={() => router.push(`/departures?stationId=${station.id}` as never)}
-            />
-          ))}
+        <View>
+          <ScheduleBoard>
+            {departures.map((d) => (
+              <ScheduleDepartureCard
+                key={d.id}
+                departure={d}
+                onPress={() => router.push(`/departures?stationId=${station.id}` as never)}
+              />
+            ))}
+          </ScheduleBoard>
           <Pressable
             onPress={() => router.push(`/departures?stationId=${station.id}` as never)}
-            style={{ padding: 14, alignItems: "center", backgroundColor: "transparent" }}
+            style={{ padding: SPACING.cell, alignItems: "center" }}
           >
-            <Txt size={15} weight="600" color="#0079C1">
+            <Txt size={15} weight="600" color={c.primary}>
               View full timetable
             </Txt>
           </Pressable>
-        </GroupedList>
+        </View>
       )}
     </>
   );
@@ -93,7 +98,7 @@ function StopRow({ station }: { station: NearbyStation }) {
   const router = useRouter();
   const { data } = useDepartures(station.id, 1);
   const next = data?.departures?.[0];
-  const nextDisplay = next ? departuresToDisplay([next])[0] : station.fallback[0];
+  const nextDisplay = next ? departuresToDisplay([next])[0] : null;
 
   return (
     <Pressable
@@ -147,7 +152,13 @@ export default function NearbyScreen() {
     });
   }, []);
 
-  const { data: nearbyStops, isLoading, refetch: refetchNearby } = useNearbyStops(loc.lat, loc.lng, 2000);
+  const {
+    data: nearbyStops,
+    isLoading,
+    isError,
+    error,
+    refetch: refetchNearby,
+  } = useNearbyStops(loc.lat, loc.lng, 2000);
 
   const onRefresh = useCallback(async () => {
     await refetchNearby();
@@ -157,20 +168,16 @@ export default function NearbyScreen() {
   const { refreshControl } = useRefreshControl(onRefresh);
 
   const stations = useMemo<NearbyStation[]>(() => {
-    if (nearbyStops && nearbyStops.length > 0) {
-      return nearbyStops.slice(0, 8).map((s: any) => ({
-        id: String(s.station_id),
-        name: String(s.station_name).replace(/\s+Station$/i, ""),
-        distance: fmtDistance(Number(s.distance_meters)),
-        fallback: [],
-      }));
-    }
-    return NEARBY_STATIONS.map((s) => ({ id: s.id, name: s.name, distance: s.distance, fallback: s.departures }));
+    if (!nearbyStops?.length) return [];
+    return nearbyStops.slice(0, 8).map((s: { station_id: string; station_name: string; distance_meters: number }) => ({
+      id: String(s.station_id),
+      name: String(s.station_name).replace(/\s+Station$/i, ""),
+      distance: fmtDistance(Number(s.distance_meters)),
+    }));
   }, [nearbyStops]);
 
   const nearest = stations[0];
   const otherStops = nearest ? stations.slice(1) : stations;
-  const usingDemoData = !nearbyStops || nearbyStops.length === 0;
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -178,9 +185,7 @@ export default function NearbyScreen() {
         title="Stops"
         left={
           navigationCanPop(navigation) ? (
-            <Pressable onPress={goBack} style={{ width: MIN_TOUCH, height: MIN_TOUCH, justifyContent: "center" }}>
-              <ChevronLeft size={26} color={c.text} strokeWidth={2.2} />
-            </Pressable>
+            <BackButton variant="plain" onPress={goBack} />
           ) : undefined
         }
       />
@@ -213,7 +218,7 @@ export default function NearbyScreen() {
         </View>
       </View>
 
-      <Page refreshControl={refreshControl}>
+      <Page tabScreen refreshControl={refreshControl}>
         {locationDenied ? (
           <Pressable
             onPress={() => Linking.openSettings()}
@@ -233,38 +238,43 @@ export default function NearbyScreen() {
           </Pressable>
         ) : null}
 
-        {usingDemoData && !isLoading ? (
-          <Txt size={13} color={c.textSecondary} style={{ paddingHorizontal: SPACING.screen, paddingTop: 8 }}>
-            Showing sample stops — start the backend for live nearby data.
-          </Txt>
+        {isError ? (
+          <EmptyState
+            title="Nearby stops unavailable"
+            message={apiErrorMessage(error)}
+          />
         ) : null}
 
         {isLoading && stations.length === 0 ? (
           <DepartureLoadingRows count={5} />
         ) : null}
 
-        {nearest ? <NearestBoard station={nearest} /> : null}
-
-        <SectionHeader title="Nearby stops" />
-        {otherStops.length === 0 && !nearest ? (
+        {!isLoading && !isError && stations.length === 0 ? (
           <EmptyState
             title="No stops found"
             message="Try moving closer to a station or pull to refresh."
           />
-        ) : (
-          <View
-            style={{
-              backgroundColor: c.card,
-              borderTopWidth: 0.5,
-              borderBottomWidth: 0.5,
-              borderColor: c.separator,
-            }}
-          >
-            {otherStops.map((station) => (
-              <StopRow key={station.id} station={station} />
-            ))}
-          </View>
-        )}
+        ) : null}
+
+        {nearest ? <NearestBoard station={nearest} /> : null}
+
+        {otherStops.length > 0 ? (
+          <>
+            <SectionHeader title="Nearby stops" />
+            <View
+              style={{
+                backgroundColor: c.card,
+                borderTopWidth: 0.5,
+                borderBottomWidth: 0.5,
+                borderColor: c.separator,
+              }}
+            >
+              {otherStops.map((station) => (
+                <StopRow key={station.id} station={station} />
+              ))}
+            </View>
+          </>
+        ) : null}
       </Page>
     </View>
   );

@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArrowDown, X } from "lucide-react-native";
 import { Txt } from "../design";
-import { MIN_TOUCH } from "../../constants/design";
+import { MIN_TOUCH, SPACING } from "../../constants/design";
 import type { JourneyRoute } from "../../constants/sampleData";
 import { useColors } from "../../hooks/useColors";
 import {
@@ -30,8 +30,9 @@ function formatPlatform(platform?: string, mode?: string): string | null {
   const p = String(platform || "").trim();
   if (!p || p === "—" || p === "-") return null;
   if (mode === "light_rail" || mode === "lightrail") return null;
-  if (/platform|wharf|stand/i.test(p)) return p;
+  if (/platform|wharf|stand|bay/i.test(p)) return p;
   if (mode === "ferry") return `Wharf ${p}`;
+  if (mode === "bus") return `Stand ${p}`;
   return `Platform ${p}`;
 }
 
@@ -181,7 +182,7 @@ export function TripDetailSheet({
           </Pressable>
         </View>
 
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 24 }}>
+        <ScrollView contentContainerStyle={{ padding: SPACING.cell, paddingBottom: SPACING.section + SPACING.cell }}>
           {legs.length === 0 ? (
             <Txt size={14} color={c.textSecondary}>
               No transit segment available for this trip.
@@ -197,7 +198,7 @@ export function TripDetailSheet({
                   : [leg.originName, leg.destinationName].filter(Boolean);
               const isWalk = leg.mode === "walk";
               const legColor = isWalk ? c.textSecondary : legAccentColor(leg);
-              const route = leg.routeNumber || leg.mode.toUpperCase();
+              const route = String(leg.routeNumber || leg.mode).toUpperCase();
               const prevLeg = legIdx > 0 ? legs[legIdx - 1] : null;
 
               return (
@@ -213,7 +214,7 @@ export function TripDetailSheet({
                     />
                   ) : null}
                   <View style={{ marginBottom: legIdx === legs.length - 1 ? 0 : 4 }}>
-                    <Txt size={13} weight="600" color={legColor} style={{ marginBottom: 8 }}>
+                    <Txt size={13} weight="600" color={legColor} style={{ marginBottom: 4 }}>
                       {isWalk
                         ? `Walk · ${leg.duration} min`
                         : `${legModeLabel(leg.mode, route)} · ${leg.duration} min`}
@@ -221,6 +222,14 @@ export function TripDetailSheet({
                         ? ` · ${formatPlatform(leg.platform, leg.mode)}`
                         : ""}
                     </Txt>
+                    {!isWalk && leg.mode === "bus" && leg.destinationName ? (
+                      <Txt size={12} color={c.textSecondary} style={{ marginBottom: 8 }}>
+                        To {shortStop(leg.destinationName)}
+                        {timeline.length > 2 ? ` · ${timeline.length} stops` : ""}
+                      </Txt>
+                    ) : (
+                      <View style={{ marginBottom: 8 }} />
+                    )}
                     <Txt size={12} color={c.textSecondary} style={{ marginBottom: 8 }}>
                       {formatTripClock(leg.departure)} – {formatTripClock(leg.arrival)}
                     </Txt>

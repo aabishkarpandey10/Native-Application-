@@ -1,16 +1,13 @@
-import { Children, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { Pressable, View, type ViewStyle } from "react-native";
-import { HAIRLINE } from "../../constants/design";
+import { HAIRLINE, LIST_TRANSPORT_SEPARATOR, RADIUS, SPACING } from "../../constants/design";
 import { useColors } from "../../hooks/useColors";
 
 interface GroupedListProps {
   children: ReactNode;
   style?: ViewStyle;
-  /** horizontal margin (defaults to 16; 0 = TripView full-bleed table) */
   inset?: number;
-  /** inset for row separators (defaults to 16; use ~60 when rows have leading icons) */
   separatorInset?: number;
-  /** TripView flat timetable — no rounded corners, edge-to-edge white rows */
   flat?: boolean;
 }
 
@@ -18,8 +15,8 @@ interface GroupedListProps {
 export function GroupedList({
   children,
   style,
-  inset = 16,
-  separatorInset = 16,
+  inset = SPACING.screen,
+  separatorInset = SPACING.screen,
   flat = false,
 }: GroupedListProps) {
   const c = useColors();
@@ -40,7 +37,11 @@ export function GroupedList({
       >
         {items.map((child, i) => (
           <View key={i}>
-            {i > 0 ? <View style={{ height: HAIRLINE, backgroundColor: c.separator, marginLeft: 56 }} /> : null}
+            {i > 0 ? (
+              <View
+                style={{ height: HAIRLINE, backgroundColor: c.separator, marginLeft: LIST_TRANSPORT_SEPARATOR }}
+              />
+            ) : null}
             {child}
           </View>
         ))}
@@ -54,7 +55,7 @@ export function GroupedList({
         {
           marginHorizontal: inset,
           backgroundColor: c.card,
-          borderRadius: 10,
+          borderRadius: RADIUS.card,
           overflow: "hidden",
           borderWidth: HAIRLINE,
           borderColor: c.separator,
@@ -88,6 +89,15 @@ interface CellProps {
   accessibilityLabel?: string;
 }
 
+function flattenRowChildren(children: ReactNode): ReactNode[] {
+  return Children.toArray(children).flatMap((child) => {
+    if (isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment) {
+      return Children.toArray(child.props.children);
+    }
+    return [child];
+  });
+}
+
 /** Single row inside a GroupedList or flat table. */
 export function Cell({ children, onPress, style, minHeight = 56, accessibilityLabel }: CellProps) {
   const c = useColors();
@@ -96,19 +106,23 @@ export function Cell({ children, onPress, style, minHeight = 56, accessibilityLa
       style={[
         {
           minHeight,
-          paddingHorizontal: 16,
+          paddingHorizontal: SPACING.screen,
           paddingVertical: 10,
           flexDirection: "row",
           alignItems: "center",
           backgroundColor: c.card,
+          alignSelf: "stretch",
+          width: "100%",
         },
         style,
       ]}
     >
-      {children}
+      {flattenRowChildren(children)}
     </View>
   );
+
   if (!onPress) return content;
+
   return (
     <Pressable
       onPress={onPress}

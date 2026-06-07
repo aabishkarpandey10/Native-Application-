@@ -1,3 +1,4 @@
+import { getBusLinesForStation } from "./busNetworkData.js";
 import { buildMockStopsForDeparture } from "./stopSequence.js";
 import { SYDNEY_TRANSIT_LINES } from "./sydneyNetworks.js";
 import {
@@ -13,6 +14,7 @@ import {
   hasStationTimetable,
   warmLightRailTimetables,
   warmMetroTimetables,
+  warmBusTimetableIndex,
   rebuildTimetableIndex,
 } from "./timetableLoader.js";
 import {
@@ -23,9 +25,18 @@ import {
   sydneyWallClockToUtc,
   toIsoString,
 } from "./tfnswTime.js";
-import { estimateServiceEndMs } from "./timedStopSequence.js";
+import { buildDepartureStopSequence, estimateServiceEndMs } from "./timedStopSequence.js";
 
-export { warmLightRailTimetables, warmMetroTimetables };
+export { warmLightRailTimetables, warmMetroTimetables, warmBusTimetableIndex };
+
+function isBusRoute(routeNumber, station) {
+  const route = String(routeNumber || "");
+  return (
+    station?.mode === "bus" ||
+    /^\d{1,4}[A-Z]?$/i.test(route) ||
+    /^B\d/i.test(route)
+  );
+}
 
 export function reloadCustomTimetables() {
   stationRowIndexCache.clear();
@@ -134,6 +145,15 @@ function lineMeta(routeNumber, stationId) {
     const hit = metroLines.find((l) => l.route === routeNumber);
     if (hit) return hit;
   }
+  if (isBusRoute(routeNumber, { mode: "bus" })) {
+    const busLines = getBusLinesForStation(stationId);
+    const hit = busLines.find((l) => l.route === routeNumber);
+    if (hit) return hit;
+    return {
+      color: "#00B5EF",
+      name: `Route ${routeNumber}`,
+    };
+  }
   return (
     SYDNEY_TRANSIT_LINES.find((l) => l.route === routeNumber) || {
       color: /^L\d/i.test(routeNumber) ? "#E62B1E" : "#888888",
@@ -159,6 +179,49 @@ export function getDayScheduleRows(stationId, now = new Date(), limit = 5000) {
   }
 
   return out;
+}
+
+/** Last N departures before now (service day only). Fast — binary search on indexed rows. */
+export function getRecentPastScheduleRows(stationId, now = new Date(), limit = 5) {
+  const indexed = getIndexedStationRows(stationId);
+  if (!indexed.length || limit <= 0) return [];
+
+  const cutoffSm = currentServiceMinute(now);
+  const endIdx = firstIndexAtOrAfterServiceMinute(indexed, cutoffSm);
+  const startIdx = Math.max(0, endIdx - limit);
+  const out = [];
+
+  for (let i = startIdx; i < endIdx; i++) {
+    const entry = indexed[i];
+    out.push({
+      row: entry.row,
+      when: whenFromServiceMinute(entry.serviceMinute, now),
+      index: entry.index,
+    });
+  }
+
+  return out;
+}
+
+/** Rows for trip planning: optional recent past + all remaining services until end of day. */
+export function getScheduleRowsForTripPlan(
+  stationId,
+  now = new Date(),
+  { includePast = false, pastLimit = 5, upcomingLimit = 3000 } = {}
+) {
+  const past = includePast ? getRecentPastScheduleRows(stationId, now, pastLimit) : [];
+  const upcoming = getRestOfDayScheduleRows(stationId, now, upcomingLimit);
+  if (!past.length) return upcoming;
+
+  const seen = new Set();
+  const merged = [];
+  for (const entry of [...past, ...upcoming]) {
+    const key = `${entry.row.routeNumber}|${entry.row.destination}|${entry.when.getTime()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(entry);
+  }
+  return merged.sort((a, b) => a.when.getTime() - b.when.getTime());
 }
 
 /** Remaining services from now until end of the Sydney service day (04:00 next day). */
@@ -320,12 +383,39 @@ function scheduledRowsToDepartures(station, stationId, entries, { lite = false }
       ? "light_rail"
       : /^M\d/i.test(route)
         ? "metro"
-        : station?.mode === "metro"
-          ? "metro"
-          : station?.mode === "lightrail" || station?.mode === "light_rail"
-            ? "light_rail"
-            : "train";
+        : isBusRoute(route, station)
+          ? "bus"
+          : station?.mode === "metro"
+            ? "metro"
+            : station?.mode === "lightrail" || station?.mode === "light_rail"
+              ? "light_rail"
+              : "train";
     const line = lineMeta(route, stationId);
+    const timedStops =
+      !lite && buildDepartureStopSequence(station, stationId, row, schedTime);
+    const stops = lite
+      ? [
+          {
+            station_name: station?.name || stationId,
+            time: toIsoString(schedTime),
+          },
+          {
+            station_name: row.destination,
+            time: toIsoString(schedTime),
+          },
+        ]
+      : timedStops?.length >= 2
+        ? timedStops
+        : buildMockStopsForDeparture(
+            station,
+            stationId,
+            row.destination,
+            route,
+            mode,
+            schedTime,
+            schedTime,
+            row
+          );
     return {
       id: `pdf_${route}_${stationId}_${row.scheduledTime.replace(":", "")}_${index}`,
       routeNumber: route,
@@ -338,27 +428,7 @@ function scheduledRowsToDepartures(station, stationId, entries, { lite = false }
       status: "on_time",
       lineColor: line.color,
       lineName: line.name,
-      stops: lite
-        ? [
-            {
-              station_name: station?.name || stationId,
-              time: toIsoString(schedTime),
-            },
-            {
-              station_name: row.destination,
-              time: toIsoString(schedTime),
-            },
-          ]
-        : buildMockStopsForDeparture(
-            station,
-            stationId,
-            row.destination,
-            route,
-            mode,
-            schedTime,
-            schedTime,
-            row
-          ),
+      stops,
     };
   });
 }
@@ -395,7 +465,11 @@ function timetablePayload(station, departures, sourceBase) {
     departures,
     meta: {
       scheduleSource:
-        station?.mode === "metro" ? "transportnsw-gtfs" : "transportnsw-pdf",
+        station?.mode === "bus"
+          ? "transportnsw-gtfs-weekday"
+          : station?.mode === "metro"
+            ? "transportnsw-gtfs"
+            : "transportnsw-pdf",
       dayType: "weekday",
       fullDay: sourceBase.includes("fullday"),
       weekendNote: isSydneyWeekend()
@@ -414,18 +488,24 @@ export function mergeLiveOntoSchedule(scheduled, live) {
   const livePool = [...live];
   const usedLive = new Set();
 
+  const normDest = (value) =>
+    String(value || "")
+      .toLowerCase()
+      .replace(/,\s*(sydney|newcastle|wollongong|parramatta)$/i, "")
+      .replace(/\s+station$/i, "")
+      .trim();
+
   const findLiveMatch = (sched) => {
     const schedMs = parseTfnswTime(sched.scheduledTime).getTime();
+    const schedDest = normDest(sched.destination);
     let best = null;
-    let bestDelta = 8 * 60_000;
+    let bestDelta = 12 * 60_000;
     for (let i = 0; i < livePool.length; i++) {
       if (usedLive.has(i)) continue;
       const lv = livePool[i];
       if (lv.routeNumber !== sched.routeNumber) continue;
-      if (
-        String(lv.destination || "").toLowerCase() !==
-        String(sched.destination || "").toLowerCase()
-      ) {
+      const liveDest = normDest(lv.destination);
+      if (liveDest !== schedDest && !liveDest.includes(schedDest) && !schedDest.includes(liveDest)) {
         continue;
       }
       const liveMs = parseTfnswTime(lv.realTime ?? lv.scheduledTime).getTime();

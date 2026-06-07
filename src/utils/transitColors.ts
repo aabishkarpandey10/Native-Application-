@@ -42,17 +42,21 @@ export function normalizeMode(mode: string): string {
   return m;
 }
 
-export function getTrainLineHex(route?: string): string | undefined {
-  const code = (route || "").toUpperCase();
+export function getTrainLineHex(route?: string | number | null): string | undefined {
+  const code = String(route ?? "").toUpperCase();
   if (!code) return undefined;
   return getTrainLine(code)?.color ?? EXTRA_LINE_HEX[code];
 }
 
-export function getRouteHexColor(mode: string, route?: string, lineColor?: string): string {
+export function getRouteHexColor(
+  mode: string,
+  route?: string | number | null,
+  lineColor?: string
+): string {
   if (lineColor && /^#[0-9A-Fa-f]{6}$/.test(lineColor)) return lineColor;
 
   const m = normalizeMode(mode);
-  const r = (route || "").toUpperCase();
+  const r = String(route ?? "").toUpperCase();
 
   if (m === "train" || /^T\d+$/.test(r) || /^(CCN|BMT|SCO|HUN|SPL)$/.test(r)) {
     return getTrainLineHex(r) ?? getModeColor("train");
@@ -63,9 +67,9 @@ export function getRouteHexColor(mode: string, route?: string, lineColor?: strin
   return getModeColor("bus");
 }
 
-export function getRouteBg(mode: string, route?: string): string {
+export function getRouteBg(mode: string, route?: string | number | null): string {
   const m = normalizeMode(mode);
-  const r = (route || "").toUpperCase();
+  const r = String(route ?? "").toUpperCase();
   if (TRAIN_BG_CLASS[r]) return TRAIN_BG_CLASS[r];
   if (m === "train" || /^T\d+$/.test(r)) return "bg-transit-train";
   if (m === "metro" || r.startsWith("M")) return "bg-transit-metro";

@@ -4,7 +4,9 @@ import { getModeColor } from "../constants/transportModes";
 import { getRouteHexColor } from "./transitColors";
 import { parseTfnswTime } from "./tfnswTime";
 
-export const TRIPVIEW_BLUE = "#0079C1";
+export const BRAND_ACCENT = "#4338CA";
+/** @deprecated Use BRAND_ACCENT */
+export const TRIPVIEW_BLUE = BRAND_ACCENT;
 
 export interface TripLegChip {
   mode: string;
@@ -80,9 +82,9 @@ export function resolveTripDisplayMode(
   return req || "train";
 }
 
-export function legModeLabel(mode: string, route?: string): string {
+export function legModeLabel(mode: string, route?: string | number | null): string {
   const m = normalizeTripMode(mode);
-  const code = route?.trim();
+  const code = String(route ?? "").trim();
   if (m === "light_rail") return code ? `${code} Light Rail` : "Light Rail";
   if (m === "metro") return code ? `${code} Metro` : "Metro";
   if (m === "ferry") return code ? `${code} Ferry` : "Ferry";

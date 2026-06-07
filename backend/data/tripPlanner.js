@@ -312,6 +312,24 @@ export function mergeLiveAndTimetableTrips(liveTrips, timetableTrips, { includeP
   );
 }
 
+/** Fast path for imported timetables — dedupe by departure minute only. */
+export function finalizeTimetableItineraries(itineraries) {
+  const seen = new Set();
+  return (itineraries || [])
+    .map(normalizeItineraryTimes)
+    .filter((it) => !isImplausibleTrainItinerary(it))
+    .filter((it) => {
+      const depMs = parseTfnswTime(it.departureTime).getTime();
+      if (seen.has(depMs)) return false;
+      seen.add(depMs);
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
+    );
+}
+
 /** Rank, de-duplicate, drop confusing alternatives, then list as a timetable. */
 export function finalizeItineraries(itineraries, origin, dest) {
   const plausible = (itineraries || [])
@@ -413,6 +431,17 @@ export function enrichItinerariesWithDirectTrain(itineraries, origin, dest, _dep
 export function buildTripEndpointParams(station, stopId) {
   const lat = station.lat ?? station.latitude;
   const lon = station.lon ?? station.longitude;
+  const resolvedStop = stopId || station.tfnswStopId || station.id;
+  // Bus/light-rail/ferry: TfNSW stop IDs return real stop sequences and times.
+  if (station.mode === "bus" && resolvedStop) {
+    return { type: "stop", name: String(resolvedStop) };
+  }
+  if (
+    (station.mode === "lightrail" || station.mode === "light_rail" || station.mode === "ferry") &&
+    resolvedStop
+  ) {
+    return { type: "stop", name: String(resolvedStop) };
+  }
   // Coordinates anchor train trip planning to the station location more reliably than parent stop IDs.
   if (station.mode === "train" && lat != null && lon != null) {
     return { type: "coord", name: `${lon}:${lat}:EPSG:4326` };
