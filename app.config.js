@@ -56,6 +56,10 @@ module.exports = () => {
     extra: {
       ...appJson.expo.extra,
       apiUrl,
+      eas: {
+        ...(appJson.expo.extra?.eas ?? {}),
+        buildProfile: buildProfile || undefined,
+      },
     },
   };
 };

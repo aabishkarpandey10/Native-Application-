@@ -49,6 +49,12 @@ export function getBackendUrl(): string {
   return getApiBaseUrl();
 }
 
+/** Build full URL for a backend path (used by asset helpers). */
+export function buildApiUrl(path: string): string {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${getApiBaseUrl()}${normalizedPath}`;
+}
+
 export function isApiDebugLoggingEnabled(): boolean {
   return __DEV__ || process.env.EXPO_PUBLIC_API_DEBUG === "true";
 }
@@ -85,6 +91,61 @@ export type FetchBackendOptions = RequestInit & {
   /** When false, returns null instead of throwing (optional endpoints only). */
   throwOnError?: boolean;
 };
+
+export async function fetchBackendRaw(
+  path: string,
+  init?: FetchBackendOptions
+): Promise<Response | null> {
+  const { timeoutMs = 12_000, throwOnError = true, ...requestInit } = init ?? {};
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${getApiBaseUrl()}${normalizedPath}`;
+  const method = (requestInit.method ?? "GET").toUpperCase();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  logApiSuccess(`→ ${method} ${normalizedPath}`, { url });
+
+  const fail = (message: string, details: { status?: number; responseBody?: string }) => {
+    const hint = networkHint(url, message);
+    logApiFailure(`✗ ${method} ${normalizedPath}: ${message}`, {
+      url,
+      status: details.status,
+      hint,
+      body: details.responseBody?.slice(0, 400),
+    });
+    if (!throwOnError) return null;
+    throw new ApiRequestError(message, {
+      status: details.status,
+      path: normalizedPath,
+      url,
+      responseBody: details.responseBody,
+      hint,
+    });
+  };
+
+  try {
+    const res = await fetch(url, {
+      ...requestInit,
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const responseBody = await res.text().catch(() => "");
+      return fail(`HTTP ${res.status}`, { status: res.status, responseBody }) as null;
+    }
+
+    logApiSuccess(`← ${method} ${normalizedPath} ${res.status}`);
+    return res;
+  } catch (err) {
+    if ((err as Error).name === "AbortError") {
+      return fail(`Timed out after ${timeoutMs}ms`, {}) as null;
+    }
+    if (err instanceof ApiRequestError) throw err;
+    return fail((err as Error).message || "Network request failed", {}) as null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 export async function fetchBackendJson<T>(
   path: string,

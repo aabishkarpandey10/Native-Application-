@@ -1,5 +1,5 @@
 import { Platform } from "react-native";
-import { getBackendUrl } from "./apiClient";
+import { fetchBackendRaw } from "./apiClient";
 import { ServiceAlert } from "./tfnsw";
 import { SavedStation } from "../store/store";
 import type { AssistantLiveBoard } from "../types/assistantLive";
@@ -56,20 +56,15 @@ export async function askAssistant(
   try {
     options?.onStatus?.("Fetching live data");
 
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
-
-    const res = await fetch(`${getBackendUrl()}/api/ai/chat`, {
+    const res = await fetchBackendRaw("/api/ai/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body,
-      signal: controller.signal,
+      timeoutMs: AI_TIMEOUT_MS,
+      throwOnError: false,
     });
 
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      console.warn("AI backend returned", res.status);
+    if (!res) {
       return { text: buildOfflineFallback(userMessage, context) };
     }
 

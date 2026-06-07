@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AppConfig } from "../types/appConfig";
-import { getBackendUrl } from "./apiClient";
+import { ApiRequestError, fetchBackendJson } from "./apiClient";
 
 const TOKEN_KEY = "admin_token";
 
@@ -29,17 +29,28 @@ export interface AdminAlert {
 
 async function adminFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await AsyncStorage.getItem(TOKEN_KEY);
-  const res = await fetch(`${getBackendUrl()}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(init?.headers as Record<string, string>),
-    },
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as { error?: string }).error || "Request failed");
-  return data as T;
+  try {
+    const data = await fetchBackendJson<T>(path, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(init?.headers as Record<string, string>),
+      },
+    });
+    if (data === null) throw new Error("Request failed");
+    return data;
+  } catch (err) {
+    if (err instanceof ApiRequestError && err.responseBody) {
+      try {
+        const parsed = JSON.parse(err.responseBody) as { error?: string };
+        if (parsed.error) throw new Error(parsed.error);
+      } catch (parseErr) {
+        if (parseErr instanceof Error && parseErr.message !== (err as Error).message) throw parseErr;
+      }
+    }
+    throw err;
+  }
 }
 
 export async function adminLogin(password: string): Promise<void> {

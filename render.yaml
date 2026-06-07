@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: sydney-transit-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: ALLOW_MOCK_DATA
+        value: "false"
+      - key: API_REQUEST_LOG
+        value: "false"
+      - key: ENABLE_ADMIN
+        value: "false"
+      - key: TFNSW_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PUBLIC_URL
+        sync: false
+      - key: CORS_ORIGIN
+        value: "*"

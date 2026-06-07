@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getBackendUrl } from "../services/apiClient";
+import { fetchBackendJson } from "../services/apiClient";
 import type { AssistantLiveBoard } from "../types/assistantLive";
 import type { SavedStation } from "../store/store";
 
@@ -16,9 +16,11 @@ export function useAssistantLiveBoard(
         lng: String(lng ?? 151.2093),
         favorites: JSON.stringify(favorites.slice(0, 6)),
       });
-      const res = await fetch(`${getBackendUrl()}/api/ai/live-board?${params}`);
-      if (!res.ok) throw new Error("Live board unavailable");
-      return res.json();
+      const data = await fetchBackendJson<AssistantLiveBoard>(
+        `/api/ai/live-board?${params}`
+      );
+      if (!data) throw new Error("Live board unavailable");
+      return data;
     },
     enabled: true,
     refetchInterval: 30_000,

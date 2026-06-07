@@ -10,7 +10,15 @@ dotenv.config({ path: join(rootDir, "backend/.env"), override: true });
 
 export const config = {
   port: Number(process.env.PORT) || 3000,
+  host: process.env.HOST || "0.0.0.0",
   nodeEnv: process.env.NODE_ENV || "development",
+  publicUrl: process.env.PUBLIC_URL?.trim() || "",
+  cors: {
+    origins: (process.env.CORS_ORIGIN || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+  },
   /** Demo timetables — off by default; set ALLOW_MOCK_DATA=true for local offline dev only. */
   allowMockData: process.env.ALLOW_MOCK_DATA === "true",
   logRequests: process.env.API_REQUEST_LOG === "true",
@@ -51,4 +59,29 @@ export function isTfnswKeyConfigured() {
   if (!key || key.length <= 5) return false;
   if (/placeholder|your_tfnsw|example|changeme/i.test(key)) return false;
   return true;
+}
+
+const INSECURE_JWT_SECRETS = new Set([
+  "tripview-dev-secret-change-in-production",
+  "change-me-in-production-min-32-chars",
+]);
+
+/** Run at startup — throws in production when critical secrets are missing. */
+export function validateProductionConfig() {
+  const warnings = [];
+  const errors = [];
+
+  if (config.nodeEnv === "production") {
+    if (INSECURE_JWT_SECRETS.has(config.auth.jwtSecret)) {
+      errors.push("Set JWT_SECRET to a unique random string (min 32 chars) in production");
+    }
+    if (!isTfnswKeyConfigured()) {
+      warnings.push("TFNSW_API_KEY is missing or placeholder — live departures will fail");
+    }
+    if (config.redis.enabled && /localhost|127\.0\.0\.1/i.test(config.redis.url)) {
+      warnings.push("REDIS_URL points to localhost — use a hosted Redis URL in production");
+    }
+  }
+
+  return { warnings, errors };
 }

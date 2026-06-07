@@ -1,6 +1,6 @@
 import type { ImageSource } from "expo-image";
 import type { AppConfig } from "../types/appConfig";
-import { getBackendUrl } from "../services/apiClient";
+import { buildApiUrl } from "../services/apiClient";
 
 const BUNDLED_MAP = require("@/assets/images/sydney-metropolitan-rail-map.jpg");
 
@@ -27,9 +27,8 @@ export function sanitizeNetworkMapUrl(raw: string | null | undefined): string {
 }
 
 function uploadedMapUri(config: AppConfig, cacheKey: string): ImageSource {
-  const base = getBackendUrl().replace(/\/$/, "");
   return {
-    uri: `${base}/api/network-map?v=${encodeURIComponent(cacheKey)}`,
+    uri: buildApiUrl(`/api/network-map?v=${encodeURIComponent(cacheKey)}`),
   };
 }
 

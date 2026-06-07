@@ -18,12 +18,14 @@ services:
       - .env
     environment:
       PORT: 3000
+      HOST: 0.0.0.0
       NODE_ENV: production
+      JWT_SECRET: ${DOCKER_JWT_SECRET:-sydney-transit-docker-runtime-secret-min-32c}
     volumes:
       - api-data:/app/backend/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       interval: 15s
       timeout: 5s
       retries: 3

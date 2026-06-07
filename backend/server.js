@@ -1,6 +1,6 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
+import { createCorsMiddleware } from "./src/middlewares/cors.js";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { buildAiChatResponse, streamAiChatResponse } from "./aiHandler.js";
@@ -29,7 +29,7 @@ import { createV1Router } from "./src/routes/v1/index.js";
 import { initCache } from "./src/services/cache.service.js";
 import { attachWebSocket } from "./src/websocket/gateway.js";
 import { apiRateLimit } from "./src/middlewares/rateLimit.js";
-import { config, isTfnswKeyConfigured } from "./src/config/index.js";
+import { config, isTfnswKeyConfigured, validateProductionConfig } from "./src/config/index.js";
 import { registerAdminRoutes } from "./adminRoutes.js";
 import { testTfnswConnection } from "./src/services/tfnswIngestion.service.js";
 import {
@@ -45,8 +45,10 @@ dotenv.config({ path: join(__dirname, ".env"), override: true });
 
 const app = express();
 const PORT = config.port;
+const HOST = config.host;
 
-app.use(cors());
+app.set("trust proxy", 1);
+app.use(createCorsMiddleware());
 app.use(express.json({ limit: "25mb" }));
 app.use(apiRateLimit);
 
@@ -379,7 +381,15 @@ if (adminEnabled) {
   console.log("[Admin] Disabled in production (set ENABLE_ADMIN=true to enable)");
 }
 
-const server = app.listen(PORT, "0.0.0.0", async () => {
+const productionCheck = validateProductionConfig();
+for (const w of productionCheck.warnings) console.warn(`[config] ${w}`);
+for (const e of productionCheck.errors) console.error(`[config] ${e}`);
+if (productionCheck.errors.length && config.nodeEnv === "production") {
+  console.error("Refusing to start with invalid production configuration.");
+  process.exit(1);
+}
+
+const server = app.listen(PORT, HOST, async () => {
   try {
     const { warmLightRailTimetables, warmMetroTimetables, warmBusTimetableIndex } =
       await import("./data/timetableLoader.js");
@@ -404,10 +414,9 @@ const server = app.listen(PORT, "0.0.0.0", async () => {
   } catch (e) {
     console.warn("Light rail timetable preload skipped:", e.message);
   }
-  console.log(`Sydney Transit Backend Proxy running on port ${PORT}`);
-  console.log(`REST v1: http://localhost:${PORT}/api/v1/status`);
-  console.log(`WebSocket: ws://localhost:${PORT}/ws/v1`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin`);
+  console.log(`Sydney Transit Backend Proxy running on ${HOST}:${PORT}`);
+  if (config.publicUrl) console.log(`Public URL: ${config.publicUrl}`);
+  console.log(`Health: /api/health`);
   if (isTfnswKeyConfigured()) {
     const live = await testTfnswConnection();
     console.log(

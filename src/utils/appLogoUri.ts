@@ -1,6 +1,6 @@
 import type { ImageSource } from "expo-image";
 import type { AppConfig } from "../types/appConfig";
-import { getBackendUrl } from "../services/apiClient";
+import { buildApiUrl } from "../services/apiClient";
 
 const BUNDLED_LOGO = require("@/assets/icon.png");
 
@@ -27,9 +27,8 @@ export function sanitizeAppLogoUrl(raw: string | null | undefined): string {
 }
 
 function uploadedLogoUri(cacheKey: string): ImageSource {
-  const base = getBackendUrl().replace(/\/$/, "");
   return {
-    uri: `${base}/api/app-logo?v=${encodeURIComponent(cacheKey)}`,
+    uri: buildApiUrl(`/api/app-logo?v=${encodeURIComponent(cacheKey)}`),
   };
 }
 
