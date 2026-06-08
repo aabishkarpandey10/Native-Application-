@@ -1,6 +1,8 @@
 # API only — use with: npm run docker:api
 # Pair with local Expo: npx expo start --web --port 8085
 
+name: sydney-transit-api
+
 services:
   api:
     build:
@@ -15,8 +17,11 @@ services:
       PORT: 3000
       HOST: 0.0.0.0
       NODE_ENV: production
-      # Override placeholder JWT from .env so production validation passes in local Docker
+      ENABLE_ADMIN: ${ENABLE_ADMIN:-true}
+      ALLOW_MOCK_DATA: ${ALLOW_MOCK_DATA:-false}
       JWT_SECRET: ${DOCKER_JWT_SECRET:-sydney-transit-docker-runtime-secret-min-32c}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
     volumes:
       - api-data:/app/backend/data
     restart: unless-stopped
@@ -25,7 +30,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
-      start_period: 25s
+      start_period: 30s
 
 volumes:
   api-data:

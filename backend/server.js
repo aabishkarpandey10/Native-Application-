@@ -1,47 +1,45 @@
-import express from "express";
 import dotenv from "dotenv";
-import { createCorsMiddleware } from "./src/middlewares/cors.js";
-import { fileURLToPath } from "url";
+import express from "express";
 import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import { registerAdminRoutes } from "./adminRoutes.js";
 import { buildAiChatResponse, streamAiChatResponse } from "./aiHandler.js";
-import { fetchStationDepartures } from "./data/departuresService.js";
-import { normalizeStationId } from "./data/stationAliases.js";
-import { getDeparturesWithCache } from "./src/services/tfnswIngestion.service.js";
-import { enrichAiContext } from "./data/aiLiveContext.js";
-import { buildLiveBoardByMode } from "./data/aiLiveBoard.js";
-import {
-  getCoreStations,
-  getStationById,
-  nearbyBusStops,
-  resolveStationsForApi,
-} from "./data/stationRegistry.js";
-import { getLinesForStation, SYDNEY_TRAIN_LINES, LINE_STATION_IDS } from "./data/sydneyNetworks.js";
-import { formatItdDateTime, resolveTfnswStopId } from "./data/tfnswHelpers.js";
-import { parseTfnswTime, toIsoString } from "./data/tfnswTime.js";
-import { rankNearbyStations } from "./data/nearby.js";
-import { buildLineStopSequence } from "./data/stopSequence.js";
-import { planTripsForStations, parseTripPlannerQuery } from "./data/tripPlanCore.js";
-import { buildMockTripItineraries } from "./data/tripPlanMock.js";
 import { getAppConfig, getStations } from "./data/adminStore.js";
+import { buildLiveBoardByMode } from "./data/aiLiveBoard.js";
+import { enrichAiContext } from "./data/aiLiveContext.js";
 import { getServiceAlerts } from "./data/alertsService.js";
+import { rankNearbyStations } from "./data/nearby.js";
+import { normalizeStationId } from "./data/stationAliases.js";
+import {
+  nearbyBusStops,
+  resolveStationsForApi
+} from "./data/stationRegistry.js";
+import { LINE_STATION_IDS, SYDNEY_TRAIN_LINES } from "./data/sydneyNetworks.js";
+import { parseTripPlannerQuery, planTripsForStations } from "./data/tripPlanCore.js";
+import { buildMockTripItineraries } from "./data/tripPlanMock.js";
 import { getLiveVehicles } from "./data/vehiclesService.js";
+import {
+  config,
+  isAdminEnabled,
+  isTfnswKeyConfigured,
+  validateProductionConfig,
+} from "./src/config/index.js";
+import { createCorsMiddleware } from "./src/middlewares/cors.js";
+import { apiRateLimit } from "./src/middlewares/rateLimit.js";
 import { createV1Router } from "./src/routes/v1/index.js";
 import { initCache } from "./src/services/cache.service.js";
-import { attachWebSocket } from "./src/websocket/gateway.js";
-import { apiRateLimit } from "./src/middlewares/rateLimit.js";
-import { config, isTfnswKeyConfigured, validateProductionConfig } from "./src/config/index.js";
-import { registerAdminRoutes } from "./adminRoutes.js";
-import { testTfnswConnection } from "./src/services/tfnswIngestion.service.js";
 import {
   registerPushToken,
   unregisterPushToken,
 } from "./src/services/notifications.service.js";
+import { getDeparturesWithCache, testTfnswConnection } from "./src/services/tfnswIngestion.service.js";
+import { attachWebSocket } from "./src/websocket/gateway.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "..");
 // Root .env (from .env.example) then backend/.env overrides
 dotenv.config({ path: join(rootDir, ".env") });
-dotenv.config({ path: join(__dirname, ".env"), override: true });
+dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 const PORT = config.port;
@@ -113,6 +111,7 @@ async function buildHealthPayload() {
     scheduleSource: tfnswLive ? "transportnsw.info" : "local-timetable",
     openaiConfigured: !!(process.env.OPENAI_API_KEY?.trim()),
     allowMockData: config.allowMockData,
+    adminEnabled: isAdminEnabled(),
     port: PORT,
   };
 }
@@ -371,14 +370,10 @@ app.post("/api/ai/chat", async (req, res) => {
   }
 });
 
-const adminEnabled =
-  process.env.ENABLE_ADMIN === "true" ||
-  (process.env.NODE_ENV !== "production" && process.env.ENABLE_ADMIN !== "false");
-
-if (adminEnabled) {
-  registerAdminRoutes(app, { rootDir, __dirname });
+if (isAdminEnabled()) {
+  registerAdminRoutes(app, { __dirname });
 } else {
-  console.log("[Admin] Disabled in production (set ENABLE_ADMIN=true to enable)");
+  console.log("[Admin] Disabled — set ENABLE_ADMIN=true in .env to enable");
 }
 
 const productionCheck = validateProductionConfig();
@@ -417,6 +412,9 @@ const server = app.listen(PORT, HOST, async () => {
   console.log(`Sydney Transit Backend Proxy running on ${HOST}:${PORT}`);
   if (config.publicUrl) console.log(`Public URL: ${config.publicUrl}`);
   console.log(`Health: /api/health`);
+  if (isAdminEnabled()) {
+    console.log(`Admin:  http://127.0.0.1:${PORT}/admin (password from ADMIN_PASSWORD in .env)`);
+  }
   if (isTfnswKeyConfigured()) {
     const live = await testTfnswConnection();
     console.log(

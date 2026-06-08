@@ -36,6 +36,7 @@ backend/.env
 backend/data/app-data.json
 backend/data/uploads/
 .env*.local
+.env*.example
 
 # typescript
 *.tsbuildinfo

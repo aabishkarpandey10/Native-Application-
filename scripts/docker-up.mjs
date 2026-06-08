@@ -177,18 +177,19 @@ if (args.includes("--api-only")) {
   console.log(`
 ✓ API container running
   http://localhost:3000/api/health
-  http://localhost:3000/admin
+  http://localhost:3000/admin  (password: ADMIN_PASSWORD in .env)
 
 Run Expo locally: npx expo start --web --port 8085
 `);
 } else {
   console.log(`
 ✓ Stack running
-  App:   http://localhost:8085
-  API:   http://localhost:3000
-  Admin: http://localhost:3000/admin
+  App:   http://localhost:8085        (web + proxied API)
+  Admin: http://localhost:8085/admin  (password: ADMIN_PASSWORD in .env)
+  API:   http://localhost:3000/api/health  (direct, optional)
 
 Logs: npm run docker:logs
 Stop: npm run docker:down
+Rebuild: npm run docker:build && npm run docker:up
 `);
 }

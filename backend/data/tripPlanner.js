@@ -271,45 +271,45 @@ function isImplausibleTrainItinerary(itinerary) {
   return false;
 }
 
-/** Prefer TfNSW live trips; add PDF timetable only for past services or when live is empty. */
+/** Prefer TfNSW live trips; PDF timetable is used only when live is unavailable. */
 export function mergeLiveAndTimetableTrips(liveTrips, timetableTrips, { includePast = false } = {}) {
   const live = (liveTrips || []).map((it) => ({ ...it, isLive: true }));
+  if (live.length) {
+    return live
+      .map(normalizeItineraryTimes)
+      .sort(
+        (a, b) =>
+          parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
+      );
+  }
+
   const timetable = (timetableTrips || []).map((it) => ({
     ...it,
     isLive: false,
   }));
-
-  if (!live.length) return timetable.map(normalizeItineraryTimes);
-  if (!timetable.length) return live.map(normalizeItineraryTimes);
+  if (!timetable.length) return [];
 
   const now = Date.now();
-  const liveDepartureMs = new Set(
-    live.map((it) => parseTfnswTime(it.departureTime).getTime())
-  );
-
-  const timetableExtras = timetable.filter((it) => {
-    if (isImplausibleTrainItinerary(it)) return false;
-    const depMs = parseTfnswTime(it.departureTime).getTime();
-    if (!includePast && depMs < now - 3 * 60_000) return false;
-    if (includePast) {
-      const legs = it.legs || [];
-      const lastLeg = legs[legs.length - 1];
-      const arrMs = lastLeg?.arrivalTime
-        ? parseTfnswTime(lastLeg.arrivalTime).getTime()
-        : parseTfnswTime(it.arrivalTime).getTime();
-      if (arrMs < now - 5 * 60_000) return false;
-    }
-    for (const liveMs of liveDepartureMs) {
-      if (Math.abs(depMs - liveMs) < 5 * 60_000) return false;
-    }
-    return true;
-  });
-
-  const merged = [...live, ...timetableExtras].map(normalizeItineraryTimes);
-  return merged.sort(
-    (a, b) =>
-      parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
-  );
+  return timetable
+    .filter((it) => {
+      if (isImplausibleTrainItinerary(it)) return false;
+      const depMs = parseTfnswTime(it.departureTime).getTime();
+      if (!includePast && depMs < now - 3 * 60_000) return false;
+      if (includePast) {
+        const legs = it.legs || [];
+        const lastLeg = legs[legs.length - 1];
+        const arrMs = lastLeg?.arrivalTime
+          ? parseTfnswTime(lastLeg.arrivalTime).getTime()
+          : parseTfnswTime(it.arrivalTime).getTime();
+        if (arrMs < now - 5 * 60_000) return false;
+      }
+      return true;
+    })
+    .map(normalizeItineraryTimes)
+    .sort(
+      (a, b) =>
+        parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
+    );
 }
 
 /** Fast path for imported timetables — dedupe by departure minute only. */

@@ -5,7 +5,7 @@ export const FEATURES = {
    * Set EXPO_PUBLIC_ENABLE_ADMIN=true for operator builds, then unlock via
    * Settings → tap Version 7×. Default operator UI is the web panel at /admin.
    */
-  admin: process.env.EXPO_PUBLIC_ENABLE_ADMIN === "true",
+  admin: __DEV__ || process.env.EXPO_PUBLIC_ENABLE_ADMIN === "true",
   /** AI assistant screen */
   assistant:
     __DEV__ || process.env.EXPO_PUBLIC_ENABLE_ASSISTANT === "true",

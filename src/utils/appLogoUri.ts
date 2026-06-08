@@ -2,7 +2,8 @@ import type { ImageSource } from "expo-image";
 import type { AppConfig } from "../types/appConfig";
 import { buildApiUrl } from "../services/apiClient";
 
-const BUNDLED_LOGO = require("@/assets/icon.png");
+/** Same asset as app.json icon — train mark on branded background. */
+export const BUNDLED_APP_LOGO = require("@/assets/images/icon.png");
 
 /** Direct image URLs only — blocks search pages and other non-image links. */
 export function sanitizeAppLogoUrl(raw: string | null | undefined): string {
@@ -33,7 +34,7 @@ function uploadedLogoUri(cacheKey: string): ImageSource {
 }
 
 export function resolveAppLogoImageSource(config: AppConfig | null | undefined): ImageSource {
-  if (config?.appLogoHasUpload || config?.appLogoUpdatedAt) {
+  if (config?.appLogoHasUpload) {
     const v = config.appLogoUpdatedAt ?? "upload";
     return uploadedLogoUri(v);
   }
@@ -41,11 +42,11 @@ export function resolveAppLogoImageSource(config: AppConfig | null | undefined):
   const url = sanitizeAppLogoUrl(config?.appLogoUrl);
   if (url) return { uri: url };
 
-  return BUNDLED_LOGO;
+  return BUNDLED_APP_LOGO;
 }
 
 export function appLogoSourceLabel(config: AppConfig | null | undefined): string {
-  if (config?.appLogoHasUpload || config?.appLogoUpdatedAt) return "Uploaded logo";
+  if (config?.appLogoHasUpload) return "Uploaded logo";
   if (sanitizeAppLogoUrl(config?.appLogoUrl)) return "Custom URL";
   return "Default app icon";
 }

@@ -155,7 +155,7 @@ export function TripResultRow({
             <>
               <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: SEMANTIC.success }} />
               <Txt size={12} weight="600" color={SEMANTIC.success}>
-                Live from Transport NSW
+                On Time
               </Txt>
             </>
           ) : onTime && !isPast ? (

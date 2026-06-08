@@ -171,13 +171,13 @@ export async function planTripsForStations(
         })) || []
       : [];
 
-    const timetableSupplement = planTripsFromTimetable(
-      origin,
-      dest,
-      planDate,
-      REST_OF_DAY_TRIP_CAP,
-      { includePast: true, fullDay: true, fastMode: true }
-    );
+    const timetableSupplement = liveItineraries.length
+      ? []
+      : planTripsFromTimetable(origin, dest, planDate, REST_OF_DAY_TRIP_CAP, {
+          includePast: true,
+          fullDay: true,
+          fastMode: true,
+        });
 
     const merged = mergeLiveAndTimetableTrips(liveItineraries, timetableSupplement, {
       includePast: true,
@@ -189,13 +189,11 @@ export async function planTripsForStations(
         : finalizeTimetableItineraries(timetableSupplement),
       meta: {
         source: liveItineraries.length
-          ? timetableSupplement.length
-            ? "tfnsw-live+timetable-fullday"
-            : "tfnsw-live"
+          ? "tfnsw-live"
           : timetableSupplement.length
             ? "timetable-fullday"
             : "none",
-        scheduleSource: "transportnsw.info",
+        scheduleSource: liveItineraries.length ? "transportnsw.info" : "timetable-pdf",
         fullDay: true,
       },
     };

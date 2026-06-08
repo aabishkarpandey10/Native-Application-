@@ -32,22 +32,22 @@ function sourceLabel(source: string | null | undefined, isError: boolean): strin
     return "Weekday PDF timetable · live board preferred on weekends";
   }
   if (source === "tfnsw-live-fullday") {
-    return "Full day timetable · live times from Transport NSW";
+    return "Full day · live times";
   }
   if (source === "tfnsw-live+timetable-fullday" || source === "tfnsw-live+timetable-pdf-fullday") {
-    return "Full day · Transport NSW live + scheduled times";
+    return "Full day · live times";
   }
   if (source === "tfnsw-live+timetable-gtfs-fullday") {
-    return "Full day · Transport NSW + GTFS timetable";
+    return "Full day · live times";
   }
   if (source === "timetable-pdf-fullday") {
     return "Full day timetable · Transport NSW";
   }
   if (source === "timetable-pdf") return "Scheduled weekday times · PDF timetable";
   if (source === "tfnsw-live+timetable-pdf") {
-    return "Live + scheduled timetable · Transport NSW";
+    return "Live departures";
   }
-  if (source === "tfnsw-live" || source === "live" || source === "tfnsw") return "Live departures · TfNSW";
+  if (source === "tfnsw-live" || source === "live" || source === "tfnsw") return "Live departures";
   if (source === "cached") return "Cached departures · offline";
   if (source === "mock" || source === "mock-fallback") {
     return "Demo data blocked — configure live API on the server";

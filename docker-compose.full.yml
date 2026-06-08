@@ -1,6 +1,8 @@
 # Full production stack: API + Web + Postgres + Redis + RabbitMQ
 # Usage: docker compose -f docker-compose.full.yml up -d
 
+name: sydney-transit-full
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -59,7 +61,13 @@ services:
       - .env
     environment:
       PORT: 3000
+      HOST: 0.0.0.0
       NODE_ENV: production
+      ENABLE_ADMIN: ${ENABLE_ADMIN:-true}
+      ALLOW_MOCK_DATA: ${ALLOW_MOCK_DATA:-false}
+      JWT_SECRET: ${DOCKER_JWT_SECRET:-sydney-transit-docker-runtime-secret-min-32c}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8085}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
       REDIS_ENABLED: "true"
       REDIS_URL: redis://redis:6379
       DATABASE_URL: postgresql://tripview:tripview_dev@postgres:5432/tripview
@@ -75,7 +83,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       interval: 15s
       timeout: 5s
       retries: 3
@@ -86,7 +94,14 @@ services:
       context: .
       dockerfile: Dockerfile.web
       args:
-        EXPO_PUBLIC_API_URL: ${EXPO_PUBLIC_API_URL:-http://localhost:3000}
+        EXPO_PUBLIC_API_SAME_ORIGIN: "true"
+        EXPO_PUBLIC_API_URL: ""
+        EXPO_PUBLIC_SUPABASE_URL: ${EXPO_PUBLIC_SUPABASE_URL:-}
+        EXPO_PUBLIC_SUPABASE_ANON_KEY: ${EXPO_PUBLIC_SUPABASE_ANON_KEY:-}
+        EXPO_PUBLIC_SENTRY_DSN: ${EXPO_PUBLIC_SENTRY_DSN:-}
+        EXPO_PUBLIC_ENABLE_ADMIN: ${EXPO_PUBLIC_ENABLE_ADMIN:-true}
+        EXPO_PUBLIC_ENABLE_ASSISTANT: ${EXPO_PUBLIC_ENABLE_ASSISTANT:-false}
+        EXPO_PUBLIC_API_DEBUG: ${EXPO_PUBLIC_API_DEBUG:-false}
     container_name: tripview-web
     ports:
       - "${WEB_PORT:-8085}:80"
@@ -94,6 +109,12 @@ services:
       api:
         condition: service_healthy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 volumes:
   pg-data:

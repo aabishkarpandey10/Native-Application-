@@ -13,6 +13,7 @@ import { MIN_TOUCH, ROW_ICON_SIZE, SPACING } from "../constants/design";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useRefreshAppConfigOnFocus } from "../hooks/useRefreshAppConfigOnFocus";
 import { useColors } from "../hooks/useColors";
+import { buildApiUrl } from "../services/apiClient";
 import { useStore } from "../store/store";
 
 const iconSlot: ViewStyle = {
@@ -124,6 +125,11 @@ export default function SettingsScreen() {
           </Txt>
         </View>
         <GroupedList>
+          <ListRow
+            label="Admin panel"
+            value="Web"
+            onPress={() => Linking.openURL(buildApiUrl("/admin"))}
+          />
           <ListRow
             label="Version"
             value={version}

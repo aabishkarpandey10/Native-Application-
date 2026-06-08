@@ -10,4 +10,9 @@ if (!existsSync(join(backendDir, "package.json"))) {
   process.exit(1);
 }
 
-execSync("npm install", { cwd: backendDir, stdio: "inherit" });
+const hasLockfile = existsSync(join(backendDir, "package-lock.json"));
+const isProduction = process.env.NODE_ENV === "production";
+const installCmd =
+  isProduction && hasLockfile ? "npm ci --omit=dev" : "npm install";
+
+execSync(installCmd, { cwd: backendDir, stdio: "inherit" });

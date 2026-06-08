@@ -10,6 +10,17 @@ import { trainOnlyTripSummary, transitLegs } from "./tripLegs";
 
 export { formatClock };
 
+export function tripIsLiveItinerary(t: TripItinerary): boolean {
+  return t.isLive === true || String(t.id || "").startsWith("real_trip_");
+}
+
+/** When TfNSW live trips exist, drop PDF/GTFS scheduled-only rows. */
+export function preferLiveTrips(list: TripItinerary[] | null | undefined): TripItinerary[] {
+  if (!list?.length) return [];
+  const live = list.filter(tripIsLiveItinerary);
+  return live.length ? live : list;
+}
+
 function asDate(value: string | Date | number | null | undefined): Date {
   if (value instanceof Date) return value;
   return parseTfnswTime(value);

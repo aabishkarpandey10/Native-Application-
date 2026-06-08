@@ -8,7 +8,6 @@
     "@supabase/supabase-js": "^2.106.1",
     "@tanstack/react-query": "^5.100.14",
     "adm-zip": "^0.5.17",
-    "dist": "^0.1.2",
     "expo": "^54.0.35",
     "expo-blur": "~15.0.8",
     "expo-build-properties": "~1.0.10",
@@ -58,7 +57,7 @@
     "tailwindcss": "^3.4.19"
   },
   "scripts": {
-    "start": "expo start",
+    "start": "node backend/server.js",
     "setup:env": "node scripts/setup-env.mjs",
     "prebackend": "node scripts/setup-env.mjs",
     "postinstall": "node scripts/install-backend.mjs",
@@ -66,6 +65,7 @@
     "backend:stop": "node scripts/stop-backend.js",
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/setup-env.mjs && node scripts/install-backend.mjs && npx tsc --noEmit && npx expo export --platform web && node scripts/patch-web-dist.mjs",
+    "build:api": "node scripts/install-backend.mjs && cd backend && npm run build",
     "build:all": "npm run setup:env && npm run build && node --check backend/server.js",
     "prebuild:native": "expo prebuild --clean",
     "build:android": "eas build --platform android --profile preview --non-interactive",
@@ -112,10 +112,16 @@
     "docker:up": "node scripts/docker-up.mjs",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
+    "docker:full": "docker compose -f docker-compose.full.yml up --build -d",
+    "docker:full:down": "docker compose -f docker-compose.full.yml down",
     "docker:api": "node scripts/docker-up.mjs --api-only",
     "docker:api:build": "docker compose -f docker-compose.api.yml build",
     "docker:check": "node scripts/docker-check.mjs",
     "docker:repair": "node scripts/docker-repair.mjs"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "postcss": "^8.5.10",
+    "uuid": "^11.1.1"
+  }
 }

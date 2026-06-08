@@ -246,6 +246,25 @@ async function fetchStationDeparturesInner(
 
   const liveCount = liveResult?.departures?.length ?? 0;
 
+  if (liveCount > 0) {
+    liveResult.departures = filterActiveDepartures(liveResult.departures, now, {
+      stationId,
+      fullDay,
+    });
+    if (liveResult.departures.length > 0) {
+      return finish({
+        ...liveResult,
+        source: fullDay ? "tfnsw-live-fullday" : "tfnsw-live",
+        meta: {
+          ...(liveResult.meta || {}),
+          scheduleSource: "transportnsw.info",
+          fullDay: fullDay || undefined,
+          syncedAt: now.toISOString(),
+        },
+      });
+    }
+  }
+
   if (pdfAvailable) {
     const pdf = fullDay
       ? buildFullDayDeparturesPayload(station, stationId, 3000)

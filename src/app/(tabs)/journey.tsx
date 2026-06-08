@@ -15,7 +15,7 @@ import { useColors } from "../../hooks/useColors";
 import { useAppConfig } from "../../hooks/useAppConfig";
 import { useTripPlan } from "../../hooks/useTripPlan";
 import { useStore } from "../../store/store";
-import { tripsToDisplay } from "../../utils/displayAdapters";
+import { tripsToDisplay, preferLiveTrips } from "../../utils/displayAdapters";
 import { resolveStationByName, resolveStationName } from "../../utils/resolveStation";
 
 function RouteCard({ route }: { route: JourneyRoute }) {
@@ -189,14 +189,43 @@ export default function JourneyScreen() {
     if (o && d) setQuery({ from: o.name, to: d.name });
   }, [params.originId, params.destinationId]);
 
+  useEffect(() => {
+    const qFrom = from.trim().toLowerCase().replace(/\s+station$/i, "");
+    const qTo = to.trim().toLowerCase().replace(/\s+station$/i, "");
+    if (!qFrom || !qTo || qFrom === qTo) return;
+    const exactFrom = SYDNEY_STATIONS.find(
+      (s) => s.name.toLowerCase().replace(/\s+station$/i, "") === qFrom
+    );
+    const exactTo = SYDNEY_STATIONS.find(
+      (s) => s.name.toLowerCase().replace(/\s+station$/i, "") === qTo
+    );
+    if (!exactFrom || !exactTo) return;
+    setQuery({ from: exactFrom.name, to: exactTo.name });
+  }, [from, to]);
+
   const canSearch = from.trim().length > 0 && to.trim().length > 0;
 
+  const stationIds = useMemo(() => {
+    if (!query) return {};
+    const orig = resolveStationByName(query.from);
+    const dest = resolveStationByName(query.to);
+    return {
+      originId: orig?.id,
+      destinationId: dest?.id,
+    };
+  }, [query]);
+
   const { data: appConfig } = useAppConfig();
-  const { data, isLoading, isError } = useTripPlan(query?.from ?? null, query?.to ?? null);
+  const { data, isLoading, isError } = useTripPlan(query?.from ?? null, query?.to ?? null, undefined, {
+    ...stationIds,
+    includePast: false,
+    fullDay: false,
+  });
   const routes = useMemo(() => {
     if (!query) return [];
-    if (data && data.length > 0) {
-      return tripsToDisplay(data, { showWalkLegs: appConfig?.showWalkLegsInTrips });
+    const liveTrips = preferLiveTrips(data);
+    if (liveTrips.length > 0) {
+      return tripsToDisplay(liveTrips, { showWalkLegs: appConfig?.showWalkLegsInTrips });
     }
     return [];
   }, [data, query, appConfig?.showWalkLegsInTrips]);

@@ -15,7 +15,7 @@ import { useColors } from "../hooks/useColors";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useTripPlan } from "../hooks/useTripPlan";
 import { useStore } from "../store/store";
-import { tripViaLabel, tripsToDisplay } from "../utils/displayAdapters";
+import { tripViaLabel, tripsToDisplay, preferLiveTrips } from "../utils/displayAdapters";
 import {
   formatRouteCodes,
   normalizeTripMode,
@@ -82,18 +82,14 @@ export default function TripResultsScreen() {
   const isBusTrip =
     planMode === "bus" || fromId.endsWith("_B") || toId.endsWith("_B");
 
-  const tripIsLive = (list: typeof fastPlan.data) =>
-    list?.some((t) => t.isLive === true || String(t.id || "").startsWith("real_trip_"));
-
   const data = useMemo(() => {
-    if (upcomingOnly) return fastPlan.data;
-    const full = fullPlan.data;
-    const fast = fastPlan.data;
-    if (!isBusTrip) return full?.length ? full : fast;
-    if (full?.length && tripIsLive(full)) return full;
-    if (fast?.length && tripIsLive(fast)) return fast;
-    return full?.length ? full : fast;
-  }, [upcomingOnly, isBusTrip, fastPlan.data, fullPlan.data]);
+    const raw = upcomingOnly
+      ? fastPlan.data
+      : fullPlan.data?.length
+        ? fullPlan.data
+        : fastPlan.data;
+    return preferLiveTrips(raw);
+  }, [upcomingOnly, fastPlan.data, fullPlan.data]);
 
   const usingFullDay = !upcomingOnly && Boolean(fullPlan.data?.length) && data === fullPlan.data;
   const isLoading = !data?.length && fastPlan.isLoading;
@@ -167,7 +163,7 @@ export default function TripResultsScreen() {
           second: "2-digit",
           hour12: true,
         })}`
-      : `Timetable times · refreshed ${formatSydneyTime(new Date(dataUpdatedAt), {
+      : `Updated ${formatSydneyTime(new Date(dataUpdatedAt), {
           hour: "numeric",
           minute: "2-digit",
           hour12: true,
@@ -318,7 +314,7 @@ export default function TripResultsScreen() {
               </Txt>
             ) : isFetching && !upcomingOnly ? (
               <Txt size={13} color={c.textSecondary} style={{ textAlign: "center" }}>
-                Refreshing timetable…
+                Refreshing live trips…
               </Txt>
             ) : null}
           </View>

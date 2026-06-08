@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Platform, Text, View } from "react-native";
 import { APP_CONFIG_DEFAULTS } from "../types/appConfig";
-import { Image } from "expo-image";
+import { AppLogo } from "../components/branding/AppLogo";
 import { useAppConfig } from "../hooks/useAppConfig";
-import { resolveAppLogoImageSource } from "../utils/appLogoUri";
 
 interface SplashScreenProps {
   visible: boolean;
@@ -13,7 +12,6 @@ const useNativeDriver = Platform.OS !== "web";
 
 export function SplashScreen({ visible }: SplashScreenProps) {
   const { data: appConfig } = useAppConfig();
-  const logoSource = resolveAppLogoImageSource(appConfig ?? APP_CONFIG_DEFAULTS);
   const appName = appConfig?.appName ?? APP_CONFIG_DEFAULTS.appName;
   const tagline = appConfig?.tagline ?? APP_CONFIG_DEFAULTS.tagline;
 
@@ -65,19 +63,7 @@ export function SplashScreen({ visible }: SplashScreenProps) {
       }}
     >
       <Animated.View style={{ transform: [{ scale }] }}>
-        <View
-          style={{
-            width: 104,
-            height: 104,
-            borderRadius: 28,
-            backgroundColor: "#0079C1",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-          }}
-        >
-          <Image source={logoSource} style={{ width: 72, height: 72 }} contentFit="contain" />
-        </View>
+        <AppLogo size={104} config={appConfig ?? APP_CONFIG_DEFAULTS} />
       </Animated.View>
 
       <Text

@@ -27,12 +27,14 @@ import {
   saveUploadedAppLogo,
 } from "./data/appLogoStore.js";
 
+import { config } from "./src/config/index.js";
+
 function getAdminToken() {
-  return (process.env.ADMIN_TOKEN || "sydney-transit-admin-dev").trim();
+  return config.admin.token;
 }
 
 function getAdminPassword() {
-  return (process.env.ADMIN_PASSWORD || "admin123").trim();
+  return config.admin.password;
 }
 
 export function requireAdmin(req, res, next) {
@@ -44,7 +46,17 @@ export function requireAdmin(req, res, next) {
 
 export function registerAdminRoutes(app, { __dirname: adminDir }) {
   const adminPath = join(adminDir, "admin");
-  app.use("/admin", express.static(adminPath));
+  const indexHtml = join(adminPath, "index.html");
+  app.get(["/admin", "/admin/"], (_req, res) => {
+    res.sendFile(indexHtml);
+  });
+  app.use(
+    "/admin",
+    express.static(adminPath, {
+      index: false,
+      redirect: false,
+    })
+  );
 
   app.post("/api/admin/login", (req, res) => {
     const { password } = req.body || {};

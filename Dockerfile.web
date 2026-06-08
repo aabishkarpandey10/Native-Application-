@@ -1,4 +1,4 @@
-# Build Expo web static export, serve with nginx
+# Build Expo web static export, serve with nginx (API/admin proxied to api service)
 FROM node:22-alpine AS builder
 
 WORKDIR /app
@@ -7,20 +7,27 @@ COPY package.json package-lock.json ./
 COPY backend/package.json backend/package-lock.json ./backend/
 COPY scripts/install-backend.mjs ./scripts/install-backend.mjs
 
-# postinstall → install-backend.mjs (script copied above); backend deps also installed explicitly.
 RUN npm ci && cd backend && npm ci
 
 COPY . .
 
-ARG EXPO_PUBLIC_API_URL=http://localhost:3000
+ARG EXPO_PUBLIC_API_URL=
+ARG EXPO_PUBLIC_API_SAME_ORIGIN=true
 ARG EXPO_PUBLIC_SUPABASE_URL=
 ARG EXPO_PUBLIC_SUPABASE_ANON_KEY=
 ARG EXPO_PUBLIC_SENTRY_DSN=
+ARG EXPO_PUBLIC_ENABLE_ADMIN=true
+ARG EXPO_PUBLIC_ENABLE_ASSISTANT=false
+ARG EXPO_PUBLIC_API_DEBUG=false
 
 ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+ENV EXPO_PUBLIC_API_SAME_ORIGIN=$EXPO_PUBLIC_API_SAME_ORIGIN
 ENV EXPO_PUBLIC_SUPABASE_URL=$EXPO_PUBLIC_SUPABASE_URL
 ENV EXPO_PUBLIC_SUPABASE_ANON_KEY=$EXPO_PUBLIC_SUPABASE_ANON_KEY
 ENV EXPO_PUBLIC_SENTRY_DSN=$EXPO_PUBLIC_SENTRY_DSN
+ENV EXPO_PUBLIC_ENABLE_ADMIN=$EXPO_PUBLIC_ENABLE_ADMIN
+ENV EXPO_PUBLIC_ENABLE_ASSISTANT=$EXPO_PUBLIC_ENABLE_ASSISTANT
+ENV EXPO_PUBLIC_API_DEBUG=$EXPO_PUBLIC_API_DEBUG
 ENV CI=1
 
 RUN npx tsc --noEmit && npx expo export --platform web && node scripts/patch-web-dist.mjs

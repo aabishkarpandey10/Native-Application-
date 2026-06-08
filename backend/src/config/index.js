@@ -5,8 +5,19 @@ import { dirname, join } from "path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../../..");
 
+// Platform env vars (Render/Railway PORT, JWT_SECRET, etc.) must win over local .env files.
 dotenv.config({ path: join(rootDir, ".env") });
-dotenv.config({ path: join(rootDir, "backend/.env"), override: true });
+dotenv.config({ path: join(rootDir, "backend/.env") });
+
+/** Admin panel: on by default in dev; in production set ENABLE_ADMIN=true. */
+export function isAdminEnabled() {
+  const flag = String(process.env.ENABLE_ADMIN ?? "")
+    .trim()
+    .toLowerCase();
+  if (flag === "true" || flag === "1") return true;
+  if (flag === "false" || flag === "0") return false;
+  return (process.env.NODE_ENV || "development") !== "production";
+}
 
 export const config = {
   port: Number(process.env.PORT) || 3000,
@@ -51,6 +62,11 @@ export const config = {
   openai: {
     apiKey: process.env.OPENAI_API_KEY?.trim() || "",
     model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+  },
+  admin: {
+    password: process.env.ADMIN_PASSWORD?.trim() || "admin123",
+    token: process.env.ADMIN_TOKEN?.trim() || "sydney-transit-admin-dev",
+    enabled: isAdminEnabled(),
   },
 };
 

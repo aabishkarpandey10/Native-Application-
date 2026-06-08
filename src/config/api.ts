@@ -46,6 +46,10 @@ function configuredUsesLocalhost(url: string | undefined): boolean {
   return /localhost|127\.0\.0\.1/i.test(url);
 }
 
+function usesSameOriginApi(): boolean {
+  return process.env.EXPO_PUBLIC_API_SAME_ORIGIN === "true";
+}
+
 export function isPrivateOrLocalHost(url: string): boolean {
   return /localhost|127\.0\.0\.1|192\.168\.|10\.\d+\.|172\.(1[6-9]|2\d|3[01])\./i.test(url);
 }
@@ -54,6 +58,9 @@ function collectIssues(configured: string | undefined, resolved: string): string
   const issues: string[] = [];
 
   if (!configured) {
+    if (usesSameOriginApi() && Platform.OS === "web") {
+      return issues;
+    }
     issues.push(
       "EXPO_PUBLIC_API_URL was not baked into this build — release APK defaults to an unreachable address"
     );
@@ -154,6 +161,9 @@ export function getApiBaseUrl(): string {
   const configured = readConfiguredApiUrl();
 
   if (Platform.OS === "web" && typeof window !== "undefined") {
+    if (usesSameOriginApi()) {
+      return window.location.origin;
+    }
     const { hostname, protocol } = window.location;
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `http://127.0.0.1:${port}`;
