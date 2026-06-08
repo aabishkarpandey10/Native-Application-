@@ -1,11 +1,11 @@
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = () => {
   const appJson = require("./app.json");
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() || "http://localhost:3000";
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() || "";
   const isPrivateOrLocal =
     !apiUrl ||
     /localhost|127\.0\.0\.1|192\.168\.|10\.\d+\.|172\.(1[6-9]|2\d|3[01])\./i.test(apiUrl);
-  const allowCleartext = apiUrl.startsWith("http://");
+  const allowCleartext = !apiUrl || apiUrl.startsWith("http://");
 
   const buildProfile = process.env.EAS_BUILD_PROFILE || "";
   const strictStoreRelease = buildProfile === "production";
@@ -55,7 +55,7 @@ module.exports = () => {
     },
     extra: {
       ...appJson.expo.extra,
-      apiUrl,
+      ...(apiUrl ? { apiUrl } : {}),
       eas: {
         ...(appJson.expo.extra?.eas ?? {}),
         buildProfile: buildProfile || undefined,

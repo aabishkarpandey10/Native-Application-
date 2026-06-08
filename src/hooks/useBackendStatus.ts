@@ -11,7 +11,7 @@ export function useBackendStatus() {
         throw new ApiRequestError("Backend health check failed", {
           path: "/api/health",
           url: getApiBaseUrl(),
-          hint: "Verify EXPO_PUBLIC_API_URL was set before building the APK",
+          hint: "Verify EXPO_PUBLIC_API_URL points to your deployed backend (set in Vercel/EAS before building)",
         });
       }
       return status;

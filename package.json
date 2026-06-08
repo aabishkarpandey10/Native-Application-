@@ -65,7 +65,7 @@
     "backend:stop": "node scripts/stop-backend.js",
     "dev": "node scripts/dev.mjs",
     "build": "node scripts/setup-env.mjs && node scripts/install-backend.mjs && npx tsc --noEmit && npx expo export --platform web && node scripts/patch-web-dist.mjs",
-    "build:vercel": "npx tsc --noEmit && npx expo export --platform web && node scripts/patch-web-dist.mjs",
+    "build:vercel": "node scripts/verify-vercel-env.mjs && npx tsc --noEmit && npx expo export --platform web && node scripts/patch-web-dist.mjs",
     "build:api": "node scripts/install-backend.mjs && cd backend && npm run build",
     "build:all": "npm run setup:env && npm run build && node --check backend/server.js",
     "prebuild:native": "expo prebuild --clean",

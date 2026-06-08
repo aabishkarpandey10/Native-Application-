@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import express from "express";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -36,10 +35,6 @@ import { getDeparturesWithCache, testTfnswConnection } from "./src/services/tfns
 import { attachWebSocket } from "./src/websocket/gateway.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const rootDir = join(__dirname, "..");
-// Root .env (from .env.example) then backend/.env overrides
-dotenv.config({ path: join(rootDir, ".env") });
-dotenv.config({ path: join(__dirname, ".env") });
 
 const app = express();
 const PORT = config.port;

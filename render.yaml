@@ -13,6 +13,8 @@ services:
         value: 0.0.0.0
       - key: ALLOW_MOCK_DATA
         value: "false"
+      - key: REDIS_ENABLED
+        value: "false"
       - key: API_REQUEST_LOG
         value: "false"
       - key: ENABLE_ADMIN
@@ -23,5 +25,6 @@ services:
         generateValue: true
       - key: PUBLIC_URL
         sync: false
+      # Allow Vercel web app + mobile clients. Set to your Vercel URL for tighter CORS.
       - key: CORS_ORIGIN
         value: "*"

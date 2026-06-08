@@ -6,8 +6,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, "../../..");
 
 // Platform env vars (Render/Railway PORT, JWT_SECRET, etc.) must win over local .env files.
-dotenv.config({ path: join(rootDir, ".env") });
-dotenv.config({ path: join(rootDir, "backend/.env") });
+const dotenvOpts = { override: false };
+dotenv.config({ path: join(rootDir, ".env"), ...dotenvOpts });
+dotenv.config({ path: join(rootDir, "backend/.env"), ...dotenvOpts });
 
 /** Admin panel: on by default in dev; in production set ENABLE_ADMIN=true. */
 export function isAdminEnabled() {

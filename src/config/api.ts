@@ -61,6 +61,12 @@ function collectIssues(configured: string | undefined, resolved: string): string
     if (usesSameOriginApi() && Platform.OS === "web") {
       return issues;
     }
+    if (Platform.OS === "web" && !__DEV__) {
+      issues.push(
+        "Set EXPO_PUBLIC_API_URL in Vercel (or your web host) to your deployed backend URL, e.g. https://your-api.onrender.com"
+      );
+      return issues;
+    }
     issues.push(
       "EXPO_PUBLIC_API_URL was not baked into this build — release APK defaults to an unreachable address"
     );
@@ -159,11 +165,19 @@ export function logApiConfigStartup(force = false): ApiConfigReport {
 export function getApiBaseUrl(): string {
   const port = process.env.EXPO_PUBLIC_API_PORT || "3000";
   const configured = readConfiguredApiUrl();
+  const normalized = configured?.replace(/\/$/, "");
 
   if (Platform.OS === "web" && typeof window !== "undefined") {
+    // Baked public API URL always wins (Vercel → Render/Railway, etc.)
+    if (normalized && !configuredUsesLocalhost(normalized)) {
+      return normalized;
+    }
+
+    // Docker / nginx: web and API share one origin
     if (usesSameOriginApi()) {
       return window.location.origin;
     }
+
     const { hostname, protocol } = window.location;
     if (hostname === "localhost" || hostname === "127.0.0.1") {
       return `http://127.0.0.1:${port}`;
@@ -171,8 +185,8 @@ export function getApiBaseUrl(): string {
     if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
       return `http://${hostname}:${port}`;
     }
-    if (configured && !/192\.168\.|10\.\d+\./.test(configured)) {
-      return configured.replace(/\/$/, "");
+    if (normalized) {
+      return normalized;
     }
     const scheme = protocol === "https:" ? "https" : "http";
     return `${scheme}://${hostname}:${port}`;

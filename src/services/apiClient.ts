@@ -63,7 +63,7 @@ function networkHint(url: string, message: string): string | undefined {
   if (__DEV__) return undefined;
 
   if (/localhost|127\.0\.0\.1/i.test(url)) {
-    return "Release APK cannot use localhost — rebuild with EXPO_PUBLIC_API_URL set to your server address";
+    return "API URL points to localhost — set EXPO_PUBLIC_API_URL to your deployed backend before building";
   }
   if (isPrivateOrLocalHost(url) && /network request failed|failed to fetch|timed out/i.test(message)) {
     return "LAN URL only works on the same Wi‑Fi as your backend, or use a public HTTPS URL";
