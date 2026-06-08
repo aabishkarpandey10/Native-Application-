@@ -1,35 +1,28 @@
 /**
- * Fail Vercel builds early when EXPO_PUBLIC_API_URL is missing or points at localhost.
- * Vercel hosts the static web app only — the Express API runs on Render/Railway/etc.
+ * Vercel build checks — unified deploy (web + API on Vercel) or split deploy (API elsewhere).
  */
-const apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
 const onVercel = process.env.VERCEL === "1";
+if (!onVercel) process.exit(0);
 
-if (!onVercel) {
-  process.exit(0);
+const sameOrigin = process.env.EXPO_PUBLIC_API_SAME_ORIGIN === "true";
+let apiUrl = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
+
+if (sameOrigin && !apiUrl && process.env.VERCEL_URL) {
+  apiUrl = `https://${process.env.VERCEL_URL}`;
+  process.env.EXPO_PUBLIC_API_URL = apiUrl;
+  console.log(`[Vercel] EXPO_PUBLIC_API_SAME_ORIGIN — API URL → ${apiUrl}`);
 }
 
 if (!apiUrl) {
   console.error(`
-[Vercel] EXPO_PUBLIC_API_URL is not set.
-
-In Vercel → Project → Settings → Environment Variables, add:
-  EXPO_PUBLIC_API_URL = https://your-backend.onrender.com
-
-Also set (recommended):
-  EXPO_PUBLIC_API_SAME_ORIGIN = false
+[Vercel] Set EXPO_PUBLIC_API_URL or EXPO_PUBLIC_API_SAME_ORIGIN=true (unified web+API deploy).
 `);
   process.exit(1);
 }
 
 if (/localhost|127\.0\.0\.1/i.test(apiUrl)) {
-  console.error(`
-[Vercel] EXPO_PUBLIC_API_URL cannot be localhost in production.
-Current value: ${apiUrl}
-
-Set it to your deployed backend URL, e.g. https://your-backend.onrender.com
-`);
+  console.error(`[Vercel] EXPO_PUBLIC_API_URL cannot be localhost. Current: ${apiUrl}`);
   process.exit(1);
 }
 
-console.log(`[Vercel] EXPO_PUBLIC_API_URL OK → ${apiUrl.replace(/\/$/, "")}`);
+console.log(`[Vercel] API URL OK → ${apiUrl.replace(/\/$/, "")}`);

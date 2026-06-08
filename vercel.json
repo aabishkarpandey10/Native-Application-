@@ -5,6 +5,18 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist",
   "env": {
-    "EXPO_PUBLIC_API_SAME_ORIGIN": "false"
+    "EXPO_PUBLIC_API_SAME_ORIGIN": "true"
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" },
+    { "source": "/admin", "destination": "/api" },
+    { "source": "/admin/:path*", "destination": "/api" },
+    { "source": "/health", "destination": "/api" }
+  ],
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
   }
 }

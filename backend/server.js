@@ -374,12 +374,12 @@ if (isAdminEnabled()) {
 const productionCheck = validateProductionConfig();
 for (const w of productionCheck.warnings) console.warn(`[config] ${w}`);
 for (const e of productionCheck.errors) console.error(`[config] ${e}`);
-if (productionCheck.errors.length && config.nodeEnv === "production") {
+if (productionCheck.errors.length && config.nodeEnv === "production" && !process.env.VERCEL) {
   console.error("Refusing to start with invalid production configuration.");
   process.exit(1);
 }
 
-const server = app.listen(PORT, HOST, async () => {
+async function onServerReady() {
   try {
     const { warmLightRailTimetables, warmMetroTimetables, warmBusTimetableIndex } =
       await import("./data/timetableLoader.js");
@@ -422,19 +422,28 @@ const server = app.listen(PORT, HOST, async () => {
       "TfNSW API key NOT set — using mock timetables. Run: npm run setup:env (from .env.example)"
     );
   }
-});
+}
 
-attachWebSocket(server);
+export default app;
 
-server.on("error", (err) => {
-  if (err.code === "EADDRINUSE") {
-    console.error(
-      `\nPort ${PORT} is already in use — the backend is probably already running.\n` +
-        `  • Use the app as-is: http://localhost:${PORT}/api/status\n` +
-        `  • Or stop the old process, then run npm run backend again:\n` +
-        `    Get-NetTCPConnection -LocalPort ${PORT} | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }\n`
-    );
-    process.exit(1);
-  }
-  throw err;
-});
+// Vercel serverless: export app only. Docker/local: listen on PORT.
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, HOST, () => {
+    onServerReady().catch((err) => console.warn("Startup warmup failed:", err.message));
+  });
+
+  attachWebSocket(server);
+
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.error(
+        `\nPort ${PORT} is already in use — the backend is probably already running.\n` +
+          `  • Use the app as-is: http://localhost:${PORT}/api/status\n` +
+          `  • Or stop the old process, then run npm run backend again:\n` +
+          `    Get-NetTCPConnection -LocalPort ${PORT} | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }\n`
+      );
+      process.exit(1);
+    }
+    throw err;
+  });
+}
