@@ -219,6 +219,11 @@ export function sydneyServiceDayStart(ref = new Date()) {
   return start;
 }
 
+/** End of the Sydney service day (04:00 next calendar morning). */
+export function sydneyServiceDayEnd(ref = new Date()) {
+  return new Date(sydneyServiceDayStart(ref).getTime() + 24 * 3600 * 1000);
+}
+
 /**
  * Map timetable HH:MM onto the current Sydney service day (starts 04:00).
  * Handles after-midnight times (00:xx–03:xx → next calendar day) and GTFS

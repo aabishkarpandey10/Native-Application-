@@ -171,16 +171,16 @@ export async function planTripsForStations(
         })) || []
       : [];
 
-    const timetableSupplement = liveItineraries.length
-      ? []
-      : planTripsFromTimetable(origin, dest, planDate, REST_OF_DAY_TRIP_CAP, {
-          includePast: true,
-          fullDay: true,
-          fastMode: true,
-        });
+    const timetableSupplement = planTripsFromTimetable(origin, dest, planDate, REST_OF_DAY_TRIP_CAP, {
+      includePast: true,
+      fullDay: true,
+      fastMode: true,
+    });
 
     const merged = mergeLiveAndTimetableTrips(liveItineraries, timetableSupplement, {
       includePast: true,
+      supplementTimetable: true,
+      serviceDayRef: planDate,
     });
 
     const payload = {

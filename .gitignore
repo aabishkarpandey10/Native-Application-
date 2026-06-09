@@ -36,7 +36,9 @@ backend/.env
 backend/data/app-data.json
 backend/data/uploads/
 .env*.local
+.env.vercel*
 .env*.example
+.vercel
 
 # typescript
 *.tsbuildinfo
@@ -55,3 +57,5 @@ backend/data/timetables/bus-weekday.json
 # generated native folders
 /ios
 /android
+
+.vercel

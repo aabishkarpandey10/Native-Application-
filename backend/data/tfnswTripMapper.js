@@ -235,7 +235,7 @@ export function mapTfnswJourneys(journeys, origin, dest) {
 }
 
 export function calcTfnswTripCount(origin, dest, includePast = false, fullDay = false) {
-  if (fullDay) return 40;
+  if (fullDay) return 60;
   if (includePast) return 20;
   const modes = [origin?.mode, dest?.mode].map((m) =>
     m === "lightrail" ? "light_rail" : m

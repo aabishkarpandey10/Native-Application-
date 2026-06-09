@@ -1,7 +1,7 @@
 import { STATION_BY_ID, getLinesForStation } from "./trainNetworkData.js";
 import { findBranchPath } from "./trainNetworkPath.js";
 import { buildLineStopSequence } from "./stopSequence.js";
-import { parseTfnswTime, toIsoString } from "./tfnswTime.js";
+import { parseTfnswTime, sydneyServiceDayEnd, sydneyServiceDayStart, toIsoString } from "./tfnswTime.js";
 
 /**
  * Find the shortest same-branch train path between two stations (no transfers).
@@ -271,18 +271,11 @@ function isImplausibleTrainItinerary(itinerary) {
   return false;
 }
 
-/** Prefer TfNSW live trips; PDF timetable is used only when live is unavailable. */
-export function mergeLiveAndTimetableTrips(liveTrips, timetableTrips, { includePast = false } = {}) {
-  const live = (liveTrips || []).map((it) => ({ ...it, isLive: true }));
-  if (live.length) {
-    return live
-      .map(normalizeItineraryTimes)
-      .sort(
-        (a, b) =>
-          parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
-      );
-  }
+function departureMinuteKey(itinerary) {
+  return Math.round(parseTfnswTime(itinerary.departureTime).getTime() / 60_000);
+}
 
+function filterTimetableTrips(timetableTrips, { includePast = false, serviceDayRef } = {}) {
   const timetable = (timetableTrips || []).map((it) => ({
     ...it,
     isLive: false,
@@ -290,10 +283,14 @@ export function mergeLiveAndTimetableTrips(liveTrips, timetableTrips, { includeP
   if (!timetable.length) return [];
 
   const now = Date.now();
+  const dayStart = serviceDayRef ? sydneyServiceDayStart(serviceDayRef).getTime() : null;
+  const dayEnd = serviceDayRef ? sydneyServiceDayEnd(serviceDayRef).getTime() : null;
+
   return timetable
     .filter((it) => {
       if (isImplausibleTrainItinerary(it)) return false;
       const depMs = parseTfnswTime(it.departureTime).getTime();
+      if (dayStart != null && (depMs < dayStart || depMs >= dayEnd)) return false;
       if (!includePast && depMs < now - 3 * 60_000) return false;
       if (includePast) {
         const legs = it.legs || [];
@@ -305,11 +302,44 @@ export function mergeLiveAndTimetableTrips(liveTrips, timetableTrips, { includeP
       }
       return true;
     })
-    .map(normalizeItineraryTimes)
-    .sort(
+    .map(normalizeItineraryTimes);
+}
+
+/** Prefer TfNSW live trips; timetable fills gaps for full-day views. */
+export function mergeLiveAndTimetableTrips(
+  liveTrips,
+  timetableTrips,
+  { includePast = false, supplementTimetable = false, serviceDayRef } = {}
+) {
+  const live = (liveTrips || []).map((it) => ({ ...it, isLive: true })).map(normalizeItineraryTimes);
+
+  if (live.length && supplementTimetable) {
+    const timetable = filterTimetableTrips(timetableTrips, { includePast, serviceDayRef });
+    const liveDepMinutes = new Set(live.map(departureMinuteKey));
+    const extra = timetable.filter((it) => {
+      const depMin = departureMinuteKey(it);
+      for (const liveMin of liveDepMinutes) {
+        if (Math.abs(liveMin - depMin) <= 2) return false;
+      }
+      return true;
+    });
+    return [...live, ...extra].sort(
       (a, b) =>
         parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
     );
+  }
+
+  if (live.length) {
+    return live.sort(
+      (a, b) =>
+        parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
+    );
+  }
+
+  return filterTimetableTrips(timetableTrips, { includePast, serviceDayRef }).sort(
+    (a, b) =>
+      parseTfnswTime(a.departureTime).getTime() - parseTfnswTime(b.departureTime).getTime()
+  );
 }
 
 /** Fast path for imported timetables — dedupe by departure minute only. */

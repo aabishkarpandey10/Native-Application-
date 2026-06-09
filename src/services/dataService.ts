@@ -379,9 +379,11 @@ export async function planTripWithDb(
     `/api/trip?originId=${encodeURIComponent(orig.id)}&destinationId=${encodeURIComponent(dest.id)}${departParam}${pastParam}${fullDayParam}${refreshParam}`,
     {
       timeoutMs:
-        options?.fullDay || options?.includePast || orig.mode === "bus" || dest.mode === "bus"
-          ? 12_000
-          : 5_000,
+        options?.fullDay
+          ? 25_000
+          : options?.includePast || orig.mode === "bus" || dest.mode === "bus"
+            ? 12_000
+            : 5_000,
     }
   );
   if (journeys && journeys.length > 0) {

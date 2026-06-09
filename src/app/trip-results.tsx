@@ -15,7 +15,12 @@ import { useColors } from "../hooks/useColors";
 import { useAppConfig } from "../hooks/useAppConfig";
 import { useTripPlan } from "../hooks/useTripPlan";
 import { useStore } from "../store/store";
-import { tripViaLabel, tripsToDisplay, preferLiveTrips } from "../utils/displayAdapters";
+import {
+  tripBoardPlatform,
+  tripViaLabel,
+  tripsToDisplay,
+  preferLiveTrips,
+} from "../utils/displayAdapters";
 import {
   formatRouteCodes,
   normalizeTripMode,
@@ -88,7 +93,7 @@ export default function TripResultsScreen() {
       : fullPlan.data?.length
         ? fullPlan.data
         : fastPlan.data;
-    return preferLiveTrips(raw);
+    return preferLiveTrips(raw, { fullDay: !upcomingOnly });
   }, [upcomingOnly, fastPlan.data, fullPlan.data]);
 
   const usingFullDay = !upcomingOnly && Boolean(fullPlan.data?.length) && data === fullPlan.data;
@@ -380,6 +385,7 @@ export default function TripResultsScreen() {
                 isPast={r.isPast}
                 onTime={!r.isPast}
                 realtime={!isError && !r.isPast && r.isLive === true}
+                originPlatform={r.itinerary ? tripBoardPlatform(r.itinerary) : undefined}
                 viaLabel={r.itinerary ? tripViaLabel(r.itinerary) : undefined}
                 platformLabel={isBusTrip ? "Stand" : "Plat"}
                 onPress={() => setSelectedTrip(r)}

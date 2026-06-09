@@ -14,9 +14,40 @@ export function tripIsLiveItinerary(t: TripItinerary): boolean {
   return t.isLive === true || String(t.id || "").startsWith("real_trip_");
 }
 
-/** When TfNSW live trips exist, drop PDF/GTFS scheduled-only rows. */
-export function preferLiveTrips(list: TripItinerary[] | null | undefined): TripItinerary[] {
+function departureMinuteKey(t: TripItinerary): number {
+  return Math.round(asDate(t.departureTime).getTime() / 60_000);
+}
+
+/** Upcoming-only: prefer live rows. Full-day: keep timetable + live, dedupe within 2 min. */
+export function preferLiveTrips(
+  list: TripItinerary[] | null | undefined,
+  options?: { fullDay?: boolean }
+): TripItinerary[] {
   if (!list?.length) return [];
+  if (options?.fullDay) {
+    const sorted = [...list].sort(
+      (a, b) => asDate(a.departureTime).getTime() - asDate(b.departureTime).getTime()
+    );
+    const kept: TripItinerary[] = [];
+    const liveMinutes = new Set<number>();
+    for (const trip of sorted) {
+      const depMin = departureMinuteKey(trip);
+      if (tripIsLiveItinerary(trip)) {
+        kept.push(trip);
+        liveMinutes.add(depMin);
+        continue;
+      }
+      let nearLive = false;
+      for (const liveMin of liveMinutes) {
+        if (Math.abs(liveMin - depMin) <= 2) {
+          nearLive = true;
+          break;
+        }
+      }
+      if (!nearLive) kept.push(trip);
+    }
+    return kept;
+  }
   const live = list.filter(tripIsLiveItinerary);
   return live.length ? live : list;
 }
@@ -161,18 +192,45 @@ export function tripToDisplay(
   };
 }
 
+export function tripBoardPlatform(t: TripItinerary): string | undefined {
+  const leg = transitLegs(t.legs)[0];
+  if (!leg?.platform) return undefined;
+  const p = cleanPlatform(leg.platform);
+  return p !== "—" ? p : undefined;
+}
+
 export function tripViaLabel(t: TripItinerary): string | undefined {
-  const busLegs = t.legs.filter((l) => l.mode === "bus");
-  if (!busLegs.length) return undefined;
-  const parts = busLegs.map((leg) => {
+  const legs = transitLegs(t.legs);
+  if (!legs.length) return undefined;
+
+  const parts: string[] = [];
+
+  if (legs.length > 1) {
+    const via = legs
+      .slice(0, -1)
+      .map((leg) => shortStop(leg.destinationName || ""))
+      .filter(Boolean);
+    if (via.length) parts.push(`via ${via.join(", ")}`);
+    parts.push(`${legs.length - 1} change${legs.length > 2 ? "s" : ""}`);
+  }
+
+  const durationMin =
+    t.duration ||
+    Math.max(
+      0,
+      Math.round(
+        (asDate(t.arrivalTime).getTime() - asDate(t.departureTime).getTime()) / 60000
+      )
+    );
+  if (durationMin > 0) parts.push(`${durationMin} min`);
+
+  for (const leg of legs.filter((l) => l.mode === "bus")) {
     const route = String(leg.routeNumber || "Bus").toUpperCase();
-    const dest = shortStop(leg.destinationName || "");
     const stops = leg.stopTimes?.length ?? leg.stops?.length ?? 0;
-    if (stops > 2) return `Route ${route} · ${stops} stops to ${dest}`;
-    if (dest) return `Route ${route} to ${dest}`;
-    return `Route ${route}`;
-  });
-  return parts.join(" · ");
+    if (stops > 2) parts.push(`Route ${route} · ${stops} stops`);
+  }
+
+  return parts.length ? parts.join(" · ") : undefined;
 }
 
 export function tripsToDisplay(
